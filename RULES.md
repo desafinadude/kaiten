@@ -67,6 +67,23 @@ After round 7, score the game.
 | Front Door | Take the first-player marker for next round. Gain 1 Wasabi and draw 1 dish from the deck as an order. | 1 |
 | Staff Room | Pay 2 Wasabi to hire your apprentice. They work from next round on (4 chefs). | 1 |
 
+## Events
+
+At the start of rounds 2, 4 and 6, turn over the top card of the shuffled event deck. It lasts for that
+round only.
+
+| Event | Effect |
+| --- | --- |
+| Health Inspection | Anyone holding more than 4 fish discards the extra. Everyone holding 4 or fewer gains 1 VP. |
+| Food Blogger | Every dish served this round scores 1 extra VP. |
+| Tuna Auction | The Fish Market gives 1 extra fish this round. |
+| Rice Shortage | The Pantry gives 1 fewer staple this round (at least 1). |
+| Summer Matsuri | Every chef gains 1 wasabi. |
+| Celebrity Chef | The first chef to serve a Special this round gains 3 VP. |
+| Power Cut | Nobody can use the Kaiten Belt station this round (the belt still turns at the end). |
+
+VP from events counts toward your final score.
+
 ## Ingredients, orders and cooking
 
 - **Rice** and **Nori** are staples and come from the Pantry.
@@ -95,6 +112,7 @@ satisfy several over the game.
   your counter. Specials don't count toward sets.
 - **Regulars:** the VP on each regular you won.
 - **Game-end cards:** effects that score at the end.
+- **Events:** VP gained from event cards.
 
 Most VP wins. Ties go to the player with more dishes served, then to the
 player with more Wasabi left.
