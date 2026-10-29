@@ -9,7 +9,8 @@ its cream gutter trimmed off, then scaled and saved under the name the game expe
 """
 from pathlib import Path
 
-from PIL import Image
+import numpy as np
+from PIL import Image, ImageFilter
 
 ROOT = Path(__file__).resolve().parent.parent
 SHEETS = ROOT / 'art' / 'sheets'
@@ -29,10 +30,10 @@ TEXTURES = ['tex-table', 'tex-tray', 'tex-noren', 'tex-belt', 'tex-ice', 'tex-pa
 SPECS = {
     1: dict(cols=2, rows=2, size=256, cells=CHEFS),
     2: dict(cols=4, rows=3, size=192, cells=REGS),
-    3: dict(cols=4, rows=4, size=320, cells=[f'dish-{c}' if c else None for c in SHEET3]),
-    4: dict(cols=4, rows=3, size=320, cells=[f'dish-{c}' for c in SHEET4]),
-    5: dict(cols=4, rows=2, size=128, cells=INGS),
-    6: dict(cols=4, rows=2, size=128, cells=STATIONS),
+    3: dict(cols=4, rows=4, size=320, cells=[f'dish-{c}' if c else None for c in SHEET3], key=True),
+    4: dict(cols=4, rows=3, size=320, cells=[f'dish-{c}' for c in SHEET4], key=True),
+    5: dict(cols=4, rows=2, size=128, cells=INGS, key=True),
+    6: dict(cols=4, rows=2, size=128, cells=STATIONS, key=True),
     7: dict(cols=3, rows=2, size=512, cells=TEXTURES, texture=True),
     8: dict(cols=2, rows=1, size=512, cells=['icon', 'maskable'], icon=True),
 }
@@ -61,6 +62,45 @@ def trim_gutter(cell):
     while bottom > h * 0.92 and line_is_gutter([(x, bottom - 1) for x in range(0, w, 4)]):
         bottom -= 1
     return cell.crop((left, top, right, bottom))
+
+
+def key_out(cell, tol=26):
+    """Make the plain background around the subject transparent, then crop to the subject.
+
+    The background colour is read from the cell border; only background-coloured pixels that
+    connect to the border are removed, so cream rice or white plates inside the subject stay.
+    """
+    a = np.asarray(cell.convert('RGB')).astype(np.int16)
+    h, w, _ = a.shape
+    border = np.concatenate([a[0], a[-1], a[:, 0], a[:, -1]])
+    bg = np.median(border, axis=0)
+    dist = np.abs(a - bg).max(axis=2)
+    cand = dist < tol
+    region = np.zeros_like(cand)
+    region[0, :], region[-1, :], region[:, 0], region[:, -1] = cand[0, :], cand[-1, :], cand[:, 0], cand[:, -1]
+    while True:
+        grown = region.copy()
+        grown[1:] |= region[:-1]; grown[:-1] |= region[1:]
+        grown[:, 1:] |= region[:, :-1]; grown[:, :-1] |= region[:, 1:]
+        grown &= cand
+        if (grown == region).all():
+            break
+        region = grown
+    # soft edge: fade pixels that are close to the background colour near the cut line
+    soft = np.clip((dist - tol * 0.5) / (tol * 1.5), 0, 1)
+    alpha = np.where(region, 0, 255).astype(np.uint8)
+    alpha_img = Image.fromarray(alpha).filter(ImageFilter.GaussianBlur(1.2))
+    alpha = np.minimum(np.asarray(alpha_img), np.where(region, 0, np.maximum(soft * 255, np.asarray(alpha_img)))).astype(np.uint8)
+    rgba = np.dstack([a.astype(np.uint8), alpha])
+    out = Image.fromarray(rgba, 'RGBA')
+    box = Image.fromarray((alpha > 24).astype(np.uint8) * 255).getbbox()
+    if box:
+        out = out.crop(box)
+    # centre on a square transparent canvas with a little breathing room
+    s = int(max(out.size) * 1.06)
+    canvas = Image.new('RGBA', (s, s), (0, 0, 0, 0))
+    canvas.paste(out, ((s - out.width) // 2, (s - out.height) // 2))
+    return canvas
 
 
 def square(img):
@@ -93,9 +133,14 @@ def main():
             c, r = i % spec['cols'], i // spec['cols']
             cell = sheet.crop((round(c * cw), round(r * ch), round((c + 1) * cw), round((r + 1) * ch)))
             if spec.get('texture'):
-                # cut well inside the gutters so the tile edges are pure texture
-                m = int(min(cell.size) * 0.06)
+                # trim the gutters, then a hair more, so the tile edges are pure texture
+                cell = trim_gutter(cell)
+                m = int(min(cell.size) * 0.012)
                 cell = square(cell.crop((m, m, cell.width - m, cell.height - m)))
+            elif spec.get('key'):
+                cell = trim_gutter(cell)
+                m = int(min(cell.size) * 0.03)  # drop any tinted gutter line the trim left behind
+                cell = key_out(cell.crop((m, m, cell.width - m, cell.height - m)))
             else:
                 cell = square(trim_gutter(cell))
             if spec.get('icon'):
