@@ -4,7 +4,8 @@ A small-box worker-placement and set-collection card game about running a stall 
 sushi bar. 2–4 players, about 30 minutes.
 
 - **Play it:** open `index.html` in a browser (you against 1–3 bot chefs). It fits one screen on phone,
-  tablet and desktop, and can be installed to a home screen.
+  tablet and desktop, and can be installed to a home screen. Music, restaurant ambience and sound
+  effects are synthesised in the browser (toggle them in the menu).
 - **Rules and card list:** [RULES.md](RULES.md)
 - **Balance check:** `node sim.cjs 1000` plays bot-vs-bot games and reports scores, seat win rates and
   per-card win rates.
