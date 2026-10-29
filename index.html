@@ -30,7 +30,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .pc0{--pc:var(--p0)}.pc1{--pc:var(--p1)}.pc2{--pc:var(--p2)}.pc3{--pc:var(--p3)}
 
 /* noren header */
-.noren{position:relative;flex:none;background:linear-gradient(rgba(20,38,64,0),rgba(20,38,64,.45)),url(art/tex-noren.webp) 0 0/360px,linear-gradient(var(--indigo),var(--indigo-2));color:#f4efe4;box-shadow:0 4px 0 rgba(0,0,0,.25);z-index:2}
+.noren{position:relative;flex:none;background:linear-gradient(rgba(20,38,64,0),rgba(20,38,64,.45)),url(art/tex-noren.webp) 0 0/360px,linear-gradient(var(--indigo),var(--indigo-2));color:#f4efe4;box-shadow:0 4px 0 rgba(0,0,0,.25);z-index:8}
 .noren::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:10px;background:repeating-linear-gradient(90deg,var(--indigo-2) 0 calc(12.5% - 4px),transparent calc(12.5% - 4px) 12.5%);pointer-events:none}
 .noren .in{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;min-height:62px}
 .logo{display:flex;align-items:baseline;gap:8px}
@@ -79,21 +79,17 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 /* wooden table */
 .table{flex:1;min-height:0;margin-top:14px;background:url(art/tex-table.webp) 0 0/480px,linear-gradient(var(--wood),var(--wood-2));box-shadow:inset 0 3px 0 rgba(255,255,255,.4)}
 .table>.in{height:100%;padding-top:12px;padding-bottom:12px}
-.tin{height:100%;display:grid;grid-template-columns:262px minmax(0,1fr) 280px;grid-template-areas:"market kitchen room";gap:14px}
+.tin{height:100%;display:grid;grid-template-columns:214px minmax(0,1fr);grid-template-areas:"market kitchen";gap:16px}
 .pane{min-height:0;min-width:0;display:flex;flex-direction:column;gap:8px}
-.pane-market{grid-area:market}.pane-kitchen{grid-area:kitchen}.pane-room{grid-area:room}
+.pane-market{grid-area:market}.pane-kitchen{grid-area:kitchen}
 .ph{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex:none}
 .ph h2{margin:0;font-family:var(--disp);font-weight:400;font-size:16px}
 .ph .kj{font-family:var(--disp);color:var(--lac);font-size:13px}
 .ph p{margin:0;font-size:12px;color:var(--ink-2)}
 .scroll{flex:1;min-height:0;overflow:auto;padding:2px 6px 14px 2px;-webkit-mask-image:linear-gradient(#000 calc(100% - 22px),transparent);mask-image:linear-gradient(#000 calc(100% - 22px),transparent)}
-.ptabs{display:none;gap:6px;flex:none}
-.ptab{flex:1;border:0;border-radius:10px 10px 4px 4px;min-height:42px;background:var(--wood-3);color:#3a2814;font-weight:900;cursor:pointer;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
-.ptab .kj{font-family:var(--disp);font-size:11px;opacity:.75;margin-left:4px}
-.ptab.on{background:var(--paper);color:var(--ink);box-shadow:0 3px 0 var(--wood-dk)}
 
 /* stations */
-.stations{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px 10px}
+.stations{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px 10px}
 .board{position:relative;text-align:left;cursor:default;border:2px solid var(--wood-dk);border-radius:12px;padding:10px 10px 9px;display:flex;flex-direction:column;gap:4px;min-height:140px;background:linear-gradient(rgba(255,246,224,.38),rgba(255,246,224,.2)),url(art/tex-table.webp) 0 0/300px,linear-gradient(#f3e0b9,#e3c48e);box-shadow:0 4px 0 var(--wood-dk),0 8px 12px rgba(60,35,10,.22);opacity:.62;filter:saturate(.6)}
 .board.can{opacity:1;filter:none;cursor:pointer;border-color:var(--lac);box-shadow:0 4px 0 var(--lac-2),0 0 0 3px rgba(194,52,42,.25),0 10px 16px rgba(60,35,10,.3);animation:glow 1.6s ease-in-out infinite}
 .board.can:hover{transform:translateY(-2px)}
@@ -124,12 +120,6 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .stamp{position:absolute;right:8px;top:50%;margin-top:-17px;width:34px;height:34px;border-radius:50%;border:2.5px solid var(--lac);color:var(--lac);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;transform:rotate(-10deg)}
 .hint{margin:2px 0 10px;font-size:12px;color:var(--ink-2)}
 
-/* diners */
-.paper{background:url(art/tex-paper.webp) 0 0/320px,var(--paper);border-radius:12px;box-shadow:0 4px 0 var(--paper-2),0 8px 14px rgba(60,35,10,.2);display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
-.stabs{display:flex;border-bottom:2px solid var(--paper-2);flex:none}
-.stab{flex:1;border:0;background:transparent;min-height:42px;font-weight:900;color:var(--ink-2);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
-.stab.on{color:var(--lac);border-bottom-color:var(--lac)}
-.paper .scroll{padding:6px 12px 14px}
 .seat{display:flex;flex-direction:column;gap:6px;padding:8px 0 10px;border-bottom:1px dashed var(--paper-2)}
 .seat-h{display:flex;align-items:center;gap:8px}
 .seat-h .face{width:34px;height:34px}
@@ -156,7 +146,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 
 /* your counter */
 .tray{flex:none;background:url(art/tex-tray.webp) 0 0/420px,linear-gradient(#a87b45,#8b6033);box-shadow:inset 0 4px 0 rgba(255,255,255,.18),0 -6px 14px rgba(0,0,0,.25);color:#fff7e8}
-.tray .in{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:18px;align-items:start;padding-top:12px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.tray .in{display:grid;grid-template-columns:auto minmax(0,1fr) 236px auto;grid-template-areas:"pantry orders regs plates" "pantry orders regs me";grid-template-rows:auto 1fr;gap:6px 18px;align-items:start;padding-top:12px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 .tlabel{font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#f3dcb5}
 .tcol{display:flex;flex-direction:column;gap:8px;min-width:0}
 .bowls{display:grid;grid-template-columns:repeat(4,46px);gap:8px 6px}
@@ -182,8 +172,8 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .stack .lb{font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#f3dcb5}
 .sets{font-size:11.5px;color:#f3dcb5}
 .sets b{color:#fff;font-family:var(--disp);font-weight:400}
-.me{align-items:center}
-.mebig{width:58px;height:58px}
+.t-pantry{grid-area:pantry}.t-orders{grid-area:orders}.t-regs{grid-area:regs}.t-plates{grid-area:plates}.t-me{grid-area:me}
+.t-me{flex-direction:row;align-items:center}
 .chefs{display:flex;gap:2px;min-height:30px;align-items:flex-end}
 .chefs .face{width:28px;height:28px}
 
@@ -231,21 +221,73 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
   .belt .plabel .ab{display:none}
   .table{margin-top:12px}
   .table>.in{padding-top:10px;padding-bottom:10px}
-  .board{min-height:116px;padding:8px 9px 8px}
-  .board .bt{font-size:11.5px}
+  .board{min-height:104px;padding:8px 9px 8px}
+  .board .bt{font-size:11.5px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
   .orders{padding-top:10px}
   .oticket{padding:10px 9px 7px}
   .oticket .thumb{width:46px;height:34px}
   .tray .in{padding-top:10px;padding-bottom:10px}
 }
-@media (min-width:1000px) and (max-width:1120px){.tin{grid-template-columns:228px minmax(0,1fr) 248px}}
+/* header menu */
+.lshort{display:none}
+.burger{width:44px;height:44px;border:0;border-radius:10px;background:rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex:none}
+.burger span{display:block;width:20px;height:2.5px;border-radius:2px;background:#f4efe4}
+.burger:hover{background:rgba(255,255,255,.18)}
+.menu-veil{position:fixed;inset:0;border:0;background:transparent;z-index:14;cursor:default}
+.menu{position:absolute;top:calc(100% + 4px);right:max(16px,calc((100% - 1200px) / 2 + 16px));z-index:15;background:url(art/tex-paper.webp) 0 0/320px,var(--paper);border-radius:12px;box-shadow:0 6px 0 var(--paper-2),0 16px 40px rgba(0,0,0,.45);padding:6px;display:flex;flex-direction:column;min-width:200px;border-top:5px solid var(--lac)}
+.menu button{border:0;background:transparent;text-align:left;padding:0 14px;min-height:44px;border-radius:8px;font-weight:900;color:var(--ink);cursor:pointer}
+.menu button:hover{background:var(--paper-2)}
+.menu .mnew{color:var(--lac)}
+/* rival bar */
+.crew{flex:none;background:linear-gradient(#2c231b,#1f1813);color:#f4efe4;box-shadow:inset 0 2px 0 rgba(255,255,255,.06)}
+.crew .in{display:flex;align-items:center;gap:8px;padding-top:7px;padding-bottom:7px;overflow-x:auto}
+.mate{display:flex;align-items:center;gap:8px;flex:none;padding:3px 10px 3px 4px;border-radius:12px;background:rgba(255,255,255,.06);border:2px solid transparent;color:#f4efe4;cursor:pointer;text-align:left}
+.mate:hover{background:rgba(255,255,255,.12)}
+.mate.on{border-color:#ffd27a;background:rgba(255,210,122,.12)}
+.mate>.face{width:32px;height:32px}
+.mate .mid{display:flex;flex-direction:column;gap:2px}
+.mate .top{display:flex;align-items:baseline;gap:8px}
+.mate .nm{font-weight:900;font-size:13px;line-height:1.1}
+.mate .vp{font-family:var(--disp);font-size:15px;color:#ff8a6e;line-height:1}
+.pips{display:flex;gap:7px;align-items:center;font-size:12px;font-weight:700;font-variant-numeric:tabular-nums}
+.pip{display:inline-flex;align-items:center;gap:3px}
+.pip .pd{width:13px;height:8px;border-radius:50%;background:var(--cat);border:1.5px solid #fffdf8}
+.pip .ic{width:15px;height:15px}
+.pip .mf{width:15px;height:15px;box-shadow:none}
+.setb{font-size:8.5px;font-weight:900;letter-spacing:.06em;background:var(--gold);color:#2b1f14;border-radius:3px;padding:0 3px}
+.regb{width:12px;height:12px;border-radius:50%;border:2px solid #ff8a6e;display:inline-block}
+.ordb{width:10px;height:13px;border-radius:2px;background:var(--paper);display:inline-block;box-shadow:inset 0 3px 0 #9aa3a6}
+.lastev{flex:1 1 180px;min-width:160px;display:flex;gap:7px;align-items:center;font-size:12px;color:#d9cfbf}
+.lastev .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lastev .ld{width:9px;height:9px;border-radius:50%;background:var(--pc);flex:none}
+/* regulars in the counter tray, and their phone chips */
+.rtix{display:flex;flex-direction:column;gap:5px}
+.rtk{display:flex;align-items:center;gap:7px;background:url(art/tex-paper.webp) 0 0/320px,var(--paper);color:var(--ink);border-radius:4px;padding:3px 8px 3px 4px;box-shadow:0 2px 4px rgba(0,0,0,.25);border-left:3px solid var(--lac)}
+.rtk .face{width:30px;height:30px;box-shadow:none}
+.rtx{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.15}
+.rtx b{font-size:12px}
+.rtx span{font-size:10.5px;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rvp{width:26px;height:26px;border-radius:50%;border:2px solid var(--lac);color:var(--lac);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:12px;transform:rotate(-10deg);flex:none;background:var(--paper)}
+.regmini{display:none}
+.rmini{position:relative;border:0;background:var(--paper);border-radius:50%;padding:0;width:42px;height:42px;cursor:pointer;flex:none}
+.rmini .face{width:42px;height:42px}
+.rmini .rvp{position:absolute;right:-6px;bottom:-6px;width:21px;height:21px;font-size:10px}
+.stinfo{display:flex;align-items:center;gap:14px;padding:6px 0}
+.stbig{width:72px;height:72px;flex:none}
+.regbig{width:84px;height:84px}
+.stinfo .holes{margin-top:0}
+.stinfo p{margin:4px 0 0;color:var(--ink-2);font-size:13px}
+.sheet .why{color:var(--lac-2);font-weight:700;margin:6px 0 0}
+.sheet .seat:first-child{padding-top:0}
+.pane-market .ice{padding:12px 8px;gap:10px 6px}
+.fish span{display:block}
 /* tablet */
 @media (max-width:999px){
-  .tin{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"kitchen kitchen" "market room";grid-template-rows:minmax(0,1.5fr) minmax(0,1fr)}
+  .tin{grid-template-columns:200px minmax(0,1fr)}
+  .stations{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   .logo .en{display:none}
-  .tray .in{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"pantry orders" "plates me"}
-  .t-pantry{grid-area:pantry}.t-orders{grid-area:orders}.t-plates{grid-area:plates}.t-me{grid-area:me}
-  .me{flex-direction:row;justify-content:flex-end;align-self:end}
+  .tray .in{grid-template-columns:auto minmax(0,1fr) 220px;grid-template-areas:"pantry orders orders" "plates regs me";grid-template-rows:auto auto}
+  .t-me{justify-content:flex-end;align-self:center}
 }
 /* phone */
 @media (max-width:640px){
@@ -253,13 +295,16 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
   .logo .en{display:none}
   .logo .jp{font-size:20px}
   .lanterns{gap:4px}
-  .lantern{width:11px;height:15px}
-  .who-turn{order:5;flex-basis:100%}
+  .lantern{width:9px;height:13px}
+  .noren .in{flex-wrap:nowrap;min-height:52px}
+  .logo,.turn .sub,.lfull{display:none}
+  .lshort{display:inline;white-space:nowrap}
+  .who-turn{flex:1 1 0;align-items:center;gap:8px}
+  .burger{width:40px;height:40px}
   .turnface{width:32px;height:32px}
   .turn .lead{font-size:13.5px}
   .hanko{width:42px;height:42px;margin-left:auto}
   .hanko b{font-size:16px}
-  .tag{min-height:34px;padding:0 10px;font-size:12px}
   .beltzone{padding-top:14px}
   .track{padding:10px 8px 8px;border-radius:12px}
   .belt{grid-template-columns:repeat(5,104px);gap:8px}
@@ -272,18 +317,29 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
   .table{margin-top:10px}
   .table>.in{padding-top:8px;padding-bottom:8px}
   .tin{display:flex;flex-direction:column;gap:8px}
-  .ptabs{display:flex}
-  .pane{display:none;flex:1}
-  .k.p-kitchen .pane-kitchen,.k.p-market .pane-market,.k.p-room .pane-room{display:flex}
-  .pane-kitchen .ph{display:none}
-  .stations{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 8px}
-  .board{min-height:0;padding:8px 8px 7px}
-  .board .bn{font-size:13.5px}
-  .board .bt{font-size:11px}
-  .sticon{width:28px;height:28px}
-  .hole{width:30px;height:30px}
-  .hole .face{width:26px;height:26px}
-  .tray .in{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"pantry pantry" "orders orders" "plates me";gap:6px 8px;padding-top:8px}
+  .pane-market{flex:none}
+  .pane-kitchen{flex:1}
+  .ph,.pane-market .deck{display:none}
+  .pane-market .scroll{display:flex;align-items:center;gap:8px;overflow:visible;-webkit-mask-image:none;mask-image:none;padding:0}
+  .pane-market .ice{flex:1;flex-wrap:nowrap;justify-content:space-around;gap:2px;padding:5px 4px;border-width:2px;box-shadow:0 3px 0 #7f9aa4}
+  .pane-market .fish{width:auto}
+  .pane-market .fish span{display:none}
+  .pane-market .fish .ic.xl{width:34px;height:34px}
+  .regmini{display:flex;gap:7px;flex:none}
+  .stations{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px 6px}
+  .board{min-height:0;padding:6px 3px 6px;align-items:center;text-align:center;gap:3px;border-radius:10px}
+  .board .kj,.board .bt,.board .why{display:none}
+  .board .top{flex-direction:column;gap:2px;padding-right:0}
+  .board .bn{font-size:10.5px;line-height:1.05}
+  .sticon{width:32px;height:32px}
+  .holes{justify-content:center;gap:2px}
+  .hole{width:22px;height:22px}
+  .hole .face{width:20px;height:20px}
+  .open-all{font-size:8px;letter-spacing:.06em}
+  .crew .in{padding-top:5px;padding-bottom:5px}
+  .lastev{display:none}
+  .tray .in{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"pantry pantry" "orders orders" "plates me";grid-template-rows:auto;gap:6px 8px;padding-top:8px}
+  .t-regs{display:none}
   .t-pantry .tlabel,.t-orders .tlabel,.t-plates .tlabel{display:none}
   .bowls{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
   .bowl{height:auto;aspect-ratio:1/1;max-width:44px}
@@ -294,7 +350,6 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
   .oticket .ab{display:none}
   .stack{width:38px}
   .stack .pl,.stack .none{width:34px;height:8px}
-  .mebig{width:40px;height:40px}
   .veil{align-items:flex-end;padding:0}
   .sheet{border-radius:16px 16px 0 0;max-height:90%}
   .sheet-f{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
@@ -308,7 +363,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 }
 </style>
 
-<div class="k p-kitchen" id="app"></div>
+<div class="k" id="app"></div>
 
 <script id="engine">
 /* ================= KAITEN — rules engine (no DOM) ================= */
@@ -690,7 +745,7 @@ const ingArt=k=>A('ing-'+k);
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let S=null;
-const ui={pane:'kitchen',side:'seats',sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0};
+const ui={menu:false,sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0};
 const app=document.getElementById('app');
 
 const ic=(k,cls)=>'<img class="ic'+(cls?' '+cls:'')+'" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">';
@@ -710,6 +765,8 @@ function cookStatus(p,id){
   return {ok,miss,note:ok?(miss.length?'Ready · uses '+miss.length+' wasabi':'Ready to cook'):'Need '+miss.map(k=>ING_NAME[k]).join(', ')};
 }
 
+const isPhone=()=>window.matchMedia&&window.matchMedia('(max-width: 640px)').matches;
+
 function render(){
   // keep each scrolling container where the player left it
   const keep={}; app.querySelectorAll('[data-sk]').forEach(el=>keep[el.dataset.sk]=[el.scrollLeft,el.scrollTop]);
@@ -717,49 +774,40 @@ function render(){
   const cur=S.players[S.turn], left=S.over?0:chefsLeft(me);
   const rk=ranking(S), win=S.players[rk[0].i];
   const lastAct=S.log.find(l=>l.pi>=0);
-  app.className='k p-'+ui.pane;
+  app.className='k';
 
   const lanterns=Array.from({length:S.maxRounds},(_,i)=>'<span class="lantern'+(S.over||i+1<S.round?' done':i+1===S.round?' now':'')+'"></span>').join('');
   const lead=S.over?'Closing time.':my?'Your turn · place a chef ('+left+' left)':cur.name+' is placing a chef…';
+  const short=S.over?'Closing time':my?'Your turn':cur.name+'’s turn';
+  const sub='Round '+S.round+' of '+S.maxRounds+' · '+S.players[S.first].name+(S.first===0?' go':' goes')+' first';
 
   const belt=S.belt.map((b,i)=>'<div class="bslot">'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
     (b?plateHTML(b.id,b.w)+labelHTML(b.id):'<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
 
-  const market=S.market.map(f=>'<div class="fish"><img class="ic xl" src="'+ingArt(f)+'" alt="">'+ING_NAME[f]+'</div>').join('')||'<p class="hint">The ice is empty.</p>';
-  const regs=S.regulars.map(r=>r?'<div class="ticket"><img class="face" src="'+A('reg-'+r)+'" alt=""><span><span class="nm">'+esc(REG[r].name)+'</span><span class="rq">'+reqText(REG[r])+'</span></span><span class="stamp num">'+REG[r].vp+'</span></div>'
-    :'<div class="ticket"><span><span class="nm">Empty seat</span><span class="rq">No one left in the queue</span></span><span class="stamp">–</span></div>').join('');
+  const market=S.market.map(f=>'<div class="fish"><img class="ic xl" src="'+ingArt(f)+'" alt="'+ING_NAME[f]+'"><span>'+ING_NAME[f]+'</span></div>').join('')||'<p class="hint">The ice is empty.</p>';
+  const regTickets=S.regulars.map(r=>r?'<div class="rtk"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rtx"><b>'+esc(REG[r].name)+'</b><span>'+reqText(REG[r])+'</span></span><span class="rvp num">'+REG[r].vp+'</span></div>'
+    :'<div class="rtk"><span class="rtx"><b>Empty seat</b><span>No one left in the queue</span></span></div>').join('');
+  const regMini=S.regulars.map((r,i)=>r?'<button type="button" class="rmini" data-reg="'+i+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP')+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span></button>':'').join('');
 
   const stations=LOCS.map(L=>{
-    const cap=L.cap(n), taken=S.spots[L.id], why=my?whyNot(S,0,L.id):'', can=my&&!why, unlimited=cap>20;
-    let text=L.text;
-    if(L.id==='market'&&abCount(me,'market')) text='Take '+(2+abCount(me,'market'))+' fish from the ice.';
-    if(L.id==='pantry'&&abCount(me,'pantry')) text='Take '+(2+abCount(me,'pantry'))+' Rice or Nori, any mix.';
-    const holes=taken.map(pi=>'<span class="hole" title="'+esc(S.players[pi].name)+'"><img class="face" src="'+chefArt(S.players[pi].color)+'" alt="'+esc(S.players[pi].name)+'"></span>').join('')+
-      (unlimited?'<span class="open-all">Open to all</span>':Array.from({length:cap-taken.length},()=>'<span class="hole" aria-hidden="true"></span>').join(''));
-    return '<button type="button" class="board'+(can?' can':!my?' live':'')+'" data-loc="'+L.id+'"'+(can?'':' disabled')+'>'+
+    const cap=L.cap(n), taken=S.spots[L.id], why=my?whyNot(S,0,L.id):'', can=my&&!why;
+    return '<button type="button" class="board'+(can?' can':!my?' live':'')+'" data-loc="'+L.id+'" aria-disabled="'+!can+'" aria-label="'+esc(L.name+(can?', available':why?', '+why:''))+'">'+
       '<span class="kj" lang="ja" aria-hidden="true">'+L.kj+'</span><span class="top"><img class="sticon" src="'+A('st-'+L.id)+'" alt=""><span class="bn">'+L.name+'</span></span>'+
-      '<span class="bt">'+text+'</span>'+(my&&why&&why!=='Taken'?'<span class="why">'+why+'</span>':'')+'<span class="holes">'+holes+'</span></button>';
+      '<span class="bt">'+stationText(L,me)+'</span>'+(my&&why&&why!=='Taken'?'<span class="why">'+why+'</span>':'')+'<span class="holes">'+holesHTML(L,taken,cap)+'</span></button>';
   }).join('');
 
-  let side='';
-  if(ui.side==='seats'){
-    side=S.players.map((p,i)=>{
-      const s2=score(p);
-      return '<div class="seat"><div class="seat-h"><img class="face" src="'+chefArt(p.color)+'" alt=""><b>'+esc(p.name)+'</b>'+(S.first===i?'<span class="firstmark">FIRST</span>':'')+'<span class="sc num">'+s2.total+'</span></div>'+
-        '<div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
-        '<div class="meta">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+' chefs'+(p.hired&&!p.apprentice?' (+1 next round)':'')+' · '+p.orders.length+' orders · '+p.regulars.length+' regulars'+(p.regulars.length?' ('+p.regulars.map(r=>REG[r].name).join(', ')+')':'')+'</div>'+
-        '<div class="dlist">'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(d.ab?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>'+
-        '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+'</div></div>';
-    }).join('');
-  } else if(ui.side==='log'){
-    side='<ul class="loglist">'+S.log.slice(0,50).map(l=>'<li class="logi'+(l.pi<0?' sys':'')+'">'+(l.pi>=0?'<span class="ld pc'+S.players[l.pi].color+'"></span>':'')+'<span>'+esc(l.t)+'</span></li>').join('')+'</ul>';
-  } else {
-    side='<div class="rules"><p>Run the best stall at the sushi bar over 7 rounds. Send chefs to stations, gather fish and staples, take orders off the belt, and serve dishes. Served plates stay with you, score, and often keep working for you.</p>'+
-      '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, first player passes left.</li></ol>'+
-      '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p>'+
-      '<h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>Regulars you win, and effects printed on your dishes.</li></ul>'+
-      '<h3>New game</h3><div class="newrow">'+newOpts()+'</div></div>';
-  }
+  const mates=S.players.filter(p=>p.bot).map(p=>{
+    const s2=score(p), c=catCounts(p.tableau);
+    return '<button type="button" class="mate'+(!S.over&&S.turn===p.color?' on':'')+'" data-open="seats" aria-label="'+esc(p.name+': '+s2.total+' VP, '+p.tableau.length+' plates served, '+p.regulars.length+' regulars. Open details.')+'">'+
+      '<img class="face" src="'+chefArt(p.color)+'" alt=""><span class="mid"><span class="top"><b class="nm">'+esc(p.name)+'</b><span class="vp num">'+s2.total+'</span></span><span class="pips">'+
+      CATS.map(k=>'<span class="pip c-'+k+'" title="'+c[k]+' '+CAT_NAME[k]+'"><span class="pd"></span>'+c[k]+'</span>').join('')+
+      '<span class="pip" title="Tasting sets"><span class="setb">SET</span>'+Math.min(c.nigiri,c.maki,c.sashimi)+'</span>'+
+      '<span class="pip" title="Regulars won"><span class="regb"></span>'+p.regulars.length+'</span>'+
+      '<span class="pip" title="Wasabi"><img class="ic" src="'+ingArt('W')+'" alt="">'+p.wasabi+'</span>'+
+      '<span class="pip" title="Orders held"><span class="ordb"></span>'+p.orders.length+'</span>'+
+      '<span class="pip" title="Chefs left this round"><img class="face mf" src="'+chefArt(p.color)+'" alt="">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+'</span>'+
+      '</span></span></button>';
+  }).join('');
 
   const bowls=ING_KEYS.map(k=>[k,me.hand[k]]).concat([['W',me.wasabi]]).map(([k,v])=>'<div class="bowl'+(v?'':' z')+'" role="img" aria-label="'+v+' '+ING_NAME[k]+'"><img class="ic lg" src="'+ingArt(k)+'" alt=""><b class="num">'+v+'</b></div>').join('');
   const orders=me.orders.map(id=>{
@@ -776,31 +824,31 @@ function render(){
   '<header class="noren"><div class="in">'+
     '<div class="logo"><span class="jp" lang="ja">回転寿司</span><span class="en">KAITEN</span></div>'+
     '<div class="lanterns" role="img" aria-label="Round '+S.round+' of '+S.maxRounds+'">'+lanterns+'</div>'+
-    '<div class="who-turn"><img class="face turnface" src="'+chefArt(S.over?win.color:cur.color)+'" alt=""><div class="turn" aria-live="polite"><span class="lead'+(my?' mine':'')+'">'+esc(lead)+'</span><span class="sub">'+esc(lastAct?lastAct.t:'Round '+S.round+' of '+S.maxRounds)+'</span></div></div>'+
-    '<button type="button" class="tag" data-act="new">New game</button>'+
+    '<div class="who-turn"><img class="face turnface" src="'+chefArt(S.over?win.color:cur.color)+'" alt=""><div class="turn" aria-live="polite"><span class="lead'+(my?' mine':'')+'"><span class="lfull">'+esc(lead)+'</span><span class="lshort">'+esc(short)+'</span></span><span class="sub">'+esc(sub)+'</span></div></div>'+
     '<div class="hanko" role="img" aria-label="Your score: '+sc.total+' VP"><b class="num">'+sc.total+'</b><span>VP</span></div>'+
-  '</div></header>'+
+    '<button type="button" class="burger" data-act="menu" aria-label="Menu" aria-expanded="'+!!ui.menu+'"><span></span><span></span><span></span></button>'+
+  '</div>'+
+  (ui.menu?'<button type="button" class="menu-veil" data-act="menu" aria-label="Close menu"></button><div class="menu" role="menu">'+
+    '<button type="button" role="menuitem" data-open="seats">Chefs &amp; scores</button><button type="button" role="menuitem" data-open="log">Service log</button>'+
+    '<button type="button" role="menuitem" data-open="rules">How to play</button><button type="button" role="menuitem" class="mnew" data-open="new">New game</button></div>':'')+
+  '</header>'+
   '<section class="beltzone" aria-label="The belt"><div class="in"><div class="track" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
   '<main class="table"><div class="in"><div class="tin">'+
-    '<div class="ptabs" role="tablist" aria-label="Table areas">'+
-      [['kitchen','Kitchen','厨房'],['market','Market','市場'],['room','Diners','客席']].map(([k,l,j])=>'<button type="button" role="tab" class="ptab'+(ui.pane===k?' on':'')+'" aria-selected="'+(ui.pane===k)+'" data-pane="'+k+'">'+l+'<span class="kj" lang="ja">'+j+'</span></button>').join('')+
-    '</div>'+
-    '<section class="pane pane-market" aria-label="Fish market and regulars"><div class="scroll" data-sk="market">'+
+    '<section class="pane pane-market" aria-label="Fish market"><div class="scroll" data-sk="market">'+
       '<div class="ph"><h2>Fish market</h2><span class="kj" lang="ja">魚市場</span></div>'+
-      '<div class="ice" style="margin-top:6px">'+market+'</div><p class="deck num">'+S.fishDeck.length+' fish left in the deck</p>'+
-      '<div class="ph"><h2>Regulars waiting</h2><span class="kj" lang="ja">常連</span></div><p class="hint">Yours the moment your served plates match.</p>'+
-      '<div class="tickets">'+regs+'</div></div></section>'+
-    '<section class="pane pane-kitchen" aria-label="Stations"><div class="ph"><h2>Stations</h2><p>'+(my?'Tap a glowing board':S.over?'Closed':'Waiting for '+esc(cur.name))+'</p></div>'+
+      '<div class="ice">'+market+'</div><p class="deck num">'+S.fishDeck.length+' fish left in the deck</p>'+
+      '<div class="regmini" aria-label="Regulars waiting">'+regMini+'</div></div></section>'+
+    '<section class="pane pane-kitchen" aria-label="Stations"><div class="ph"><h2>Stations</h2><span class="kj" lang="ja">厨房</span></div>'+
       '<div class="scroll" data-sk="kitchen"><div class="stations">'+stations+'</div></div></section>'+
-    '<section class="pane pane-room" aria-label="Diners"><div class="paper">'+
-      '<div class="stabs" role="tablist" aria-label="Diners">'+[['seats','Chefs'],['log','Log'],['rules','Rules']].map(([k,l])=>'<button type="button" role="tab" class="stab'+(ui.side===k?' on':'')+'" aria-selected="'+(ui.side===k)+'" data-side="'+k+'">'+l+'</button>').join('')+'</div>'+
-      '<div class="scroll" data-sk="side-'+ui.side+'">'+side+'</div></div></section>'+
   '</div></div></main>'+
+  '<section class="crew" aria-label="Rival chefs"><div class="in" data-sk="crew">'+mates+
+    '<div class="lastev" aria-live="polite">'+(lastAct?'<span class="ld pc'+S.players[lastAct.pi].color+'"></span>':'')+'<span class="t">'+esc(lastAct?lastAct.t:'The noren goes up.')+'</span></div></div></section>'+
   '<section class="tray" aria-label="Your counter"><div class="in">'+
     '<div class="tcol t-pantry"><span class="tlabel">Your pantry</span><div class="bowls">'+bowls+'</div></div>'+
     '<div class="tcol t-orders"><span class="tlabel">Orders · '+me.orders.length+'/'+ORDER_LIMIT+'</span><div class="orders" data-sk="orders">'+orders+'</div></div>'+
+    '<div class="tcol t-regs"><span class="tlabel">Regulars waiting · yours when your plates match</span><div class="rtix">'+regTickets+'</div></div>'+
     '<div class="tcol t-plates"><span class="tlabel">Served plates</span><div class="stacks">'+stacks+'</div><span class="sets">Tasting sets <b class="num">'+Math.min(cc.nigiri,cc.maki,cc.sashimi)+'</b> · 4 VP each</span></div>'+
-    '<div class="tcol t-me me"><img class="face mebig" src="'+chefArt(0)+'" alt="Your head chef"><div class="chefs" aria-label="'+left+' chefs ready">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(0)+'" alt="">').join('')+'</div><span class="tlabel">'+left+(left===1?' chef':' chefs')+' ready</span></div>'+
+    '<div class="tcol t-me"><div class="chefs" aria-label="'+left+(left===1?' chef':' chefs')+' ready">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(0)+'" alt="">').join('')+'</div></div>'+
   '</div></section>'+
   sheetHTML(me)+
   (ui.toast?'<div class="toast" role="status">'+esc(ui.toast)+'</div>':'');
@@ -808,6 +856,15 @@ function render(){
   app.querySelectorAll('[data-sk]').forEach(el=>{const k=keep[el.dataset.sk]; if(k){el.scrollLeft=k[0]; el.scrollTop=k[1];}});
 }
 
+function stationText(L,me){
+  if(L.id==='market'&&abCount(me,'market')) return 'Take '+(2+abCount(me,'market'))+' fish from the ice.';
+  if(L.id==='pantry'&&abCount(me,'pantry')) return 'Take '+(2+abCount(me,'pantry'))+' Rice or Nori, any mix.';
+  return L.text;
+}
+function holesHTML(L,taken,cap){
+  return taken.map(pi=>'<span class="hole" title="'+esc(S.players[pi].name)+'"><img class="face" src="'+chefArt(S.players[pi].color)+'" alt="'+esc(S.players[pi].name)+'"></span>').join('')+
+    (cap>20?'<span class="open-all">Open to all</span>':Array.from({length:cap-taken.length},()=>'<span class="hole" aria-hidden="true"></span>').join(''));
+}
 function newOpts(){return [1,2,3].map(k=>'<button type="button" class="gbtn'+(k===ui.nBots?' on':' wood')+'" data-start="'+k+'">'+k+' rival'+(k>1?'s':'')+'</button>').join('');}
 function maxPick(){
   const me=S.players[0], s=ui.sheet;
@@ -816,6 +873,21 @@ function maxPick(){
   if(s==='head') return 2;
   return 1;
 }
+function seatsHTML(){
+  return S.players.map((p,i)=>{
+    const s2=score(p);
+    return '<div class="seat"><div class="seat-h"><img class="face" src="'+chefArt(p.color)+'" alt=""><b>'+esc(p.name)+'</b>'+(S.first===i?'<span class="firstmark">FIRST</span>':'')+'<span class="sc num">'+s2.total+'</span></div>'+
+      '<div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
+      '<div class="meta">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+' chefs'+(p.hired&&!p.apprentice?' (+1 next round)':'')+' · '+p.orders.length+' orders · '+p.regulars.length+' regulars'+(p.regulars.length?' ('+p.regulars.map(r=>REG[r].name).join(', ')+')':'')+'</div>'+
+      '<div class="dlist">'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(d.ab?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>'+
+      '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+'</div></div>';
+  }).join('');
+}
+const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over 7 rounds. Send chefs to stations, gather fish and staples, take orders off the belt, and serve dishes. Served plates stay with you, score, and often keep working for you.</p>'+
+  '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, first player passes left.</li></ol>'+
+  '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p>'+
+  '<h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>Regulars you win, and effects printed on your dishes.</li></ul></div>';
+
 function sheetHTML(me){
   if(S.over&&ui.endOpen){
     const rk=ranking(S), win=S.players[rk[0].i];
@@ -824,7 +896,7 @@ function sheetHTML(me){
       '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="'+ui.nBots+'">Play again</button></div></div></div>';
   }
   const sh=ui.sheet; if(!sh) return '';
-  let title='', help='', body='', ok=false, label='Place chef';
+  let title='', help='', body='', ok=false, label='Place chef', confirm=true;
   if(sh==='market'){
     const k=maxPick(); title='Fish Market'; help='Pick '+k+' fish off the ice.'; label='Buy fish';
     body='<div class="ice pick-ice">'+S.market.map((f,i)=>'<button type="button" class="fbtn'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'"><img class="ic xl" src="'+ingArt(f)+'" alt="">'+ING_NAME[f]+'</button>').join('')+'</div>';
@@ -848,13 +920,31 @@ function sheetHTML(me){
       return '<button type="button" class="pcard'+(sel?' sel':'')+'" aria-pressed="'+sel+'" data-pick="'+id+'"'+(fits?'':' disabled')+'>'+plateHTML(id,0)+labelHTML(id,cookStatus(me,id).note)+'</button>';
     }).join('')+'</div>';
     ok=ui.sel.length>=1;
+  } else if(sh.startsWith('st:')){
+    // phone: a station tile opens its details first
+    const L=LOC[sh.slice(3)], my=!S.over&&S.turn===0, taken=S.spots[L.id], cap=L.cap(S.players.length);
+    const why=my?whyNot(S,0,L.id):(S.over?'Service is over.':'Wait for your turn.');
+    title=L.name; help=stationText(L,me); label='Place chef here'; ok=my&&!why;
+    body='<div class="stinfo"><img class="stbig" src="'+A('st-'+L.id)+'" alt=""><div><span class="holes">'+holesHTML(L,taken,cap)+'</span>'+
+      '<p>'+(cap>20?'Any number of chefs can work here.':(cap-taken.length)+' of '+cap+' spots free this round.')+'</p></div></div>'+(why&&why!=='Taken'?'<p class="why">'+esc(why)+'</p>':why==='Taken'?'<p class="why">Every spot here is taken this round.</p>':'');
+  } else if(sh.startsWith('reg:')){
+    const r=S.regulars[+sh.slice(4)]; confirm=false;
+    if(r){title=REG[r].name; help='A regular waiting at the door.';
+      body='<div class="stinfo"><img class="face regbig" src="'+A('reg-'+r)+'" alt=""><div><b>Wants: '+reqText(REG[r])+'</b><p>Worth '+REG[r].vp+' VP. They join you the moment your served plates match. Nothing is spent, and you can win one regular per turn.</p></div></div>';}
+  } else if(sh==='seats'){
+    title='The chefs'; help='Everyone’s pantry, served plates and score so far.'; body=seatsHTML(); confirm=false;
+  } else if(sh==='log'){
+    title='Service log'; help='Everything that happened, newest first.'; confirm=false;
+    body='<ul class="loglist">'+S.log.slice(0,60).map(l=>'<li class="logi'+(l.pi<0?' sys':'')+'">'+(l.pi>=0?'<span class="ld pc'+S.players[l.pi].color+'"></span>':'')+'<span>'+esc(l.t)+'</span></li>').join('')+'</ul>';
+  } else if(sh==='rules'){
+    title='How to play'; help='7 rounds, 3 chefs each, most VP wins.'; body=RULES_HTML; confirm=false;
   } else if(sh==='new'){
-    title='New game'; help='How many rival chefs? This game will be lost.';
+    title='New game'; help='How many rival chefs? This game will be lost.'; confirm=false;
     body='<div class="newrow">'+newOpts()+'</div>';
   }
   return '<div class="veil" data-act="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="sheet-h"><h2>'+esc(title)+'</h2><p>'+esc(help)+'</p></div>'+
-    '<div class="sheet-b">'+body+'</div><div class="sheet-f"><button type="button" class="gbtn wood" data-act="cancel">Cancel</button>'+
-    (sh==='new'?'':'<button type="button" class="gbtn" data-act="confirm"'+(ok?'':' disabled')+'>'+label+'</button>')+'</div></div></div>';
+    '<div class="sheet-b">'+body+'</div><div class="sheet-f"><button type="button" class="gbtn wood" data-act="cancel">'+(confirm?'Cancel':'Close')+'</button>'+
+    (confirm?'<button type="button" class="gbtn" data-act="confirm"'+(ok?'':' disabled')+'>'+label+'</button>':'')+'</div></div></div>';
 }
 
 /* ----- flow ----- */
@@ -870,13 +960,14 @@ function schedule(){
   const g=S;
   ui.botT=setTimeout(()=>{
     if(g!==S||S.over||!S.players[S.turn].bot) return;
-    const m=botMove(S,S.turn); doAct(S.turn,m.loc,m.args); render(); schedule();
+    const m=botMove(S,S.turn); doAct(S.turn,m.loc,m.args);
+    render(); schedule();
   },700);
 }
 function startNew(k){
   clearTimeout(ui.botT); ui.nBots=k;
   try{localStorage.setItem('kaiten-bots',String(k));}catch(e){}
-  S=newGame({nBots:k}); Object.assign(ui,{sheet:null,sel:[],endOpen:true,pane:'kitchen'});
+  S=newGame({nBots:k}); Object.assign(ui,{sheet:null,sel:[],endOpen:true,menu:false});
   render(); schedule();
 }
 function defaultRice(){
@@ -884,26 +975,28 @@ function defaultRice(){
   me.orders.forEach(id=>{const c=countCost(DISH[id].cost); r+=c.R; nn+=c.N;}); r-=me.hand.R; nn-=me.hand.N;
   if(r<=0&&nn<=0) return Math.ceil(k/2); if(nn<=0) return k; if(r<=0) return 0; return Math.round(k*r/(r+nn));
 }
-function pickLoc(id){
+function pickLoc(id,direct){
+  if(isPhone()&&!direct){ui.sheet='st:'+id; ui.sel=[]; return render();}
   if(S.over||S.turn!==0||!legal(S,0,id)) return;
-  if(id==='door'||id==='staff'){doAct(0,id,{}); render(); schedule(); return;}
+  if(id==='door'||id==='staff'){ui.sheet=null; doAct(0,id,{}); render(); schedule(); return;}
   const me=S.players[0]; ui.sel=[];
   if(id==='prep'||id==='head'){const f=me.orders.find(x=>canCook(me,DISH[x])); if(f) ui.sel=[f];}
   ui.sheet=id; ui.rice=defaultRice(); render();
 }
 function confirmSheet(){
   const loc=ui.sheet, sel=ui.sel;
+  if(loc.startsWith('st:')){ui.sheet=null; return pickLoc(loc.slice(3),true);}
   const args=loc==='market'?{picks:sel}:loc==='pantry'?{rice:ui.rice}:loc==='belt'?{slots:sel}:loc==='prep'?{dish:sel[0]}:{dishes:sel};
   ui.sheet=null; ui.sel=[]; doAct(0,loc,args); render(); schedule();
 }
 
 app.addEventListener('click',e=>{
-  const t=e.target.closest('[data-loc],[data-pick],[data-pane],[data-side],[data-rice],[data-start],[data-act]');
+  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-act]');
   if(!t) return;
   const d=t.dataset;
   if(d.loc) return pickLoc(d.loc);
-  if(d.pane){ui.pane=d.pane; return render();}
-  if(d.side){ui.side=d.side; return render();}
+  if(d.open){ui.menu=false; ui.sheet=d.open; ui.sel=[]; return render();}
+  if(d.reg!=null){ui.sheet='reg:'+d.reg; return render();}
   if(d.start) return startNew(+d.start);
   if(d.rice){const k=2+abCount(S.players[0],'pantry'); ui.rice=Math.max(0,Math.min(k,ui.rice+(+d.rice))); return render();}
   if(d.pick!=null){
@@ -913,14 +1006,14 @@ app.addEventListener('click',e=>{
     return render();
   }
   switch(d.act){
-    case 'new': ui.sheet='new'; return render();
+    case 'menu': ui.menu=!ui.menu; return render();
     case 'cancel': ui.sheet=null; ui.sel=[]; return render();
     case 'confirm': return confirmSheet();
     case 'closeend': ui.endOpen=false; return render();
     case 'veil': if(e.target===t){ui.sheet=null; ui.sel=[]; render();} return;
   }
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.sheet){ui.sheet=null; ui.sel=[]; render();}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(ui.sheet||ui.menu)){ui.sheet=null; ui.sel=[]; ui.menu=false; render();}});
 // a mouse wheel over the belt or the order clips scrolls them sideways
 app.addEventListener('wheel',e=>{
   const el=e.target.closest('.track,.orders');
@@ -932,6 +1025,6 @@ function start(data){
   if(data&&data.state){S=data.state; Object.assign(ui,data.ui||{});} else S=newGame({nBots:ui.nBots});
   render(); schedule();
 }
-window.claude?.hot?.snapshot?.(()=>({state:S,ui:{pane:ui.pane,side:ui.side,nBots:ui.nBots,endOpen:ui.endOpen}}));
+window.claude?.hot?.snapshot?.(()=>({state:S,ui:{nBots:ui.nBots,endOpen:ui.endOpen}}));
 window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 </script>
