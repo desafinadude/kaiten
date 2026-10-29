@@ -9,5 +9,5 @@ sushi bar. 2–4 players, about 30 minutes.
 - **Balance check:** `node sim.cjs 1000` plays bot-vs-bot games and reports scores, seat win rates and
   per-card win rates.
 - **Art:** `art/` holds the drawn SVG placeholders, made by `python3 tools/make_art.py art`.
-  [docs/art-brief.md](docs/art-brief.md) is the brief for painted contact sheets;
+  [docs/art-brief.md](docs/art-brief.md) is the brief (the painted app icon from sheet 8 is in `icons/`) for painted contact sheets;
   `python3 tools/slice_sheets.py` cuts them into the game's files.
