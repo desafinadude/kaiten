@@ -1,0 +1,938 @@
+<title>Kaiten</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="theme-color" content="#21385b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Kaiten">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/svg+xml" href="icons/icon.svg">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap">
+<style>
+/* Layout: one screen, no page scroll. Noren header, the belt, a wooden table (market, stations, diners), and your counter tray. */
+:root{--wall:#1c1814;--wood:#e6cd9f;--wood-2:#d6b682;--wood-3:#b88d55;--wood-dk:#7a532b;--ink:#2b1f14;--ink-2:#5b4733;--paper:#fcf7ec;--paper-2:#efe4cc;--indigo:#21385b;--indigo-2:#142640;--lac:#c2342a;--lac-2:#8f1f17;--gold:#d2a43c;--ice:#eef7fa;--ice-2:#cfe4ec;--steel:#8d989b;--steel-2:#6e797c;--c-nigiri:#c8392b;--c-maki:#2c5a39;--c-sashimi:#e07a3f;--c-special:#c0921f;--p0:#2f62c4;--p1:#d24a2f;--p2:#d9a51a;--p3:#1f9488;--disp:"Dela Gothic One","Zen Kaku Gothic New",system-ui,sans-serif;
+  color-scheme:light;height:100%;box-sizing:border-box;overflow:hidden;scrollbar-width:none;background:var(--wall)}
+html::-webkit-scrollbar,body::-webkit-scrollbar{display:none}
+body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink)}
+.k{height:100%;overflow:hidden;display:flex;flex-direction:column;color:var(--ink);font-family:"Zen Kaku Gothic New",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.4;background:radial-gradient(120% 70% at 50% 0%,#3d3026 0%,var(--wall) 70%)}
+.k *{box-sizing:border-box;scrollbar-width:none}
+.k *::-webkit-scrollbar{display:none;width:0;height:0}
+.k button{font:inherit;color:inherit}
+.k :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+.in{max-width:1200px;margin:0 auto;width:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.num{font-variant-numeric:tabular-nums}
+.ic{display:inline-block;flex:none;width:20px;height:20px;object-fit:contain;vertical-align:middle}
+.ic.sm{width:16px;height:16px}.ic.lg{width:32px;height:32px}.ic.xl{width:46px;height:46px}
+.face{display:block;flex:none;object-fit:contain}
+.c-nigiri{--cat:var(--c-nigiri)}.c-maki{--cat:var(--c-maki)}.c-sashimi{--cat:var(--c-sashimi)}.c-special{--cat:var(--c-special)}
+.pc0{--pc:var(--p0)}.pc1{--pc:var(--p1)}.pc2{--pc:var(--p2)}.pc3{--pc:var(--p3)}
+
+/* noren header */
+.noren{position:relative;flex:none;background:linear-gradient(var(--indigo),var(--indigo-2));color:#f4efe4;box-shadow:0 4px 0 rgba(0,0,0,.25);z-index:2}
+.noren::after{content:"";position:absolute;left:0;right:0;bottom:-10px;height:10px;background:repeating-linear-gradient(90deg,var(--indigo-2) 0 calc(12.5% - 4px),transparent calc(12.5% - 4px) 12.5%);pointer-events:none}
+.noren .in{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap;padding-top:8px;padding-bottom:8px;min-height:62px}
+.logo{display:flex;align-items:baseline;gap:8px}
+.logo .jp{font-family:var(--disp);font-size:24px;line-height:1;color:#fff}
+.logo .en{font-family:var(--disp);font-size:13px;letter-spacing:.3em;color:#c9d3e6}
+.lanterns{display:flex;gap:6px;align-items:center}
+.lantern{width:14px;height:19px;border-radius:7px/9px;background:#3a4d6e;position:relative}
+.lantern::before,.lantern::after{content:"";position:absolute;left:3px;right:3px;height:3px;background:#0d1626;border-radius:1px}
+.lantern::before{top:-1px}.lantern::after{bottom:-1px}
+.lantern.done{background:#8a5a3a}
+.lantern.now{background:#ff6a3d;box-shadow:0 0 10px 3px rgba(255,120,60,.65)}
+.who-turn{display:flex;align-items:flex-end;gap:10px;flex:1 1 180px;min-width:0}
+.turnface{width:42px;height:50px;margin-bottom:-10px;filter:drop-shadow(0 2px 0 rgba(0,0,0,.3))}
+.turn{min-width:0;display:flex;flex-direction:column}
+.turn .lead{font-weight:900;font-size:15px}
+.turn .lead.mine{color:#ffd27a}
+.turn .sub{font-size:12px;color:#b9c4d8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hanko{width:52px;height:52px;border-radius:50%;background:var(--lac);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:inset 0 0 0 3px rgba(255,255,255,.35),0 3px 0 var(--lac-2);flex:none}
+.hanko b{font-family:var(--disp);font-weight:400;font-size:20px;line-height:1}
+.hanko span{font-size:8px;letter-spacing:.2em;font-weight:900}
+.tag{border:0;background:linear-gradient(#ecd3a6,#d3b07a);color:var(--ink);font-weight:900;border-radius:8px;padding:0 14px;min-height:40px;box-shadow:0 3px 0 var(--wood-dk);cursor:pointer}
+.tag:active{transform:translateY(2px);box-shadow:0 1px 0 var(--wood-dk)}
+
+/* belt */
+.beltzone{flex:none;padding-top:16px}
+.track{position:relative;border-radius:16px;padding:12px 10px 10px;background:repeating-linear-gradient(90deg,var(--steel) 0 46px,var(--steel-2) 46px 48px);background-size:48px 100%;box-shadow:inset 0 7px 0 #b9c2c4,inset 0 -7px 0 #4d5658,0 6px 14px rgba(0,0,0,.45);animation:roll 3.4s linear infinite;overflow-x:auto;overflow-y:hidden}
+@keyframes roll{to{background-position:48px 0}}
+.belt{display:grid;grid-template-columns:repeat(5,minmax(132px,1fr));gap:10px;min-width:min-content}
+.bslot{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;position:relative}
+.bsign{position:absolute;top:-4px;left:2px;z-index:2;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:var(--paper);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.bsign.last{background:var(--lac);color:#fff}
+.bempty{width:100px;height:100px;border-radius:50%;border:3px dashed rgba(255,255,255,.35)}
+.plate{position:relative;width:100px;height:100px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#fffdf8 0 50%,var(--cat) 51% 60%,#fffdf8 61% 66%,var(--cat) 67% 100%);box-shadow:0 5px 0 rgba(0,0,0,.22),0 9px 14px rgba(0,0,0,.25)}
+.dart{width:82%;height:auto;display:block;margin-top:-4px;pointer-events:none}
+.vpb{position:absolute;top:-4px;right:-4px;width:30px;height:30px;border-radius:50%;background:var(--paper);border:3px solid var(--cat);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;color:var(--ink)}
+.wsb{position:absolute;bottom:-2px;left:-4px;display:flex;gap:1px;background:var(--paper);border-radius:10px;padding:2px 4px;box-shadow:0 2px 0 rgba(0,0,0,.2)}
+.wsb .ic{width:13px;height:13px}
+.plabel{width:100%;max-width:200px;background:var(--paper);border-radius:7px;padding:5px 8px 6px;box-shadow:0 2px 0 rgba(0,0,0,.25);text-align:center;border-top:3px solid var(--cat);display:flex;flex-direction:column;gap:1px}
+.plabel .nm{font-weight:900;font-size:13px;line-height:1.15}
+.plabel .ct{font-size:9.5px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--cat)}
+.plabel .ab{font-size:11px;color:var(--ink-2);line-height:1.25}
+.plabel .cost{justify-content:center;margin-top:3px}
+.plabel .cost .ic{width:17px;height:17px}
+.cost{display:flex;flex-wrap:wrap;gap:2px;align-items:center}
+
+/* wooden table */
+.table{flex:1;min-height:0;margin-top:14px;background:repeating-linear-gradient(91deg,rgba(110,70,30,.07) 0 2px,transparent 2px 11px),linear-gradient(var(--wood),var(--wood-2));box-shadow:inset 0 3px 0 rgba(255,255,255,.4)}
+.table>.in{height:100%;padding-top:12px;padding-bottom:12px}
+.tin{height:100%;display:grid;grid-template-columns:262px minmax(0,1fr) 280px;grid-template-areas:"market kitchen room";gap:14px}
+.pane{min-height:0;min-width:0;display:flex;flex-direction:column;gap:8px}
+.pane-market{grid-area:market}.pane-kitchen{grid-area:kitchen}.pane-room{grid-area:room}
+.ph{display:flex;align-items:baseline;justify-content:space-between;gap:8px;flex:none}
+.ph h2{margin:0;font-family:var(--disp);font-weight:400;font-size:16px}
+.ph .kj{font-family:var(--disp);color:var(--lac);font-size:13px}
+.ph p{margin:0;font-size:12px;color:var(--ink-2)}
+.scroll{flex:1;min-height:0;overflow:auto;padding:2px 6px 14px 2px;-webkit-mask-image:linear-gradient(#000 calc(100% - 22px),transparent);mask-image:linear-gradient(#000 calc(100% - 22px),transparent)}
+.ptabs{display:none;gap:6px;flex:none}
+.ptab{flex:1;border:0;border-radius:10px 10px 4px 4px;min-height:42px;background:var(--wood-3);color:#3a2814;font-weight:900;cursor:pointer;box-shadow:inset 0 -3px 0 rgba(0,0,0,.15)}
+.ptab .kj{font-family:var(--disp);font-size:11px;opacity:.75;margin-left:4px}
+.ptab.on{background:var(--paper);color:var(--ink);box-shadow:0 3px 0 var(--wood-dk)}
+
+/* stations */
+.stations{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px 10px}
+.board{position:relative;text-align:left;cursor:default;border:2px solid var(--wood-dk);border-radius:12px;padding:10px 10px 9px;display:flex;flex-direction:column;gap:4px;min-height:140px;background:repeating-linear-gradient(89deg,rgba(110,70,30,.08) 0 2px,transparent 2px 13px),linear-gradient(#f3e0b9,#e3c48e);box-shadow:0 4px 0 var(--wood-dk),0 8px 12px rgba(60,35,10,.22);opacity:.62;filter:saturate(.6)}
+.board.can{opacity:1;filter:none;cursor:pointer;border-color:var(--lac);box-shadow:0 4px 0 var(--lac-2),0 0 0 3px rgba(194,52,42,.25),0 10px 16px rgba(60,35,10,.3);animation:glow 1.6s ease-in-out infinite}
+.board.can:hover{transform:translateY(-2px)}
+.board.can:active{transform:translateY(2px);box-shadow:0 2px 0 var(--lac-2)}
+@keyframes glow{50%{box-shadow:0 4px 0 var(--lac-2),0 0 0 6px rgba(194,52,42,.18),0 10px 16px rgba(60,35,10,.3)}}
+.board.live{opacity:1;filter:none}
+.board .kj{position:absolute;top:8px;right:8px;font-family:var(--disp);font-size:12px;color:var(--lac);opacity:.85;writing-mode:vertical-rl;letter-spacing:.1em}
+.board .top{display:flex;align-items:center;gap:7px;padding-right:16px}
+.sticon{width:36px;height:36px;flex:none}
+.board .bn{font-family:var(--disp);font-size:15px;line-height:1.1}
+.board .bt{font-size:12px;color:var(--ink-2);line-height:1.3;padding-right:16px}
+.board .why{font-size:11px;font-weight:700;color:var(--lac-2)}
+.holes{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;align-items:center}
+.hole{width:34px;height:34px;border-radius:50%;background:#caa66c;box-shadow:inset 0 3px 5px rgba(60,35,10,.45);display:flex;align-items:center;justify-content:center}
+.hole .face{width:28px;height:34px;margin-top:-8px}
+.open-all{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+
+/* market and regulars */
+.ice{border-radius:14px;padding:10px;border:3px solid #9cb7c1;background:radial-gradient(circle at 25% 30%,#fff 0 2px,transparent 3px) 0 0/15px 15px,radial-gradient(circle at 70% 70%,#fff 0 1.5px,transparent 2.5px) 0 0/11px 11px,linear-gradient(var(--ice),var(--ice-2));display:flex;flex-wrap:wrap;gap:6px;justify-content:center;box-shadow:0 4px 0 #7f9aa4}
+.fish{display:flex;flex-direction:column;align-items:center;gap:2px;width:50px;font-size:10.5px;font-weight:900;color:#2c3c42}
+.deck{font-size:11px;color:var(--ink-2);text-align:right;margin:8px 0 14px}
+.tickets{display:flex;flex-direction:column;gap:8px}
+.ticket{position:relative;display:flex;align-items:center;gap:10px;background:var(--paper);padding:8px 46px 8px 8px;border-radius:3px;box-shadow:0 3px 6px rgba(60,35,10,.25);border-top:3px dotted var(--paper-2)}
+.ticket:nth-child(odd){transform:rotate(-.8deg)}.ticket:nth-child(even){transform:rotate(.8deg)}
+.ticket .face{width:46px;height:46px}
+.ticket .nm{font-weight:900;font-size:14px;display:block}
+.ticket .rq{font-size:12px;color:var(--ink-2);display:block}
+.stamp{position:absolute;right:8px;top:50%;margin-top:-17px;width:34px;height:34px;border-radius:50%;border:2.5px solid var(--lac);color:var(--lac);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;transform:rotate(-10deg)}
+.hint{margin:2px 0 10px;font-size:12px;color:var(--ink-2)}
+
+/* diners */
+.paper{background:var(--paper);border-radius:12px;box-shadow:0 4px 0 var(--paper-2),0 8px 14px rgba(60,35,10,.2);display:flex;flex-direction:column;min-height:0;flex:1;overflow:hidden}
+.stabs{display:flex;border-bottom:2px solid var(--paper-2);flex:none}
+.stab{flex:1;border:0;background:transparent;min-height:42px;font-weight:900;color:var(--ink-2);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.stab.on{color:var(--lac);border-bottom-color:var(--lac)}
+.paper .scroll{padding:6px 12px 14px}
+.seat{display:flex;flex-direction:column;gap:6px;padding:8px 0 10px;border-bottom:1px dashed var(--paper-2)}
+.seat-h{display:flex;align-items:center;gap:8px}
+.seat-h .face{width:32px;height:38px}
+.seat-h b{font-weight:900;font-size:15px;flex:1}
+.seat-h .sc{font-family:var(--disp);font-size:17px;color:var(--lac)}
+.firstmark{font-size:10px;font-weight:900;letter-spacing:.1em;background:var(--ink);color:var(--paper);border-radius:4px;padding:1px 5px}
+.res{display:flex;flex-wrap:wrap;gap:3px 8px;font-size:12px;font-weight:700;align-items:center}
+.res>span{display:inline-flex;align-items:center;gap:3px}
+.res .z{opacity:.4}
+.meta{font-size:11.5px;color:var(--ink-2)}
+.dlist{display:flex;flex-direction:column;gap:3px}
+.drow{display:flex;gap:6px;font-size:12px;align-items:baseline}
+.drow .dot{width:9px;height:9px;border-radius:50%;background:var(--cat);flex:none;align-self:center}
+.drow .e{color:var(--ink-2);font-size:11px}
+.loglist{list-style:none;margin:0;padding:6px 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
+.logi{display:flex;gap:7px;align-items:flex-start}
+.logi.sys{color:var(--ink-2);font-style:italic}
+.logi .ld{width:9px;height:9px;border-radius:50%;background:var(--pc);flex:none;margin-top:5px}
+.rules p,.rules li{font-size:13px;margin:0}
+.rules p{margin-top:6px}
+.rules h3{font-family:var(--disp);font-weight:400;font-size:14px;margin:12px 0 4px}
+.rules ol,.rules ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
+.newrow{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+
+/* your counter */
+.tray{flex:none;background:repeating-linear-gradient(90deg,rgba(40,20,5,.12) 0 2px,transparent 2px 14px),linear-gradient(#a87b45,#8b6033);box-shadow:inset 0 4px 0 rgba(255,255,255,.18),0 -6px 14px rgba(0,0,0,.25);color:#fff7e8}
+.tray .in{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;gap:18px;align-items:start;padding-top:12px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.tlabel{font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#f3dcb5}
+.tcol{display:flex;flex-direction:column;gap:8px;min-width:0}
+.bowls{display:grid;grid-template-columns:repeat(4,46px);gap:8px 6px}
+.bowl{height:46px;border-radius:50%;background:radial-gradient(circle,#fbf5e9 0 55%,#d9cbb1 56% 62%,#f4ead8 63%);box-shadow:0 3px 0 rgba(0,0,0,.3);display:flex;align-items:center;justify-content:center;position:relative}
+.bowl b{position:absolute;right:-4px;bottom:-4px;min-width:20px;height:20px;border-radius:10px;background:var(--ink);color:#fff;font-family:var(--disp);font-weight:400;font-size:11px;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.bowl.z{opacity:.45}
+.orders{display:flex;gap:10px;overflow-x:auto;padding:10px 2px 6px;min-width:0}
+.oticket{position:relative;flex:0 0 158px;background:var(--paper);color:var(--ink);border-radius:3px;padding:12px 10px 8px;box-shadow:0 3px 6px rgba(0,0,0,.3);display:flex;flex-direction:column;gap:5px;border-top:4px solid var(--cat)}
+.oticket::before{content:"";position:absolute;top:-9px;left:50%;margin-left:-12px;width:24px;height:10px;border-radius:3px;background:#9aa3a6;box-shadow:inset 0 -2px 0 #6e7779}
+.oticket .nm{font-weight:900;font-size:13.5px;line-height:1.15;padding-right:28px}
+.oticket .vpb{top:6px;right:6px;width:26px;height:26px;font-size:12px;border-width:2.5px}
+.oticket .thumb{width:64px;height:50px;object-fit:contain;align-self:center;margin:-4px 0 -2px}
+.oticket .ab{font-size:10.5px;color:var(--ink-2);line-height:1.25}
+.oticket .cost .ic,.need .ic{width:17px;height:17px}
+.need{display:flex;align-items:center;gap:3px;flex-wrap:wrap;font-size:10px;font-weight:900;letter-spacing:.1em;color:var(--ink-2)}
+.ready{align-self:flex-start;font-size:10px;font-weight:900;letter-spacing:.12em;color:#fff;background:var(--lac);border-radius:4px;padding:2px 6px;transform:rotate(-3deg)}
+.slip{flex:0 0 120px;border:2px dashed rgba(255,247,232,.4);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11.5px;color:#f3dcb5;text-align:center;padding:6px}
+.stacks{display:flex;gap:10px;align-items:flex-end}
+.stack{display:flex;flex-direction:column-reverse;align-items:center;width:46px}
+.stack .pl{width:42px;height:9px;border-radius:50%;background:var(--cat);border:2px solid #fffdf8;margin-top:-4px;box-shadow:0 2px 0 rgba(0,0,0,.25)}
+.stack .none{width:42px;height:9px;border-radius:50%;border:2px dashed rgba(255,247,232,.4)}
+.stack .cnt{font-family:var(--disp);font-size:14px;margin-top:4px}
+.stack .lb{font-size:9px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#f3dcb5}
+.sets{font-size:11.5px;color:#f3dcb5}
+.sets b{color:#fff;font-family:var(--disp);font-weight:400}
+.me{align-items:center}
+.mebig{width:60px;height:72px;filter:drop-shadow(0 3px 0 rgba(0,0,0,.25))}
+.chefs{display:flex;gap:2px;min-height:30px;align-items:flex-end}
+.chefs .face{width:25px;height:30px}
+
+/* sheets */
+.veil{position:fixed;inset:0;background:rgba(15,10,6,.6);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.sheet{background:var(--paper);color:var(--ink);border-radius:14px;max-width:700px;width:100%;max-height:calc(100% - 32px);display:flex;flex-direction:column;box-shadow:0 8px 0 var(--paper-2),0 24px 60px rgba(0,0,0,.5);border-top:8px solid var(--lac);overflow:hidden}
+.sheet-h{padding:16px 18px 8px;display:flex;flex-direction:column;gap:4px;flex:none}
+.sheet-h h2{margin:0;font-family:var(--disp);font-weight:400;font-size:22px}
+.sheet-h p{margin:0;color:var(--ink-2)}
+.sheet-b{flex:1;min-height:0;overflow:auto;padding:8px 18px 12px}
+.sheet-f{flex:none;display:flex;justify-content:flex-end;gap:10px;padding:10px 18px 16px;border-top:1px dashed var(--paper-2)}
+.gbtn{border:0;border-radius:10px;min-height:46px;padding:0 20px;font-family:var(--disp);font-weight:400;font-size:15px;cursor:pointer;background:var(--lac);color:#fff;box-shadow:0 4px 0 var(--lac-2)}
+.gbtn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--lac-2)}
+.gbtn:disabled{opacity:.4;cursor:not-allowed}
+.gbtn.wood{background:linear-gradient(#ecd3a6,#d3b07a);color:var(--ink);box-shadow:0 4px 0 var(--wood-dk)}
+.gbtn.on{background:var(--indigo);box-shadow:0 4px 0 var(--indigo-2)}
+.picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px 10px;padding-top:6px}
+.pcard{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:8px 4px;border-radius:14px}
+.pcard.sel{background:rgba(194,52,42,.12);box-shadow:inset 0 0 0 3px var(--lac)}
+.pcard:disabled{opacity:.4;cursor:not-allowed}
+.pcard .plabel{box-shadow:0 0 0 1px var(--paper-2),0 2px 0 var(--paper-2)}
+.pick-ice{justify-content:flex-start}
+.fbtn{border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:10px;font-size:11px;font-weight:900;min-width:56px;min-height:56px;color:#2c3c42}
+.fbtn.sel{background:#fff;box-shadow:inset 0 0 0 3px var(--lac)}
+.stepper{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 0}
+.stepper .gbtn{width:50px;padding:0;font-size:22px}
+.bigbowl{display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:900}
+.bigbowl .bowl{width:72px;height:72px}
+.bigbowl .bowl b{min-width:26px;height:26px;font-size:14px;border-radius:13px}
+.endt{display:flex;flex-direction:column;gap:8px}
+.erow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 12px;align-items:center;padding:10px 12px;border-radius:10px;background:var(--paper-2)}
+.erow.win{background:#fde3c7;box-shadow:inset 0 0 0 2px var(--gold)}
+.erow .who{display:flex;align-items:center;gap:8px;font-weight:900;font-size:15px}
+.erow .who .face{width:36px;height:43px}
+.erow .tot{font-family:var(--disp);font-size:24px;color:var(--lac);grid-row:span 2}
+.erow .bk{font-size:11.5px;color:var(--ink-2)}
+.toast{position:fixed;left:50%;top:76px;transform:translateX(-50%) rotate(-1.5deg);background:linear-gradient(#ecd3a6,#d3b07a);color:var(--ink);padding:10px 20px;border-radius:8px;font-family:var(--disp);font-size:16px;z-index:30;box-shadow:0 4px 0 var(--wood-dk),0 10px 20px rgba(0,0,0,.4);max-width:calc(100% - 32px);text-align:center;border:2px solid var(--wood-dk);pointer-events:none}
+@media (prefers-reduced-motion: reduce){.track,.board.can{animation:none}}
+
+/* short screens: give the stations more room */
+@media (min-width:641px) and (max-height:860px){
+  .beltzone{padding-top:14px}
+  .track{padding:10px 10px 8px}
+  .plate,.bempty{width:84px;height:84px}
+  .belt .plabel .ab{display:none}
+  .table{margin-top:12px}
+  .table>.in{padding-top:10px;padding-bottom:10px}
+  .board{min-height:116px;padding:8px 9px 8px}
+  .board .bt{font-size:11.5px}
+  .orders{padding-top:10px}
+  .oticket{padding:10px 9px 7px}
+  .oticket .thumb{width:46px;height:34px}
+  .tray .in{padding-top:10px;padding-bottom:10px}
+}
+@media (min-width:1000px) and (max-width:1120px){.tin{grid-template-columns:228px minmax(0,1fr) 248px}}
+/* tablet */
+@media (max-width:999px){
+  .tin{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"kitchen kitchen" "market room";grid-template-rows:minmax(0,1.5fr) minmax(0,1fr)}
+  .logo .en{display:none}
+  .tray .in{grid-template-columns:auto minmax(0,1fr);grid-template-areas:"pantry orders" "plates me"}
+  .t-pantry{grid-area:pantry}.t-orders{grid-area:orders}.t-plates{grid-area:plates}.t-me{grid-area:me}
+  .me{flex-direction:row;justify-content:flex-end;align-self:end}
+}
+/* phone */
+@media (max-width:640px){
+  .noren .in{gap:4px 10px;min-height:0;padding-top:6px;padding-bottom:6px}
+  .logo .en{display:none}
+  .logo .jp{font-size:20px}
+  .lanterns{gap:4px}
+  .lantern{width:11px;height:15px}
+  .who-turn{order:5;flex-basis:100%}
+  .turnface{width:30px;height:36px;margin-bottom:-4px}
+  .turn .lead{font-size:13.5px}
+  .hanko{width:42px;height:42px;margin-left:auto}
+  .hanko b{font-size:16px}
+  .tag{min-height:34px;padding:0 10px;font-size:12px}
+  .beltzone{padding-top:14px}
+  .track{padding:10px 8px 8px;border-radius:12px}
+  .belt{grid-template-columns:repeat(5,104px);gap:8px}
+  .plate{width:76px;height:76px}
+  .vpb{width:24px;height:24px;font-size:11.5px;border-width:2.5px}
+  .bempty{width:76px;height:76px}
+  .plabel{padding:4px 5px}
+  .plabel .nm{font-size:11.5px}
+  .belt .plabel .ab,.belt .plabel .ct,.belt .plabel .cost{display:none}
+  .table{margin-top:10px}
+  .table>.in{padding-top:8px;padding-bottom:8px}
+  .tin{display:flex;flex-direction:column;gap:8px}
+  .ptabs{display:flex}
+  .pane{display:none;flex:1}
+  .k.p-kitchen .pane-kitchen,.k.p-market .pane-market,.k.p-room .pane-room{display:flex}
+  .pane-kitchen .ph{display:none}
+  .stations{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px 8px}
+  .board{min-height:0;padding:8px 8px 7px}
+  .board .bn{font-size:13.5px}
+  .board .bt{font-size:11px}
+  .sticon{width:28px;height:28px}
+  .hole{width:30px;height:30px}
+  .hole .face{width:24px;height:29px}
+  .tray .in{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"pantry pantry" "orders orders" "plates me";gap:6px 8px;padding-top:8px}
+  .t-pantry .tlabel,.t-orders .tlabel,.t-plates .tlabel{display:none}
+  .bowls{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
+  .bowl{height:auto;aspect-ratio:1/1;max-width:44px}
+  .bowl .ic.lg{width:26px;height:26px}
+  .bowl b{min-width:18px;height:18px;font-size:10px}
+  .oticket{flex-basis:142px;padding:10px 8px 7px}
+  .oticket .thumb{width:46px;height:36px}
+  .oticket .ab{display:none}
+  .stack{width:38px}
+  .stack .pl,.stack .none{width:34px;height:8px}
+  .mebig{width:40px;height:48px}
+  .veil{align-items:flex-end;padding:0}
+  .sheet{border-radius:16px 16px 0 0;max-height:90%}
+  .sheet-f{padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+  .picks{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .toast{top:64px}
+}
+@media (max-width:640px) and (max-height:700px){
+  .belt .plabel{display:none}
+  .orders{padding-top:8px}
+  .oticket .thumb{display:none}
+}
+</style>
+
+<div class="k p-kitchen" id="app"></div>
+
+<script id="engine">
+/* ================= KAITEN — rules engine (no DOM) ================= */
+const FISH=['T','S','U','E'];
+const ING_KEYS=['R','N','T','S','U','E'];
+const ING_NAME={R:'Rice',N:'Nori',T:'Tuna',S:'Salmon',U:'Eel',E:'Shrimp',W:'Wasabi'};
+const CATS=['nigiri','maki','sashimi','special'];
+const CAT_NAME={nigiri:'Nigiri',maki:'Maki',sashimi:'Sashimi',special:'Special'};
+const ROUNDS=7, ORDER_LIMIT=3, SET_VP=4;
+
+const D=(id,name,cat,cost,vp,ab)=>({id,name,cat,cost,vp,ab:ab||null});
+const DISHES=[
+  D('n1','Maguro Nigiri','nigiri','RT',1,{t:'start',g:'R'}),
+  D('n2','Sake Nigiri','nigiri','RS',1,{t:'market'}),
+  D('n3','Unagi Nigiri','nigiri','RU',2),
+  D('n4','Ebi Nigiri','nigiri','RE',2),
+  D('n5','Otoro Nigiri','nigiri','RTT',3),
+  D('n6','Aburi Salmon','nigiri','RSS',2,{t:'cook',c:'nigiri'}),
+  D('n7','Ebi Tempura Nigiri','nigiri','REE',2,{t:'now',w:2}),
+  D('n8','Tamago Nigiri','nigiri','RRN',1,{t:'start',g:'W'}),
+  D('n9','Unagi Kabayaki','nigiri','RUU',2,{t:'end',c:'nigiri'}),
+  D('n10','Kohaku Pair','nigiri','RTS',3),
+  D('m1','Tekka Maki','maki','RNT',3,{t:'pantry'}),
+  D('m2','Sake Maki','maki','RNS',2,{t:'start',g:'N'}),
+  D('m3','Kappa Maki','maki','RN',0,{t:'start',g:'W'}),
+  D('m4','California Roll','maki','RNE',2,{t:'belt'}),
+  D('m5','Dragon Roll','maki','RNUE',4),
+  D('m6','Spicy Tuna Roll','maki','RNTT',3,{t:'cook',c:'maki'}),
+  D('m7','Futomaki','maki','RRNTU',6),
+  D('m8','Rainbow Roll','maki','RNTSUE',6),
+  D('m9','Salmon Skin Roll','maki','RNS',1,{t:'market'}),
+  D('m10','Philadelphia Roll','maki','RNSS',2,{t:'end',c:'maki'}),
+  D('s1','Maguro Sashimi','sashimi','TT',2),
+  D('s2','Sake Sashimi','sashimi','SS',2),
+  D('s3','Amaebi','sashimi','EE',1,{t:'start',g:'F'}),
+  D('s4','Moriawase','sashimi','TSE',2,{t:'cook',c:'sashimi'}),
+  D('s5','Toro Sashimi','sashimi','TTT',4),
+  D('s6','Salmon Belly','sashimi','SSS',3,{t:'now',w:2}),
+  D('s7','Sashimi Trio','sashimi','TSU',3),
+  D('s8','Odori Ebi','sashimi','EEE',2,{t:'start',g:'W'}),
+  D('s9','Tuna Tataki','sashimi','TTS',2,{t:'end',c:'sashimi'}),
+  D('s10','Sashimi Boat','sashimi','TSUE',5),
+  D('x1','Chirashi Bowl','special','RRTSE',7),
+  D('x2','Unadon','special','RRUU',4,{t:'start',g:'R'}),
+  D('x3','Omakase','special','RNTSUE',10),
+  D('x4','Tempura Platter','special','REEE',3,{t:'market'}),
+  D('x5','Kaisendon','special','RRSST',4,{t:'regular'}),
+  D('x6','Chawanmushi','special','RNE',1,{t:'start',g:'W'}),
+];
+const DISH=Object.fromEntries(DISHES.map(d=>[d.id,d]));
+
+const REGULARS=[
+  {id:'r1',name:'Salaryman',req:{cat:{nigiri:3}},vp:5},
+  {id:'r2',name:'Roll Fanatic',req:{cat:{maki:3}},vp:5},
+  {id:'r3',name:'Purist',req:{cat:{sashimi:3}},vp:5},
+  {id:'r4',name:'Food Critic',req:{cat:{nigiri:1,maki:1,sashimi:1,special:1}},vp:6},
+  {id:'r5',name:'Tuna Devotee',req:{fish:'T',n:3},vp:4},
+  {id:'r6',name:'Salmon Devotee',req:{fish:'S',n:3},vp:4},
+  {id:'r7',name:'Eel Devotee',req:{fish:'U',n:3},vp:4},
+  {id:'r8',name:'Shrimp Devotee',req:{fish:'E',n:3},vp:4},
+  {id:'r9',name:'Big Spender',req:{cat:{special:2}},vp:6},
+  {id:'r10',name:'Family Table',req:{total:6},vp:4},
+  {id:'r11',name:'Ocean Medley',req:{allFish:1},vp:3},
+  {id:'r12',name:'Lunch Date',req:{cat:{nigiri:2,maki:2}},vp:5},
+];
+const REG=Object.fromEntries(REGULARS.map(r=>[r.id,r]));
+
+const LOCS=[
+  {id:'market',name:'Fish Market',kj:'魚市場',text:'Take 2 fish from the ice.',cap:n=>n>=4?3:2},
+  {id:'pantry',name:'Pantry',kj:'食料庫',text:'Take 2 Rice or Nori, any mix.',cap:()=>99},
+  {id:'belt',name:'Kaiten Belt',kj:'回転台',text:'Take up to 2 dishes off the belt as orders, wasabi and all.',cap:n=>n>=4?3:2},
+  {id:'prep',name:'Prep Counter',kj:'仕込み',text:'Cook 1 order.',cap:()=>99},
+  {id:'head',name:'Head Chef',kj:'板長',text:'Cook up to 2 orders.',cap:()=>1},
+  {id:'door',name:'Front Door',kj:'暖簾',text:'Go first next round. Gain 1 wasabi and draw an order.',cap:()=>1},
+  {id:'staff',name:'Staff Room',kj:'控室',text:'Pay 2 wasabi: hire a 4th chef from next round.',cap:()=>1},
+];
+const LOC=Object.fromEntries(LOCS.map(l=>[l.id,l]));
+const BOT_NAMES=['Hana','Ren','Ito'];
+
+function abText(ab){
+  if(!ab) return '';
+  switch(ab.t){
+    case 'start': return 'Each round: +1 '+(ab.g==='F'?'fish from the deck':ab.g==='W'?'wasabi':ING_NAME[ab.g])+'.';
+    case 'market': return 'Fish Market: +1 fish.';
+    case 'pantry': return 'Pantry: +1 staple.';
+    case 'belt': return 'Kaiten Belt: +1 wasabi.';
+    case 'cook': return '+2 VP each time you serve another '+CAT_NAME[ab.c]+'.';
+    case 'end': return 'Game end: +1 VP per '+CAT_NAME[ab.c]+' served.';
+    case 'now': return 'When served: +'+ab.w+' wasabi.';
+    case 'regular': return 'Game end: +2 VP per regular won.';
+  }
+  return '';
+}
+function reqText(r){
+  const q=r.req;
+  if(q.cat){const e=Object.entries(q.cat); if(e.length===4) return 'One of each type'; return e.map(([k,v])=>v+' '+CAT_NAME[k]).join(' + ');}
+  if(q.fish) return q.n+' dishes with '+ING_NAME[q.fish];
+  if(q.total) return q.total+' dishes of any type';
+  if(q.allFish) return 'All four fish served';
+  return '';
+}
+
+function rnd(s){
+  s.rng=(s.rng+0x6D2B79F5)|0; let t=s.rng;
+  t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61);
+  return ((t^(t>>>14))>>>0)/4294967296;
+}
+function shuffle(s,a){for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd(s)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function log(s,text,pi){s.log.unshift({r:s.round,t:text,pi:pi==null?-1:pi}); if(s.log.length>80) s.log.length=80;}
+function drawFish(s){
+  if(!s.fishDeck.length){if(!s.fishDiscard.length) return null; s.fishDeck=shuffle(s,s.fishDiscard); s.fishDiscard=[];}
+  return s.fishDeck.pop();
+}
+function drawDish(s){
+  if(!s.dishDeck.length){if(!s.dishDiscard.length) return null; s.dishDeck=shuffle(s,s.dishDiscard); s.dishDiscard=[];}
+  return s.dishDeck.pop();
+}
+function refillMarket(s){while(s.market.length<5){const f=drawFish(s); if(!f) break; s.market.push(f);}}
+
+function newGame(opts){
+  const o=Object.assign({nBots:2,seed:(Math.random()*1e9)|0,allBots:false},opts||{});
+  const n=o.nBots+1;
+  const s={rng:o.seed|0,seed:o.seed|0,round:1,maxRounds:ROUNDS,log:[],over:false,doorTaker:null};
+  s.players=[];
+  for(let i=0;i<n;i++){
+    s.players.push({name:o.allBots?'Bot '+(i+1):i===0?'You':BOT_NAMES[i-1],bot:o.allBots||i>0,color:i,
+      hand:{R:i?3:2,N:1,T:0,S:0,U:0,E:0},wasabi:1,orders:[],tableau:[],bonus:0,regulars:[],hired:false,apprentice:false,placed:0});
+  }
+  s.fishDeck=[]; FISH.forEach(f=>{for(let i=0;i<12;i++) s.fishDeck.push(f);}); shuffle(s,s.fishDeck); s.fishDiscard=[];
+  s.market=[]; refillMarket(s);
+  s.dishDeck=shuffle(s,DISHES.map(d=>d.id)); s.dishDiscard=[];
+  s.belt=[]; for(let i=0;i<5;i++){const id=drawDish(s); s.belt.push(id?{id,w:0}:null);}
+  s.players.forEach(p=>{p.orders.push(drawDish(s),drawDish(s));});
+  s.regDeck=shuffle(s,REGULARS.map(r=>r.id)).slice(0,n+4); s.regulars=[s.regDeck.pop(),s.regDeck.pop(),s.regDeck.pop()];
+  s.spots={}; LOCS.forEach(l=>s.spots[l.id]=[]);
+  s.first=0; s.turn=0;
+  log(s,'The noren goes up. Round 1 of '+ROUNDS+'.');
+  return s;
+}
+
+const chefsOf=p=>3+(p.apprentice?1:0);
+const chefsLeft=p=>chefsOf(p)-p.placed;
+function countCost(cost){const c={R:0,N:0,T:0,S:0,U:0,E:0}; for(const ch of cost) c[ch]++; return c;}
+function shortfall(hand,d){const n=countCost(d.cost); let sh=0; for(const k in n) sh+=Math.max(0,n[k]-hand[k]); return sh;}
+function canCook(p,d){return shortfall(p.hand,d)<=p.wasabi;}
+function canCookAll(p,ds){
+  const h={...p.hand}; let w=p.wasabi;
+  for(const d of ds){const n=countCost(d.cost); for(const k in n){const u=Math.min(n[k],h[k]); h[k]-=u; w-=n[k]-u;} if(w<0) return false;}
+  return true;
+}
+function missingList(p,d){const n=countCost(d.cost); const out=[]; for(const k of ING_KEYS){const m=n[k]-p.hand[k]; for(let i=0;i<m;i++) out.push(k);} return out;}
+function catCounts(tab){const c={nigiri:0,maki:0,sashimi:0,special:0}; tab.forEach(id=>c[DISH[id].cat]++); return c;}
+function regMet(r,tab){
+  const q=r.req;
+  if(q.cat){const c=catCounts(tab); return Object.entries(q.cat).every(([k,v])=>c[k]>=v);}
+  if(q.fish) return tab.filter(id=>DISH[id].cost.includes(q.fish)).length>=q.n;
+  if(q.total) return tab.length>=q.total;
+  if(q.allFish) return FISH.every(f=>tab.some(id=>DISH[id].cost.includes(f)));
+  return false;
+}
+const abCount=(p,t)=>p.tableau.filter(id=>DISH[id].ab&&DISH[id].ab.t===t).length;
+
+function spotFree(s,loc){return s.spots[loc].length<LOC[loc].cap(s.players.length);}
+function whyNot(s,pi,loc){
+  const p=s.players[pi];
+  if(!spotFree(s,loc)) return 'Taken';
+  switch(loc){
+    case 'market': return s.market.length?'':'The ice is empty';
+    case 'belt': if(p.orders.length>=ORDER_LIMIT) return 'Your order clips are full'; return s.belt.some(Boolean)?'':'The belt is empty';
+    case 'prep': case 'head': return p.orders.some(id=>canCook(p,DISH[id]))?'':'Nothing ready to cook';
+    case 'staff': return p.hired?'Already hired':p.wasabi<2?'Needs 2 wasabi':'';
+  }
+  return '';
+}
+const legal=(s,pi,loc)=>!whyNot(s,pi,loc);
+
+function cook(s,pi,id){
+  const p=s.players[pi], d=DISH[id], n=countCost(d.cost);
+  for(const k in n){const u=Math.min(n[k],p.hand[k]); p.hand[k]-=u; if(FISH.includes(k)) for(let i=0;i<u;i++) s.fishDiscard.push(k); p.wasabi-=n[k]-u;}
+  p.orders.splice(p.orders.indexOf(id),1);
+  const trig=p.tableau.filter(t=>DISH[t].ab&&DISH[t].ab.t==='cook'&&DISH[t].ab.c===d.cat).length;
+  p.bonus+=2*trig; p.tableau.push(id);
+  if(d.ab&&d.ab.t==='now') p.wasabi+=d.ab.w;
+  log(s,p.name+' served '+d.name+' ('+d.vp+' VP'+(trig?', +'+2*trig+' bonus':'')+').',pi);
+}
+
+function act(s,pi,loc,args){
+  args=args||{};
+  if(s.over||s.turn!==pi) throw new Error('Not your turn');
+  if(!legal(s,pi,loc)) throw new Error('Illegal: '+loc);
+  const p=s.players[pi];
+  s.spots[loc].push(pi); p.placed++;
+  switch(loc){
+    case 'market':{
+      const k=Math.min(2+abCount(p,'market'),s.market.length);
+      const picks=[...new Set(args.picks||[])].filter(i=>i>=0&&i<s.market.length).slice(0,k);
+      while(picks.length<k){for(let i=0;i<s.market.length;i++) if(!picks.includes(i)){picks.push(i);break;}}
+      const got=picks.map(i=>s.market[i]);
+      s.market=s.market.filter((_,i)=>!picks.includes(i));
+      got.forEach(f=>p.hand[f]++); refillMarket(s);
+      log(s,p.name+' bought '+got.map(f=>ING_NAME[f]).join(', ')+' at the market.',pi);
+      break;}
+    case 'pantry':{
+      const k=2+abCount(p,'pantry'); const r=Math.max(0,Math.min(k,args.rice==null?k:args.rice));
+      p.hand.R+=r; p.hand.N+=k-r;
+      log(s,p.name+' took '+[r?r+' Rice':'',k-r?(k-r)+' Nori':''].filter(Boolean).join(' and ')+' from the pantry.',pi);
+      break;}
+    case 'belt':{
+      const room=Math.min(2,ORDER_LIMIT-p.orders.length);
+      const slots=[...new Set(args.slots||[])].filter(i=>s.belt[i]).slice(0,room);
+      if(!slots.length) slots.push(s.belt.findIndex(Boolean));
+      let w=abCount(p,'belt'); const names=[];
+      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null;});
+      p.wasabi+=w;
+      log(s,p.name+' took '+names.join(' and ')+' off the belt'+(w?' with '+w+' wasabi':'')+'.',pi);
+      break;}
+    case 'prep':{
+      let id=args.dish; if(!p.orders.includes(id)||!canCook(p,DISH[id])) id=p.orders.find(x=>canCook(p,DISH[x]));
+      cook(s,pi,id); break;}
+    case 'head':{
+      let ids=(args.dishes||[]).filter(x=>p.orders.includes(x)).slice(0,2);
+      if(!ids.length||!canCookAll(p,ids.map(x=>DISH[x]))) ids=[p.orders.find(x=>canCook(p,DISH[x]))];
+      ids.forEach(id=>cook(s,pi,id)); break;}
+    case 'door':{
+      s.doorTaker=pi; p.wasabi++;
+      let drew=''; if(p.orders.length<ORDER_LIMIT){const id=drawDish(s); if(id){p.orders.push(id); drew=' and drew an order';}}
+      log(s,p.name+' opened the front door: first next round, +1 wasabi'+drew+'.',pi);
+      break;}
+    case 'staff':{
+      p.hired=true; p.wasabi-=2; log(s,p.name+' paid 2 wasabi and hired an apprentice.',pi); break;}
+  }
+  claimRegular(s,pi);
+  advance(s);
+}
+
+function claimRegular(s,pi){
+  const p=s.players[pi];
+  for(let i=0;i<s.regulars.length;i++){
+    const r=s.regulars[i];
+    if(r&&regMet(REG[r],p.tableau)){
+      p.regulars.push(r); s.regulars[i]=s.regDeck.pop()||null;
+      log(s,p.name+' won over the '+REG[r].name+' (+'+REG[r].vp+' VP).',pi);
+      return;
+    }
+  }
+}
+function advance(s){
+  const n=s.players.length;
+  for(let k=1;k<=n;k++){const j=(s.turn+k)%n; if(chefsLeft(s.players[j])>0){s.turn=j; return;}}
+  endRound(s);
+}
+function endRound(s){
+  // the belt turns: the oldest dish goes round the corner, the rest slide along and pick up wasabi
+  const gone=s.belt[4]; if(gone){s.dishDiscard.push(gone.id); log(s,DISH[gone.id].name+' went round the corner.');}
+  const rest=s.belt.slice(0,4).filter(Boolean);
+  const nb=[null,null,null,null,null]; rest.forEach((b,i)=>{b.w++; nb[5-rest.length+i]=b;});
+  for(let i=0;i<5;i++) if(!nb[i]){const id=drawDish(s); if(id) nb[i]={id,w:0};}
+  s.belt=nb;
+  LOCS.forEach(l=>s.spots[l.id]=[]);
+  s.players.forEach(p=>{p.placed=0; if(p.hired) p.apprentice=true;});
+  if(s.doorTaker!=null){s.first=s.doorTaker; s.doorTaker=null;} else s.first=(s.first+1)%s.players.length;
+  s.round++;
+  if(s.round>s.maxRounds){s.over=true; s.round=s.maxRounds; log(s,'Closing time. Final scores are in.'); return;}
+  s.turn=s.first;
+  log(s,'Round '+s.round+' begins. '+s.players[s.first].name+(s.players[s.first].bot?' goes':' go')+' first.');
+  s.players.forEach(p=>p.tableau.forEach(id=>{
+    const a=DISH[id].ab; if(!a||a.t!=='start') return;
+    if(a.g==='W') p.wasabi++; else if(a.g==='F'){const f=drawFish(s); if(f) p.hand[f]++;} else p.hand[a.g]++;
+  }));
+}
+
+function score(p){
+  const c=catCounts(p.tableau);
+  const dishes=p.tableau.reduce((a,id)=>a+DISH[id].vp,0);
+  const sets=Math.min(c.nigiri,c.maki,c.sashimi)*SET_VP;
+  const regs=p.regulars.reduce((a,id)=>a+REG[id].vp,0);
+  let end=0; p.tableau.forEach(id=>{const a=DISH[id].ab; if(!a) return; if(a.t==='end') end+=c[a.c]; if(a.t==='regular') end+=2*p.regulars.length;});
+  return {dishes,bonus:p.bonus,sets,regs,end,total:dishes+p.bonus+sets+regs+end};
+}
+function ranking(s){
+  return s.players.map((p,i)=>({i,sc:score(p),n:p.tableau.length,w:p.wasabi}))
+    .sort((a,b)=>b.sc.total-a.sc.total||b.n-a.n||b.w-a.w);
+}
+
+/* ---------- bot ---------- */
+function dishValue(s,p,d){
+  const left=s.maxRounds-s.round, tab=p.tableau;
+  let v=d.vp; const a=d.ab;
+  if(a){switch(a.t){
+    case 'start': v+=left*(a.g==='W'||a.g==='F'?0.9:0.6); break;
+    case 'market': case 'pantry': v+=left*0.55; break;
+    case 'belt': v+=left*0.45; break;
+    case 'cook': v+=left*0.9; break;
+    case 'end': v+=catCounts(tab)[a.c]+(a.c===d.cat?1:0)+left*0.3; break;
+    case 'now': v+=a.w*0.7; break;
+    case 'regular': v+=2*p.regulars.length+left*0.3; break;
+  }}
+  v+=2*tab.filter(t=>DISH[t].ab&&DISH[t].ab.t==='cook'&&DISH[t].ab.c===d.cat).length;
+  if(d.cat!=='special'){const c=catCounts(tab); const m=Math.min(c.nigiri,c.maki,c.sashimi); if(c[d.cat]===m) v+=1.6;}
+  const after=tab.concat([d.id]);
+  for(const r of s.regulars) if(r&&!regMet(REG[r],tab)&&regMet(REG[r],after)) v+=REG[r].vp*0.9;
+  return v;
+}
+function demand(s,p){
+  const dem={R:0,N:0,T:0,S:0,U:0,E:0}; const pool={...p.hand};
+  const ords=p.orders.map(id=>DISH[id]).sort((a,b)=>dishValue(s,p,b)-dishValue(s,p,a));
+  ords.forEach(d=>{const n=countCost(d.cost); const wt=1+dishValue(s,p,d)/6; for(const k in n){const u=Math.min(pool[k],n[k]); pool[k]-=u; dem[k]+=(n[k]-u)*wt;}});
+  return dem;
+}
+function botMove(s,pi){
+  const p=s.players[pi], left=s.maxRounds-s.round, last=left===0;
+  const opts=[]; const noise=()=>rnd(s)*0.6;
+  const cookable=p.orders.filter(id=>canCook(p,DISH[id])).map(id=>({id,v:dishValue(s,p,DISH[id])})).sort((a,b)=>b.v-a.v);
+  for(const L of LOCS){
+    if(!legal(s,pi,L.id)) continue;
+    let sc=-1, args={};
+    switch(L.id){
+      case 'prep': sc=cookable[0].v+0.6; args={dish:cookable[0].id}; break;
+      case 'head':{
+        let best=null;
+        for(let i=0;i<cookable.length;i++) for(let j=i+1;j<cookable.length;j++){
+          const a=cookable[i],b=cookable[j];
+          if(canCookAll(p,[DISH[a.id],DISH[b.id]])&&(!best||a.v+b.v>best.v)) best={v:a.v+b.v,ids:[a.id,b.id]};
+        }
+        if(best){sc=best.v+1.2; args={dishes:best.ids};}
+        break;}
+      case 'belt':{
+        const room=Math.min(2,ORDER_LIMIT-p.orders.length);
+        const items=s.belt.map((b,i)=>{
+          if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-p.wasabi-b.w);
+          let v=0.5*dishValue(s,p,d)/(1+0.35*sh)+0.85*b.w;
+          if(last) v=sh===0?0.7*dishValue(s,p,d):0.16*b.w;
+          else if(left===1&&sh>2) v*=0.4;
+          return {i,v};
+        }).filter(Boolean).sort((a,b)=>b.v-a.v).slice(0,room);
+        sc=items.reduce((a,x)=>a+x.v,0)+abCount(p,'belt')*0.8; args={slots:items.map(x=>x.i)};
+        break;}
+      case 'market':{
+        const k=Math.min(2+abCount(p,'market'),s.market.length);
+        const dem=demand(s,p); const picks=[]; let v=0;
+        for(let t=0;t<k;t++){
+          let bi=-1,bv=-1;
+          s.market.forEach((f,i)=>{if(picks.includes(i)) return; const val=dem[f]>0.01?1.3+Math.min(dem[f],2)*0.2:0.35; if(val>bv){bv=val;bi=i;}});
+          if(bi<0) break; picks.push(bi); v+=bv; dem[s.market[bi]]-=1;
+        }
+        sc=v*(last?0.5:1); args={picks};
+        break;}
+      case 'pantry':{
+        const k=2+abCount(p,'pantry'); const dem=demand(s,p); let r=0,v=0;
+        for(let t=0;t<k;t++){ if(dem.R>=dem.N&&dem.R>0){r++;dem.R--;v+=1.2;} else if(dem.N>0){dem.N--;v+=1.2;} else {r++; v+=0.35;} }
+        sc=v*(last?0.5:0.95); args={rice:r};
+        break;}
+      case 'door': sc=last?0.7:1.6+(p.orders.length<ORDER_LIMIT?0.6:0); break;
+      case 'staff': sc=left>=2?1.1*left:-1; break;
+    }
+    if(sc>-1) opts.push({loc:L.id,args,sc:sc+noise()});
+  }
+  opts.sort((a,b)=>b.sc-a.sc);
+  return opts[0]||{loc:'pantry',args:{}};
+}
+
+if(typeof module!=='undefined') module.exports={newGame,act,botMove,score,ranking,DISHES,REGULARS,LOCS,chefsLeft,legal};
+</script>
+
+<script>
+/* ================= UI ================= */
+const DISH_ART={
+  n1:'nigiri-tuna',n2:'nigiri-salmon',n3:'nigiri-eel',n4:'nigiri-shrimp',n5:'nigiri-toro',n6:'nigiri-aburi',n7:'nigiri-shrimp',n8:'nigiri-egg',n9:'nigiri-eel',n10:'nigiri-pair',
+  m1:'maki-tuna',m2:'maki-salmon',m3:'maki-cucumber',m4:'uramaki',m5:'roll-dragon',m6:'maki-tuna',m7:'futomaki',m8:'roll-rainbow',m9:'maki-salmon',m10:'uramaki',
+  s1:'sashimi-tuna',s2:'sashimi-salmon',s3:'sashimi-ebi',s4:'sashimi-mixed',s5:'sashimi-toro',s6:'sashimi-salmon',s7:'sashimi-mixed',s8:'sashimi-ebi',s9:'sashimi-tuna',s10:'sashimi-boat',
+  x1:'bowl-chirashi',x2:'bowl-unadon',x3:'omakase',x4:'tempura',x5:'bowl-kaisen',x6:'chawanmushi',
+};
+// 'svg' = drawn placeholders; switch to 'webp' once tools/slice_sheets.py has cut the painted sheets
+const ART_EXT='svg';
+const A=k=>'art/'+k+'.'+ART_EXT;
+const dishArt=id=>A('dish-'+DISH_ART[id]);
+const chefArt=c=>A('chef-'+c);
+const ingArt=k=>A('ing-'+k);
+const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+let S=null;
+const ui={pane:'kitchen',side:'seats',sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0};
+const app=document.getElementById('app');
+
+const ic=(k,cls)=>'<img class="ic'+(cls?' '+cls:'')+'" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">';
+const costRow=c=>'<span class="cost">'+[...c].map(k=>ic(k)).join('')+'</span>';
+const wasabiRow=w=>w?'<span class="wsb" aria-label="'+w+' wasabi riding on this plate">'+Array.from({length:Math.min(w,5)},()=>'<img class="ic" src="'+ingArt('W')+'" alt="">').join('')+'</span>':'';
+function plateHTML(id,w){
+  const d=DISH[id];
+  return '<span class="plate c-'+d.cat+'"><img class="dart" src="'+dishArt(id)+'" alt=""><span class="vpb num" title="Victory points">'+d.vp+'</span>'+wasabiRow(w)+'</span>';
+}
+function labelHTML(id,note){
+  const d=DISH[id];
+  return '<span class="plabel c-'+d.cat+'"><span class="ct">'+CAT_NAME[d.cat]+'</span><span class="nm">'+esc(d.name)+'</span>'+costRow(d.cost)+
+    (note?'<span class="ab"><b>'+esc(note)+'</b></span>':'')+(d.ab?'<span class="ab">'+abText(d.ab)+'</span>':'')+'</span>';
+}
+function cookStatus(p,id){
+  const d=DISH[id], miss=missingList(p,d), ok=canCook(p,d);
+  return {ok,miss,note:ok?(miss.length?'Ready · uses '+miss.length+' wasabi':'Ready to cook'):'Need '+miss.map(k=>ING_NAME[k]).join(', ')};
+}
+
+function render(){
+  // keep each scrolling container where the player left it
+  const keep={}; app.querySelectorAll('[data-sk]').forEach(el=>keep[el.dataset.sk]=[el.scrollLeft,el.scrollTop]);
+  const me=S.players[0], my=!S.over&&S.turn===0, n=S.players.length, sc=score(me);
+  const cur=S.players[S.turn], left=S.over?0:chefsLeft(me);
+  const rk=ranking(S), win=S.players[rk[0].i];
+  const lastAct=S.log.find(l=>l.pi>=0);
+  app.className='k p-'+ui.pane;
+
+  const lanterns=Array.from({length:S.maxRounds},(_,i)=>'<span class="lantern'+(S.over||i+1<S.round?' done':i+1===S.round?' now':'')+'"></span>').join('');
+  const lead=S.over?'Closing time.':my?'Your turn · place a chef ('+left+' left)':cur.name+' is placing a chef…';
+
+  const belt=S.belt.map((b,i)=>'<div class="bslot">'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
+    (b?plateHTML(b.id,b.w)+labelHTML(b.id):'<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
+
+  const market=S.market.map(f=>'<div class="fish"><img class="ic xl" src="'+ingArt(f)+'" alt="">'+ING_NAME[f]+'</div>').join('')||'<p class="hint">The ice is empty.</p>';
+  const regs=S.regulars.map(r=>r?'<div class="ticket"><img class="face" src="'+A('reg-'+r)+'" alt=""><span><span class="nm">'+esc(REG[r].name)+'</span><span class="rq">'+reqText(REG[r])+'</span></span><span class="stamp num">'+REG[r].vp+'</span></div>'
+    :'<div class="ticket"><span><span class="nm">Empty seat</span><span class="rq">No one left in the queue</span></span><span class="stamp">–</span></div>').join('');
+
+  const stations=LOCS.map(L=>{
+    const cap=L.cap(n), taken=S.spots[L.id], why=my?whyNot(S,0,L.id):'', can=my&&!why, unlimited=cap>20;
+    let text=L.text;
+    if(L.id==='market'&&abCount(me,'market')) text='Take '+(2+abCount(me,'market'))+' fish from the ice.';
+    if(L.id==='pantry'&&abCount(me,'pantry')) text='Take '+(2+abCount(me,'pantry'))+' Rice or Nori, any mix.';
+    const holes=taken.map(pi=>'<span class="hole" title="'+esc(S.players[pi].name)+'"><img class="face" src="'+chefArt(S.players[pi].color)+'" alt="'+esc(S.players[pi].name)+'"></span>').join('')+
+      (unlimited?'<span class="open-all">Open to all</span>':Array.from({length:cap-taken.length},()=>'<span class="hole" aria-hidden="true"></span>').join(''));
+    return '<button type="button" class="board'+(can?' can':!my?' live':'')+'" data-loc="'+L.id+'"'+(can?'':' disabled')+'>'+
+      '<span class="kj" lang="ja" aria-hidden="true">'+L.kj+'</span><span class="top"><img class="sticon" src="'+A('st-'+L.id)+'" alt=""><span class="bn">'+L.name+'</span></span>'+
+      '<span class="bt">'+text+'</span>'+(my&&why&&why!=='Taken'?'<span class="why">'+why+'</span>':'')+'<span class="holes">'+holes+'</span></button>';
+  }).join('');
+
+  let side='';
+  if(ui.side==='seats'){
+    side=S.players.map((p,i)=>{
+      const s2=score(p);
+      return '<div class="seat"><div class="seat-h"><img class="face" src="'+chefArt(p.color)+'" alt=""><b>'+esc(p.name)+'</b>'+(S.first===i?'<span class="firstmark">FIRST</span>':'')+'<span class="sc num">'+s2.total+'</span></div>'+
+        '<div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
+        '<div class="meta">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+' chefs'+(p.hired&&!p.apprentice?' (+1 next round)':'')+' · '+p.orders.length+' orders · '+p.regulars.length+' regulars'+(p.regulars.length?' ('+p.regulars.map(r=>REG[r].name).join(', ')+')':'')+'</div>'+
+        '<div class="dlist">'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(d.ab?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>'+
+        '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+'</div></div>';
+    }).join('');
+  } else if(ui.side==='log'){
+    side='<ul class="loglist">'+S.log.slice(0,50).map(l=>'<li class="logi'+(l.pi<0?' sys':'')+'">'+(l.pi>=0?'<span class="ld pc'+S.players[l.pi].color+'"></span>':'')+'<span>'+esc(l.t)+'</span></li>').join('')+'</ul>';
+  } else {
+    side='<div class="rules"><p>Run the best stall at the sushi bar over 7 rounds. Send chefs to stations, gather fish and staples, take orders off the belt, and serve dishes. Served plates stay with you, score, and often keep working for you.</p>'+
+      '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, first player passes left.</li></ol>'+
+      '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p>'+
+      '<h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>Regulars you win, and effects printed on your dishes.</li></ul>'+
+      '<h3>New game</h3><div class="newrow">'+newOpts()+'</div></div>';
+  }
+
+  const bowls=ING_KEYS.map(k=>[k,me.hand[k]]).concat([['W',me.wasabi]]).map(([k,v])=>'<div class="bowl'+(v?'':' z')+'" role="img" aria-label="'+v+' '+ING_NAME[k]+'"><img class="ic lg" src="'+ingArt(k)+'" alt=""><b class="num">'+v+'</b></div>').join('');
+  const orders=me.orders.map(id=>{
+    const d=DISH[id], st=cookStatus(me,id);
+    return '<div class="oticket c-'+d.cat+'"><span class="nm">'+esc(d.name)+'</span><span class="vpb num">'+d.vp+'</span><img class="thumb" src="'+dishArt(id)+'" alt="">'+costRow(d.cost)+
+      (st.ok?'<span class="ready">'+(st.miss.length?'READY · '+st.miss.length+' WASABI':'READY')+'</span>':'<span class="need">NEED '+st.miss.map(k=>ic(k)).join('')+'</span>')+
+      (d.ab?'<span class="ab">'+abText(d.ab)+'</span>':'')+'</div>';
+  }).join('')+Array.from({length:ORDER_LIMIT-me.orders.length},()=>'<div class="slip">Empty order clip</div>').join('');
+  const cc=catCounts(me.tableau);
+  const stacks=CATS.map(k=>'<div class="stack c-'+k+'" role="img" aria-label="'+cc[k]+' '+CAT_NAME[k]+' served"><span class="lb">'+CAT_NAME[k]+'</span><span class="cnt num">'+cc[k]+'</span>'+
+    (cc[k]?Array.from({length:Math.min(cc[k],7)},()=>'<span class="pl"></span>').join(''):'<span class="none"></span>')+'</div>').join('');
+
+  app.innerHTML=
+  '<header class="noren"><div class="in">'+
+    '<div class="logo"><span class="jp" lang="ja">回転寿司</span><span class="en">KAITEN</span></div>'+
+    '<div class="lanterns" role="img" aria-label="Round '+S.round+' of '+S.maxRounds+'">'+lanterns+'</div>'+
+    '<div class="who-turn"><img class="face turnface" src="'+chefArt(S.over?win.color:cur.color)+'" alt=""><div class="turn" aria-live="polite"><span class="lead'+(my?' mine':'')+'">'+esc(lead)+'</span><span class="sub">'+esc(lastAct?lastAct.t:'Round '+S.round+' of '+S.maxRounds)+'</span></div></div>'+
+    '<button type="button" class="tag" data-act="new">New game</button>'+
+    '<div class="hanko" role="img" aria-label="Your score: '+sc.total+' VP"><b class="num">'+sc.total+'</b><span>VP</span></div>'+
+  '</div></header>'+
+  '<section class="beltzone" aria-label="The belt"><div class="in"><div class="track" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
+  '<main class="table"><div class="in"><div class="tin">'+
+    '<div class="ptabs" role="tablist" aria-label="Table areas">'+
+      [['kitchen','Kitchen','厨房'],['market','Market','市場'],['room','Diners','客席']].map(([k,l,j])=>'<button type="button" role="tab" class="ptab'+(ui.pane===k?' on':'')+'" aria-selected="'+(ui.pane===k)+'" data-pane="'+k+'">'+l+'<span class="kj" lang="ja">'+j+'</span></button>').join('')+
+    '</div>'+
+    '<section class="pane pane-market" aria-label="Fish market and regulars"><div class="scroll" data-sk="market">'+
+      '<div class="ph"><h2>Fish market</h2><span class="kj" lang="ja">魚市場</span></div>'+
+      '<div class="ice" style="margin-top:6px">'+market+'</div><p class="deck num">'+S.fishDeck.length+' fish left in the deck</p>'+
+      '<div class="ph"><h2>Regulars waiting</h2><span class="kj" lang="ja">常連</span></div><p class="hint">Yours the moment your served plates match.</p>'+
+      '<div class="tickets">'+regs+'</div></div></section>'+
+    '<section class="pane pane-kitchen" aria-label="Stations"><div class="ph"><h2>Stations</h2><p>'+(my?'Tap a glowing board':S.over?'Closed':'Waiting for '+esc(cur.name))+'</p></div>'+
+      '<div class="scroll" data-sk="kitchen"><div class="stations">'+stations+'</div></div></section>'+
+    '<section class="pane pane-room" aria-label="Diners"><div class="paper">'+
+      '<div class="stabs" role="tablist" aria-label="Diners">'+[['seats','Chefs'],['log','Log'],['rules','Rules']].map(([k,l])=>'<button type="button" role="tab" class="stab'+(ui.side===k?' on':'')+'" aria-selected="'+(ui.side===k)+'" data-side="'+k+'">'+l+'</button>').join('')+'</div>'+
+      '<div class="scroll" data-sk="side-'+ui.side+'">'+side+'</div></div></section>'+
+  '</div></div></main>'+
+  '<section class="tray" aria-label="Your counter"><div class="in">'+
+    '<div class="tcol t-pantry"><span class="tlabel">Your pantry</span><div class="bowls">'+bowls+'</div></div>'+
+    '<div class="tcol t-orders"><span class="tlabel">Orders · '+me.orders.length+'/'+ORDER_LIMIT+'</span><div class="orders" data-sk="orders">'+orders+'</div></div>'+
+    '<div class="tcol t-plates"><span class="tlabel">Served plates</span><div class="stacks">'+stacks+'</div><span class="sets">Tasting sets <b class="num">'+Math.min(cc.nigiri,cc.maki,cc.sashimi)+'</b> · 4 VP each</span></div>'+
+    '<div class="tcol t-me me"><img class="face mebig" src="'+chefArt(0)+'" alt="Your head chef"><div class="chefs" aria-label="'+left+' chefs ready">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(0)+'" alt="">').join('')+'</div><span class="tlabel">'+left+(left===1?' chef':' chefs')+' ready</span></div>'+
+  '</div></section>'+
+  sheetHTML(me)+
+  (ui.toast?'<div class="toast" role="status">'+esc(ui.toast)+'</div>':'');
+
+  app.querySelectorAll('[data-sk]').forEach(el=>{const k=keep[el.dataset.sk]; if(k){el.scrollLeft=k[0]; el.scrollTop=k[1];}});
+}
+
+function newOpts(){return [1,2,3].map(k=>'<button type="button" class="gbtn'+(k===ui.nBots?' on':' wood')+'" data-start="'+k+'">'+k+' rival'+(k>1?'s':'')+'</button>').join('');}
+function maxPick(){
+  const me=S.players[0], s=ui.sheet;
+  if(s==='market') return Math.min(2+abCount(me,'market'),S.market.length);
+  if(s==='belt') return Math.min(2,ORDER_LIMIT-me.orders.length);
+  if(s==='head') return 2;
+  return 1;
+}
+function sheetHTML(me){
+  if(S.over&&ui.endOpen){
+    const rk=ranking(S), win=S.players[rk[0].i];
+    return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Closing time"><div class="sheet-h"><h2>'+(win.bot?esc(win.name)+' runs the best counter':'You run the best counter')+'</h2><p>Closing time after 7 rounds. Ties go to the chef who served more plates.</p></div>'+
+      '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.color)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+'</span></div>';}).join('')+'</div></div>'+
+      '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="'+ui.nBots+'">Play again</button></div></div></div>';
+  }
+  const sh=ui.sheet; if(!sh) return '';
+  let title='', help='', body='', ok=false, label='Place chef';
+  if(sh==='market'){
+    const k=maxPick(); title='Fish Market'; help='Pick '+k+' fish off the ice.'; label='Buy fish';
+    body='<div class="ice pick-ice">'+S.market.map((f,i)=>'<button type="button" class="fbtn'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'"><img class="ic xl" src="'+ingArt(f)+'" alt="">'+ING_NAME[f]+'</button>').join('')+'</div>';
+    ok=ui.sel.length===k;
+  } else if(sh==='pantry'){
+    const k=2+abCount(me,'pantry'); title='Pantry'; help='Split '+k+' staples between Rice and Nori.'; label='Take staples'; ok=true;
+    body='<div class="stepper"><button type="button" class="gbtn wood" aria-label="Less rice" data-rice="-1">−</button>'+
+      '<div class="bigbowl"><div class="bowl"><img class="ic xl" src="'+ingArt('R')+'" alt=""><b class="num">'+ui.rice+'</b></div>Rice</div>'+
+      '<div class="bigbowl"><div class="bowl"><img class="ic xl" src="'+ingArt('N')+'" alt=""><b class="num">'+(k-ui.rice)+'</b></div>Nori</div>'+
+      '<button type="button" class="gbtn wood" aria-label="More rice" data-rice="1">+</button></div>';
+  } else if(sh==='belt'){
+    const room=maxPick(); title='Kaiten Belt'; help='Grab up to '+room+' plate'+(room>1?'s':'')+'. Any wasabi riding on them is yours.'; label='Take orders';
+    body='<div class="picks">'+S.belt.map((b,i)=>b?'<button type="button" class="pcard'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'">'+plateHTML(b.id,b.w)+labelHTML(b.id,cookStatus(me,b.id).note)+'</button>':'').join('')+'</div>';
+    ok=ui.sel.length>=1&&ui.sel.length<=room;
+  } else if(sh==='prep'||sh==='head'){
+    const max=sh==='head'?2:1; title=sh==='head'?'Head Chef':'Prep Counter'; label='Serve';
+    help=(max===2?'Cook 1 or 2 orders.':'Cook 1 order.')+' Wasabi covers anything missing.';
+    body='<div class="picks">'+me.orders.map(id=>{
+      const sel=ui.sel.includes(id);
+      const fits=sel||(max===1?canCook(me,DISH[id]):(ui.sel.length<max&&canCookAll(me,ui.sel.concat([id]).map(x=>DISH[x]))));
+      return '<button type="button" class="pcard'+(sel?' sel':'')+'" aria-pressed="'+sel+'" data-pick="'+id+'"'+(fits?'':' disabled')+'>'+plateHTML(id,0)+labelHTML(id,cookStatus(me,id).note)+'</button>';
+    }).join('')+'</div>';
+    ok=ui.sel.length>=1;
+  } else if(sh==='new'){
+    title='New game'; help='How many rival chefs? This game will be lost.';
+    body='<div class="newrow">'+newOpts()+'</div>';
+  }
+  return '<div class="veil" data-act="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="sheet-h"><h2>'+esc(title)+'</h2><p>'+esc(help)+'</p></div>'+
+    '<div class="sheet-b">'+body+'</div><div class="sheet-f"><button type="button" class="gbtn wood" data-act="cancel">Cancel</button>'+
+    (sh==='new'?'':'<button type="button" class="gbtn" data-act="confirm"'+(ok?'':' disabled')+'>'+label+'</button>')+'</div></div></div>';
+}
+
+/* ----- flow ----- */
+function flash(t){ui.toast=t; clearTimeout(ui.toastT); ui.toastT=setTimeout(()=>{ui.toast=''; render();},2000);}
+function doAct(pi,loc,args){
+  const r=S.round; act(S,pi,loc,args);
+  if(S.over){ui.endOpen=true; ui.sheet=null;}
+  else if(S.round!==r) flash('Round '+S.round+' · the belt turns');
+}
+function schedule(){
+  clearTimeout(ui.botT);
+  if(S.over||!S.players[S.turn].bot) return;
+  const g=S;
+  ui.botT=setTimeout(()=>{
+    if(g!==S||S.over||!S.players[S.turn].bot) return;
+    const m=botMove(S,S.turn); doAct(S.turn,m.loc,m.args); render(); schedule();
+  },700);
+}
+function startNew(k){
+  clearTimeout(ui.botT); ui.nBots=k;
+  try{localStorage.setItem('kaiten-bots',String(k));}catch(e){}
+  S=newGame({nBots:k}); Object.assign(ui,{sheet:null,sel:[],endOpen:true,pane:'kitchen'});
+  render(); schedule();
+}
+function defaultRice(){
+  const me=S.players[0], k=2+abCount(me,'pantry'); let r=0,nn=0;
+  me.orders.forEach(id=>{const c=countCost(DISH[id].cost); r+=c.R; nn+=c.N;}); r-=me.hand.R; nn-=me.hand.N;
+  if(r<=0&&nn<=0) return Math.ceil(k/2); if(nn<=0) return k; if(r<=0) return 0; return Math.round(k*r/(r+nn));
+}
+function pickLoc(id){
+  if(S.over||S.turn!==0||!legal(S,0,id)) return;
+  if(id==='door'||id==='staff'){doAct(0,id,{}); render(); schedule(); return;}
+  const me=S.players[0]; ui.sel=[];
+  if(id==='prep'||id==='head'){const f=me.orders.find(x=>canCook(me,DISH[x])); if(f) ui.sel=[f];}
+  ui.sheet=id; ui.rice=defaultRice(); render();
+}
+function confirmSheet(){
+  const loc=ui.sheet, sel=ui.sel;
+  const args=loc==='market'?{picks:sel}:loc==='pantry'?{rice:ui.rice}:loc==='belt'?{slots:sel}:loc==='prep'?{dish:sel[0]}:{dishes:sel};
+  ui.sheet=null; ui.sel=[]; doAct(0,loc,args); render(); schedule();
+}
+
+app.addEventListener('click',e=>{
+  const t=e.target.closest('[data-loc],[data-pick],[data-pane],[data-side],[data-rice],[data-start],[data-act]');
+  if(!t) return;
+  const d=t.dataset;
+  if(d.loc) return pickLoc(d.loc);
+  if(d.pane){ui.pane=d.pane; return render();}
+  if(d.side){ui.side=d.side; return render();}
+  if(d.start) return startNew(+d.start);
+  if(d.rice){const k=2+abCount(S.players[0],'pantry'); ui.rice=Math.max(0,Math.min(k,ui.rice+(+d.rice))); return render();}
+  if(d.pick!=null){
+    if(t.disabled) return;
+    const v=ui.sheet==='prep'||ui.sheet==='head'?d.pick:+d.pick, max=maxPick();
+    if(ui.sel.includes(v)) ui.sel=ui.sel.filter(x=>x!==v); else if(max===1) ui.sel=[v]; else if(ui.sel.length<max) ui.sel.push(v);
+    return render();
+  }
+  switch(d.act){
+    case 'new': ui.sheet='new'; return render();
+    case 'cancel': ui.sheet=null; ui.sel=[]; return render();
+    case 'confirm': return confirmSheet();
+    case 'closeend': ui.endOpen=false; return render();
+    case 'veil': if(e.target===t){ui.sheet=null; ui.sel=[]; render();} return;
+  }
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&ui.sheet){ui.sheet=null; ui.sel=[]; render();}});
+// a mouse wheel over the belt or the order clips scrolls them sideways
+app.addEventListener('wheel',e=>{
+  const el=e.target.closest('.track,.orders');
+  if(el&&Math.abs(e.deltaY)>Math.abs(e.deltaX)&&el.scrollWidth>el.clientWidth){el.scrollLeft+=e.deltaY; e.preventDefault();}
+},{passive:false});
+
+function start(data){
+  try{const k=+localStorage.getItem('kaiten-bots'); if(k>=1&&k<=3) ui.nBots=k;}catch(e){}
+  if(data&&data.state){S=data.state; Object.assign(ui,data.ui||{});} else S=newGame({nBots:ui.nBots});
+  render(); schedule();
+}
+window.claude?.hot?.snapshot?.(()=>({state:S,ui:{pane:ui.pane,side:ui.side,nBots:ui.nBots,endOpen:ui.endOpen}}));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+</script>
