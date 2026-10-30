@@ -849,6 +849,8 @@ function whyNot(s,pi,loc){
   return '';
 }
 const legal=(s,pi,loc)=>!whyNot(s,pi,loc);
+// closing time: every 3 leftover ingredients (not wasabi) score 1 VP; every order still held costs 1 VP
+const LEFTOVER_PER_VP=3;
 // how many dishes a chef may take at the belt
 const beltRoom=(s,p)=>Math.min(2,ORDER_LIMIT-p.orders.length);
 
@@ -908,7 +910,7 @@ function act(s,pi,loc,args){
       ids.forEach(id=>cook(s,pi,id)); break;}
     case 'door':{
       s.doorTaker=pi; p.wasabi+=1+abCount(p,'door');
-      let drew=''; if(p.orders.length<ORDER_LIMIT){const id=drawDish(s); if(id){p.orders.push(id); drew=' and drew an order';}}
+      let drew=''; if(p.orders.length<ORDER_LIMIT&&s.round<s.maxRounds){const id=drawDish(s); if(id){p.orders.push(id); drew=' and drew an order';}}
       log(s,p.name+' opened the front door: first next round, +'+(1+abCount(p,'door'))+' wasabi'+drew+'.',pi);
       break;}
     case 'staff':{
@@ -960,7 +962,16 @@ function endRound(s){
     s.first=best.j;
   } else s.first=(s.first+1)%s.players.length;
   s.round++; s.event=null; s.celebDone=false;
-  if(s.round>s.maxRounds){s.over=true; s.round=s.maxRounds; log(s,'Closing time. Final scores are in.'); return;}
+  if(s.round>s.maxRounds){
+    s.over=true; s.round=s.maxRounds;
+    s.players.forEach((p,i)=>{
+      const stock=ING_KEYS.reduce((a,k)=>a+p.hand[k],0);
+      p.fin={left:Math.floor(stock/LEFTOVER_PER_VP),orders:p.orders.length};
+      const you=!p.bot&&p.name==='You';
+      if(p.fin.left||p.fin.orders) log(s,'Closing: '+p.name+(p.fin.left?(you?' score ':' scores ')+p.fin.left+' VP for '+stock+' leftover ingredients':'')+(p.fin.left&&p.fin.orders?' and':'')+(p.fin.orders?(you?' lose ':' loses ')+p.fin.orders+' VP for '+p.fin.orders+' unserved order'+(p.fin.orders>1?'s':''):'')+'.',i,'final');
+    });
+    log(s,'Closing time. Final scores are in.'); return;
+  }
   s.turn=s.first;
   if(EVENT_ROUNDS.includes(s.round)&&s.eventDeck.length) startEvent(s,s.eventDeck.pop());
   log(s,'Round '+s.round+' begins. '+s.players[s.first].name+(s.players[s.first].bot?' goes':' go')+' first.');
@@ -994,7 +1005,9 @@ function score(p){
   const regs=p.regulars.reduce((a,id)=>a+REG[id].vp,0);
   let end=0; p.tableau.forEach(id=>{const a=DISH[id].ab; if(!a) return; if(a.t==='end') end+=c[a.c]; if(a.t==='regular') end+=2*p.regulars.length;});
   const ev=p.ev||0;
-  return {dishes,bonus:p.bonus,sets,regs,end,ev,total:dishes+p.bonus+sets+regs+end+ev};
+  // closing time only (p.fin is set when the game ends): leftovers score, unserved orders cost
+  const left=p.fin?p.fin.left:0, unserved=p.fin?-p.fin.orders:0;
+  return {dishes,bonus:p.bonus,sets,regs,end,ev,left,unserved,total:dishes+p.bonus+sets+regs+end+ev+left+unserved};
 }
 function ranking(s){
   return s.players.map((p,i)=>({i,sc:score(p),n:p.tableau.length,w:p.wasabi}))
@@ -1049,7 +1062,7 @@ function botMove(s,pi){
         const items=s.belt.map((b,i)=>{
           if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-p.wasabi-bw(b));
           let v=0.5*dishValue(s,p,d)/(1+0.35*sh)+0.85*bw(b);
-          if(last) v=sh===0?0.7*dishValue(s,p,d):0.16*bw(b);
+          if(last) v=sh===0?0.7*dishValue(s,p,d)-1:-1.5;
           else if(left===1&&sh>2) v*=0.4;
           return {i,v};
         }).filter(Boolean).sort((a,b)=>b.v-a.v).slice(0,room);
@@ -1063,12 +1076,12 @@ function botMove(s,pi){
           s.market.forEach((f,i)=>{if(picks.includes(i)) return; const val=dem[f]>0.01?1.3+Math.min(dem[f],2)*0.2:0.35; if(val>bv){bv=val;bi=i;}});
           if(bi<0) break; picks.push(bi); v+=bv; dem[s.market[bi]]-=1;
         }
-        sc=v*(last?0.5:1); args={picks};
+        sc=last?k/LEFTOVER_PER_VP+v*0.3:v; args={picks};
         break;}
       case 'pantry':{
         const k=pantryCount(s,p); const dem=demand(s,p); let r=0,v=0;
         for(let t=0;t<k;t++){ if(dem.R>=dem.N&&dem.R>0){r++;dem.R--;v+=1.2;} else if(dem.N>0){dem.N--;v+=1.2;} else {r++; v+=0.35;} }
-        sc=v*(last?0.5:0.95)+(p.char&&CHAR[p.char].t==='pantryw'?0.9:0); args={rice:r};
+        sc=(last?pantryCount(s,p)/LEFTOVER_PER_VP+v*0.3:v*0.95)+(p.char&&CHAR[p.char].t==='pantryw'?0.9:0); args={rice:r};
         break;}
       case 'door': sc=(last?0.7:1.6+(p.orders.length<ORDER_LIMIT?0.6:0))+abCount(p,'door')*0.7; break;
       case 'staff': sc=left>=2?1.1*left:-1; break;
@@ -1213,7 +1226,7 @@ function render(){
     '<div class="lastev" aria-live="polite">'+(lastAct?'<span class="ld pc'+S.players[lastAct.pi].color+'"></span>':'')+'<span class="t">'+esc(lastAct?lastAct.t:'The noren goes up.')+'</span>'+(lastAct?dvHTML(lastAct):'')+'</div></div></section>'+
   '<section class="tray" aria-label="Your counter"><div class="in">'+
     '<div class="tcol t-pantry"><span class="tlabel">Your pantry</span><div class="bowls">'+bowls+'</div></div>'+
-    '<div class="tcol t-orders"><span class="tlabel">Orders · '+me.orders.length+'/'+ORDER_LIMIT+'</span><div class="orders" data-sk="orders">'+orders+'</div></div>'+
+    '<div class="tcol t-orders"><span class="tlabel">Orders · '+me.orders.length+'/'+ORDER_LIMIT+(S.round===S.maxRounds&&!S.over?' · −1 VP each if unserved at closing':'')+'</span><div class="orders" data-sk="orders">'+orders+'</div></div>'+
     '<div class="tcol t-regs"><span class="tlabel">Regulars</span><div class="rtix">'+regIcons+'</div></div>'+
     '<div class="tcol t-plates"><span class="tlabel">Served plates</span><div class="stacks">'+stacks+'</div><span class="sets">Tasting sets <b class="num">'+Math.min(cc.nigiri,cc.maki,cc.sashimi)+'</b> · 4 VP each</span></div>'+
     '<div class="tcol t-me"><div class="chefs'+(my?' ready':'')+'" aria-label="'+left+(left===1?' chef':' chefs')+' left. Drag one onto a station, or tap a station.">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(me.chef)+'" alt=""'+(my?' data-drag="1" draggable="false"':'')+'>').join('')+'</div>'+
@@ -1376,7 +1389,7 @@ function dishCard(b,i,me){
 // the whole game as plain text, oldest first, for pasting into a chat
 function logText(){
   const lines=['KAITEN · '+(S.over?'final':'round '+S.round+' of '+S.maxRounds)+' · rivals: '+(S.level||'normal')+(S.catchup?' · catch-up on':'')];
-  S.players.forEach(p=>{const c=score(p); lines.push(p.name+' ('+CHAR[p.char].name+', '+CHAR[p.char].title+'): '+c.total+' VP = plates '+c.dishes+', bonuses '+c.bonus+', sets '+c.sets+', regulars '+c.regs+', end '+c.end+(c.ev?', events '+c.ev:'')+
+  S.players.forEach(p=>{const c=score(p); lines.push(p.name+' ('+CHAR[p.char].name+', '+CHAR[p.char].title+'): '+c.total+' VP = plates '+c.dishes+', bonuses '+c.bonus+', sets '+c.sets+', regulars '+c.regs+', end '+c.end+(c.ev?', events '+c.ev:'')+(c.left?', leftovers '+c.left:'')+(c.unserved?', unserved orders '+c.unserved:'')+
     ' | served '+p.tableau.length+', regulars '+(p.regulars.map(r=>REG[r].name).join(', ')||'none')+', orders '+(p.orders.map(id=>DISH[id].name).join(', ')||'none')+', wasabi '+p.wasabi);});
   lines.push('');
   const sg=d=>(d>0?'+':'')+d;
@@ -1390,7 +1403,7 @@ async function copyLog(){
   // clipboard blocked (some embeds): show the text selected so it can be copied by hand
   ui.sheet='logtext'; render(); const ta=app.querySelector('.logtext'); if(ta){ta.focus(); ta.select();}
 }
-const SCORE_PARTS=[['dishes','plates'],['bonus','bonuses'],['sets','sets'],['regs','regulars'],['end','end'],['ev','events']];
+const SCORE_PARTS=[['dishes','plates'],['bonus','bonuses'],['sets','sets'],['regs','regulars'],['end','end'],['ev','events'],['left','leftovers'],['unserved','unserved orders']];
 const dvHTML=l=>(l.dv?'<span class="dv'+(l.dv<0?' neg':'')+'"'+(l.why?' title="'+esc(l.why)+'"':'')+'><b class="num">'+(l.dv>0?'+':'')+l.dv+'</b><small class="num">'+l.tot+' VP</small>'+(l.why?'<small class="why2">'+esc(l.why)+'</small>':'')+'</span>':'')+
   (l.dvs?'<span class="dvs">'+l.dvs.map(x=>'<span class="dvx" title="'+esc(x.why)+'"><span class="ld pc'+S.players[x.pi].color+'"></span>'+esc(S.players[x.pi].name)+' <b class="num">'+(x.d>0?'+':'')+x.d+'</b></span>').join('')+'</span>':'');
 function seatsHTML(){
@@ -1402,7 +1415,7 @@ function seatsHTML(){
       '<div class="meta">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+' chefs'+(p.hired&&!p.apprentice?' (+1 next round)':'')+' · '+p.orders.length+' orders · '+p.regulars.length+' regulars'+(p.regulars.length?' ('+p.regulars.map(r=>REG[r].name).join(', ')+')':'')+'</div>'+
       (p.orders.length?'<div class="sorders"><span class="sol">Orders</span>'+p.orders.map(id=>{const d=DISH[id], ok=canCook(p,d); return '<span class="sord c-'+d.cat+(ok?' ok':'')+'" title="'+esc(d.name+(ok?': ready to cook':''))+'"><img src="'+dishArt(id)+'" alt=""><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(ok?' · ready':'')+'<span class="cost">'+[...d.cost].map(k=>ic(k,'sm')).join('')+'</span></span></span>';}).join('')+'</div>':'')+
       '<div class="dlist">'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(d.ab?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>'+
-      '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+(s2.ev?' · events '+s2.ev:'')+'</div></div>';
+      '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+(s2.ev?' · events '+s2.ev:'')+(s2.left?' · leftovers '+s2.left:'')+(s2.unserved?' · unserved '+s2.unserved:'')+'</div></div>';
   }).join('');
 }
 const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over 7 rounds. Send chefs to stations, gather fish and staples, take orders off the belt, and serve dishes. Served plates stay with you, score, and often keep working for you.</p>'+
@@ -1410,13 +1423,13 @@ const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over
   '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station (tap it, or drag a chef from your tray onto it) and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, the chef furthest behind goes first.</li></ol>'+
   '<h3>Catching up</h3><p>At the start of each round the regulars tip chefs who are behind the leader: 1 wasabi if 6 or more VP behind, 2 wasabi if 15 or more.</p>'+
   '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p>'+
-  '<h3>Rivals</h3><p>Easy rivals cook loosely and often miss their best move. Hard rivals rarely slip and start with an extra wasabi.</p><h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>Regulars you win, and effects printed on your dishes.</li></ul></div>';
+  '<h3>Rivals</h3><p>Easy rivals cook loosely and often miss their best move. Hard rivals rarely slip and start with an extra wasabi.</p><h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>At closing: 1 VP per 3 leftover ingredients (wasabi doesn’t count), and −1 VP for each order you still hold.</li><li>Regulars you win, and effects printed on your dishes.</li></ul></div>';
 
 function sheetHTML(me){
   if(S.over&&ui.endOpen){
     const rk=ranking(S), win=S.players[rk[0].i];
     return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Closing time"><div class="sheet-h"><h2>'+(win.bot?esc(win.name)+' runs the best counter':'You run the best counter')+'</h2><p>'+(rk[1]&&rk[1].sc.total===rk[0].sc.total?'Tied on '+rk[0].sc.total+' VP: '+(win.bot?esc(win.name)+' wins':'you win')+' by serving more plates ('+rk[0].n+' to '+rk[1].n+').':'Closing time after 7 rounds. Ties go to the chef who served more plates.')+'</p></div>'+
-      '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+(s.ev?' · events '+s.ev:'')+'</span></div>';}).join('')+'</div></div>'+
+      '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+(s.ev?' · events '+s.ev:'')+(s.left?' · leftovers '+s.left:'')+(s.unserved?' · unserved '+s.unserved:'')+'</span></div>';}).join('')+'</div></div>'+
       '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="copylog">Copy log</button><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="go">Play again</button></div></div></div>';
   }
   const sh=ui.sheet; if(!sh) return '';
@@ -1549,10 +1562,13 @@ function doAct(pi,loc,args){
   // note how each chef's score moved on that chef's newest line, so the log shows where points come from
   // a score change lands on that chef's newest line, or on the event/round line that caused it (e.g. an inspection)
   S.players.forEach((p,j)=>{
-    const c=score(p), d=c.total-sc0[j].total; if(!d) return;
-    const parts=SCORE_PARTS.filter(([k])=>c[k]!==sc0[j][k]).map(([k,n])=>n+' '+(c[k]>sc0[j][k]?'+':'')+(c[k]-sc0[j][k]));
-    const l=fresh.filter(x=>x.pi===j).pop();
-    if(l){l.dv=d; l.tot=c.total; l.why=parts.join(', ');}
+    const c=score(p); let d=c.total-sc0[j].total; if(!d) return;
+    // closing-time leftovers and unserved orders go on their own closing line
+    const fin=fresh.find(x=>x.pi===j&&x.k==='final');
+    if(fin){const fd=c.left+c.unserved; fin.dv=fd; fin.tot=c.total; fin.why=[c.left?'leftovers +'+c.left:'',c.unserved?'unserved orders '+c.unserved:''].filter(Boolean).join(', '); d-=fd; if(!d) return;}
+    const parts=SCORE_PARTS.filter(([k])=>!(fin&&(k==='left'||k==='unserved'))&&c[k]!==sc0[j][k]).map(([k,n])=>n+' '+(c[k]>sc0[j][k]?'+':'')+(c[k]-sc0[j][k]));
+    const l=fresh.filter(x=>x.pi===j&&x.k!=='final').pop();
+    if(l){l.dv=d; l.tot=c.total-(fin?fin.dv:0); l.why=parts.join(', ');}
     else {const e=fresh.filter(x=>x.pi<0).pop()||fresh[fresh.length-1]; if(e) (e.dvs=e.dvs||[]).push({pi:j,d,tot:c.total,why:parts.join(', ')});}
   });
   fresh.forEach(l=>{
