@@ -182,6 +182,86 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .t-me{flex-direction:row;align-items:center}
 .chefs{display:flex;gap:2px;min-height:30px;align-items:flex-end}
 .chefs .face{width:28px;height:28px}
+.chefs.ready .face{width:40px;height:40px;cursor:grab;touch-action:none;box-shadow:0 0 0 2px #ffd27a,0 4px 8px rgba(0,0,0,.35);animation:bob 1.8s ease-in-out infinite}
+.chefs.ready .face:nth-child(2){animation-delay:.2s}.chefs.ready .face:nth-child(3){animation-delay:.4s}.chefs.ready .face:nth-child(4){animation-delay:.6s}
+@keyframes bob{50%{transform:translateY(-4px)}}
+.t-me{gap:10px}
+.myab{display:flex;flex-direction:column;font-size:11px;line-height:1.25;color:#f3dcb5;max-width:150px}
+.myab b{color:#ffd27a;font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+.dragghost{position:fixed;left:0;top:0;width:56px;height:56px;z-index:60;pointer-events:none;box-shadow:0 0 0 3px #ffd27a,0 14px 24px rgba(0,0,0,.45);transition:transform .05s linear}
+body.dragging,body.dragging *{cursor:grabbing!important;user-select:none}
+body.dragging .board:not(.can){opacity:.45}
+.board.drop{transform:scale(1.04);border-color:#ffd27a!important;box-shadow:0 4px 0 var(--wood-dk),0 0 0 5px #ffd27a,0 12px 22px rgba(0,0,0,.35)!important}
+.bslot.tap{cursor:pointer}
+.bslot.tap:hover .plate,.bslot.tap:focus-visible .plate{transform:translateY(-3px)}
+.hanko.bump{animation:hbump .5s ease infinite alternate}
+@keyframes hbump{to{transform:rotate(-8deg) scale(1.18)}}
+.stack{position:relative}
+.stack.bump .pl:last-of-type{animation:drop .6s cubic-bezier(.2,1.5,.4,1) both}
+.stack.bump .cnt{animation:hbump2 .5s ease 3 alternate;color:#ffd27a}
+@keyframes drop{from{transform:translateY(-40px);opacity:0}}
+@keyframes hbump2{to{transform:scale(1.5)}}
+.stack .plus{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-family:var(--disp);color:#ffd27a;font-size:16px;text-shadow:0 2px 0 rgba(0,0,0,.4);animation:rise 1.5s ease both;pointer-events:none}
+@keyframes rise{0%{opacity:0;transform:translate(-50%,10px)}20%{opacity:1}100%{opacity:0;transform:translate(-50%,-26px)}}
+.servefx{background:radial-gradient(closest-side,rgba(20,14,9,.55),rgba(20,14,9,.2));cursor:pointer}
+.sfx-card{display:flex;flex-direction:column;align-items:center;gap:8px;color:#fff;text-align:center;animation:pop .45s cubic-bezier(.2,1.4,.4,1) both;position:relative}
+.sfx-k{font-family:var(--disp);font-size:15px;letter-spacing:.06em;color:#ffd27a;background:#1b140e;border:2px solid #ffd27a;border-radius:999px;padding:4px 16px}
+.sfx-k span{margin-right:6px}
+.sfx-plates{display:flex;gap:10px}
+.sfx-plate{animation:slam .55s calc(var(--k)*.18s + .1s) cubic-bezier(.2,1.6,.4,1) both}
+.sfx-plate .plate{width:120px;height:120px}
+@keyframes slam{from{transform:translateY(-90px) scale(1.3) rotate(-12deg);opacity:0}}
+.sfx-card h2{margin:0;font-family:var(--disp);font-weight:400;font-size:22px;text-shadow:0 3px 0 rgba(0,0,0,.5)}
+.sfx-card p{margin:0;font-weight:700;color:#ffe9c4;text-shadow:0 2px 4px rgba(0,0,0,.6)}
+.sfx-vp{font-family:var(--disp);font-size:40px;line-height:1;color:#fff;background:var(--lac);border-radius:14px;padding:6px 16px 8px;box-shadow:0 5px 0 var(--lac-2),0 12px 30px rgba(0,0,0,.4);animation:stamp .5s .35s cubic-bezier(.2,1.6,.4,1) both}
+.sfx-vp small{font-size:14px;margin-left:4px}
+.carw{display:flex;align-items:center;gap:6px}
+.car{flex:1;min-width:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
+.car::-webkit-scrollbar{display:none}
+.cslide{flex:0 0 100%;scroll-snap-align:center;display:flex;justify-content:center;padding:4px 2px}
+.carr{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--indigo);color:#fff;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 3px 0 var(--indigo-2)}
+.dots{display:flex;justify-content:center;gap:6px;padding:8px 0 2px}
+.cdot{width:8px;height:8px;border-radius:50%;background:var(--paper-2);box-shadow:inset 0 0 0 1px #b9a98a}
+.cdot.on{background:var(--lac);box-shadow:none}
+.ccard{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.ccard h3{margin:0;font-family:var(--disp);font-weight:400;font-size:20px}
+.cdish .plate{width:128px;height:128px}
+.cmeta{display:flex;gap:6px;align-items:center}
+.cct,.ctag{font-size:10px;font-weight:900;letter-spacing:.1em;text-transform:uppercase;padding:2px 8px;border-radius:999px;color:#fff;background:var(--cat)}
+.ctag{background:var(--indigo)}.ctag.last{background:var(--lac)}
+.cvpi{font-size:14px;color:var(--lac)}
+.ccost{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+.ci{padding:4px;border-radius:10px;background:var(--paper-2);opacity:.55}
+.ci.ok{opacity:1;background:#dfeccf;box-shadow:inset 0 0 0 2px #6d9a4a}
+.ci .ic{width:28px;height:28px}
+.cstat{margin:0;font-weight:700;color:var(--lac-2)}.cstat.ok{color:#3f6d2a}
+.cab{margin:0;font-size:13px;color:var(--ink-2)}
+.ctake{width:100%;margin-top:4px}
+.chead{display:flex;align-items:center;gap:12px;width:100%;text-align:left}
+.chead>div{flex:1;min-width:0}
+.cwant{margin:2px 0 0;color:var(--ink-2)}
+.cvp{flex:none;width:56px;height:56px;border-radius:50%;background:var(--lac);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);font-size:20px;line-height:1;transform:rotate(-8deg)}
+.cvp small{font-size:9px}
+.prog{display:flex;align-items:center;gap:10px;width:100%}
+.pbar{flex:1;height:12px;border-radius:6px;background:var(--paper-2);overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.2)}
+.pbar span{display:block;height:100%;background:linear-gradient(90deg,#d2a43c,#c2342a);border-radius:6px}
+.preq{list-style:none;margin:0;padding:0;width:100%;display:flex;flex-direction:column;gap:6px}
+.preq li{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:10px;background:var(--paper-2);text-align:left}
+.preq li.met{background:#dfeccf}
+.preq .pl{flex:1;font-weight:700}
+.preq .pips{display:flex;gap:4px}
+.ppip{width:14px;height:14px;border-radius:50%;border:2px solid #b9a98a}
+.ppip.on{background:#3f6d2a;border-color:#3f6d2a}
+.pdot{width:14px;height:14px;border-radius:50%;background:var(--cat,#8a7a62)}
+.cnote{margin:0;font-size:13px;color:var(--ink-2)}
+.wchefs{display:flex;gap:6px;justify-content:center}
+.wchef{flex:1;max-width:88px;border:0;border-radius:12px;background:rgba(255,255,255,.06);color:#fff;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 2px;cursor:pointer;font-weight:900;font-size:12px;min-height:44px}
+.wchef .face{width:52px;height:52px}
+.wchef.on{background:var(--indigo);box-shadow:0 0 0 2px #ffd27a}
+.wab{min-height:0}
+.wab b{color:#ffd27a}
+.rtk{border:0;text-align:left;cursor:pointer;font:inherit;width:100%}
+
 
 /* sheets */
 .veil{position:fixed;inset:0;background:rgba(15,10,6,.6);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
@@ -294,7 +374,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .recap li.won{font-weight:900;color:var(--lac-2)}
 .recap .face{width:32px;height:32px}
 .sysk{width:32px;height:32px;border-radius:50%;background:var(--indigo);color:#fff;display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:13px;flex:none}
-@media (prefers-reduced-motion: reduce){.petal{display:none}.cel-card,.cel-vp,.evcard,.actbar,.board.just{animation:none}}
+@media (prefers-reduced-motion: reduce){.chefs.ready .face,.hanko.bump,.stack.bump .cnt,.sfx-plate,.sfx-vp{animation:none}.petal{display:none}.cel-card,.cel-vp,.evcard,.actbar,.board.just{animation:none}}
 /* header menu */
 .lshort{display:none}
 .burger{width:44px;height:44px;border:0;border-radius:10px;background:rgba(255,255,255,.1);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;cursor:pointer;flex:none}
@@ -409,6 +489,10 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
   .tray .in{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"pantry pantry" "orders orders" "plates me";grid-template-rows:auto;gap:6px 8px;padding-top:8px}
   .t-regs{display:none}
   .t-pantry .tlabel,.t-orders .tlabel,.t-plates .tlabel{display:none}
+  .t-me{flex-direction:column;align-items:flex-end;gap:4px}
+  .chefs.ready .face{width:36px;height:36px;margin-left:-4px}
+  .myab{font-size:0;max-width:none}
+  .myab b{font-size:9.5px}
   .bowls{grid-template-columns:repeat(7,minmax(0,1fr));gap:5px}
   .bowl{height:auto;aspect-ratio:1/1;max-width:44px}
   .bowl .ic.lg{width:26px;height:26px}
@@ -509,7 +593,14 @@ const LOCS=[
   {id:'staff',name:'Staff Room',kj:'控室',text:'Pay 2 wasabi: hire a 4th chef from next round.',cap:()=>1},
 ];
 const LOC=Object.fromEntries(LOCS.map(l=>[l.id,l]));
-const BOT_NAMES=['Hana','Ren','Ito'];
+// the four chefs; each brings one small edge to the counter (art is chef-<art>.webp)
+const CHARS=[
+  {id:'sora',art:0,name:'Sora',title:'Fishmonger',t:'market',text:'Fish Market: take 1 extra fish.'},
+  {id:'hana',art:1,name:'Hana',title:'Hostess',t:'door',text:'Front Door: gain 1 extra wasabi.'},
+  {id:'ren',art:2,name:'Ren',title:'Rice master',t:'pantryw',text:'Pantry: also gain 1 wasabi.'},
+  {id:'ito',art:3,name:'Ito',title:'Old master',t:'first',text:'The first dish you serve each round scores 1 extra VP.'},
+];
+const CHAR=Object.fromEntries(CHARS.map(c=>[c.id,c]));
 // rival strength: random wobble on each option's value, and how often they take a worse option outright
 const LEVELS={easy:{noise:5,slip:0.4,head:0},normal:{noise:1.6,slip:0.08,head:0},hard:{noise:0.3,slip:0,head:1}};
 
@@ -569,12 +660,15 @@ function drawDish(s){
 function refillMarket(s){while(s.market.length<5){const f=drawFish(s); if(!f) break; s.market.push(f);}}
 
 function newGame(opts){
-  const o=Object.assign({nBots:2,seed:(Math.random()*1e9)|0,allBots:false,level:'normal',levels:null,catchup:true},opts||{});
+  const o=Object.assign({nBots:2,seed:(Math.random()*1e9)|0,allBots:false,level:'normal',levels:null,catchup:true,you:null,chars:null},opts||{});
   const n=o.nBots+1;
   const s={rng:o.seed|0,seed:o.seed|0,round:1,maxRounds:ROUNDS,log:[],over:false,doorTaker:null,level:o.level,catchup:o.catchup};
   s.players=[];
+  // you get the chef you chose; the rivals are dealt the others
+  const chars=o.chars||(o.you?[o.you]:[]).concat(shuffle(s,CHARS.map(c=>c.id).filter(c=>c!==o.you))).slice(0,n);
   for(let i=0;i<n;i++){
-    s.players.push({name:o.allBots?'Bot '+(i+1):i===0?'You':BOT_NAMES[i-1],bot:o.allBots||i>0,color:i,
+    const ch=CHAR[chars[i]];
+    s.players.push({name:o.allBots?ch.name+' '+(i+1):i===0?'You':ch.name,bot:o.allBots||i>0,color:i,char:ch.id,chef:ch.art,firstR:0,
       level:o.levels?o.levels[i]:o.level,
       hand:{R:i?3:2,N:1,T:0,S:0,U:0,E:0},wasabi:1+((o.allBots||i>0)?(LEVELS[o.levels?o.levels[i]:o.level]||LEVELS.normal).head:0),orders:[],tableau:[],bonus:0,ev:0,regulars:[],hired:false,apprentice:false,placed:0});
   }
@@ -611,7 +705,7 @@ function regMet(r,tab){
   if(q.allFish) return FISH.every(f=>tab.some(id=>DISH[id].cost.includes(f)));
   return false;
 }
-const abCount=(p,t)=>p.tableau.filter(id=>DISH[id].ab&&DISH[id].ab.t===t).length;
+const abCount=(p,t)=>p.tableau.filter(id=>DISH[id].ab&&DISH[id].ab.t===t).length+(p.char&&CHAR[p.char].t===t?CHAR[p.char].n||1:0);
 
 function spotFree(s,loc){return s.spots[loc].length<LOC[loc].cap(s.players.length);}
 function whyNot(s,pi,loc){
@@ -634,11 +728,12 @@ function cook(s,pi,id){
   const trig=p.tableau.filter(t=>DISH[t].ab&&DISH[t].ab.t==='cook'&&DISH[t].ab.c===d.cat).length;
   p.bonus+=2*trig; p.tableau.push(id);
   if(d.ab&&d.ab.t==='now') p.wasabi+=d.ab.w;
+  let first=0; if(p.char&&CHAR[p.char].t==='first'&&p.firstR!==s.round){p.firstR=s.round; first=1; p.bonus+=1;}
   let ev=0;
   if(s.event==='blogger') ev+=1;
   if(s.event==='celebrity'&&d.cat==='special'&&!s.celebDone){s.celebDone=true; ev+=3;}
   p.ev+=ev;
-  log(s,p.name+' served '+d.name+' ('+d.vp+' VP'+(trig?', +'+2*trig+' bonus':'')+(ev?', +'+ev+' event':'')+').',pi,'serve');
+  log(s,p.name+' served '+d.name+' ('+d.vp+' VP'+(trig?', +'+2*trig+' bonus':'')+(first?', +1 old master':'')+(ev?', +'+ev+' event':'')+').',pi,'serve');
 }
 
 function act(s,pi,loc,args){
@@ -660,7 +755,8 @@ function act(s,pi,loc,args){
     case 'pantry':{
       const k=pantryCount(s,p); const r=Math.max(0,Math.min(k,args.rice==null?k:args.rice));
       p.hand.R+=r; p.hand.N+=k-r;
-      log(s,p.name+' took '+[r?r+' Rice':'',k-r?(k-r)+' Nori':''].filter(Boolean).join(' and ')+' from the pantry.',pi);
+      const rw=p.char&&CHAR[p.char].t==='pantryw'?1:0; p.wasabi+=rw;
+      log(s,p.name+' took '+[r?r+' Rice':'',k-r?(k-r)+' Nori':''].filter(Boolean).join(' and ')+' from the pantry'+(rw?' and 1 wasabi':'')+'.',pi);
       break;}
     case 'belt':{
       const room=Math.min(2,ORDER_LIMIT-p.orders.length);
@@ -679,9 +775,9 @@ function act(s,pi,loc,args){
       if(!ids.length||!canCookAll(p,ids.map(x=>DISH[x]))) ids=[p.orders.find(x=>canCook(p,DISH[x]))];
       ids.forEach(id=>cook(s,pi,id)); break;}
     case 'door':{
-      s.doorTaker=pi; p.wasabi++;
+      s.doorTaker=pi; p.wasabi+=1+abCount(p,'door');
       let drew=''; if(p.orders.length<ORDER_LIMIT){const id=drawDish(s); if(id){p.orders.push(id); drew=' and drew an order';}}
-      log(s,p.name+' opened the front door: first next round, +1 wasabi'+drew+'.',pi);
+      log(s,p.name+' opened the front door: first next round, +'+(1+abCount(p,'door'))+' wasabi'+drew+'.',pi);
       break;}
     case 'staff':{
       p.hired=true; p.wasabi-=2; log(s,p.name+' paid 2 wasabi and hired an apprentice.',pi); break;}
@@ -831,9 +927,9 @@ function botMove(s,pi){
       case 'pantry':{
         const k=pantryCount(s,p); const dem=demand(s,p); let r=0,v=0;
         for(let t=0;t<k;t++){ if(dem.R>=dem.N&&dem.R>0){r++;dem.R--;v+=1.2;} else if(dem.N>0){dem.N--;v+=1.2;} else {r++; v+=0.35;} }
-        sc=v*(last?0.5:0.95); args={rice:r};
+        sc=v*(last?0.5:0.95)+(p.char&&CHAR[p.char].t==='pantryw'?0.9:0); args={rice:r};
         break;}
-      case 'door': sc=last?0.7:1.6+(p.orders.length<ORDER_LIMIT?0.6:0); break;
+      case 'door': sc=(last?0.7:1.6+(p.orders.length<ORDER_LIMIT?0.6:0))+abCount(p,'door')*0.7; break;
       case 'staff': sc=left>=2?1.1*left:-1; break;
     }
     if(sc>-1) opts.push({loc:L.id,args,sc:sc+noise()});
@@ -843,7 +939,7 @@ function botMove(s,pi){
   return opts[0]||{loc:'pantry',args:{}};
 }
 
-if(typeof module!=='undefined') module.exports={newGame,act,botMove,score,ranking,DISHES,REGULARS,LOCS,chefsLeft,legal};
+if(typeof module!=='undefined') module.exports={newGame,act,botMove,score,ranking,DISHES,REGULARS,LOCS,CHARS,chefsLeft,legal};
 </script>
 
 <script>
@@ -863,7 +959,7 @@ const ingArt=k=>A('ing-'+k);
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let S=null;
-const ui={welcome:true,live:false,level:'normal',menu:false,sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0,queue:[],spot:null,markId:0};
+const ui={welcome:true,live:false,level:'normal',char:'sora',vpShown:null,catShown:null,catBump:{},fx:null,carJump:null,menu:false,sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0,queue:[],spot:null,markId:0};
 const app=document.getElementById('app');
 
 const ic=(k,cls)=>'<img class="ic'+(cls?' '+cls:'')+'" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">';
@@ -899,11 +995,11 @@ function render(){
   const short=S.over?'Closing time':my?'Your turn':cur.name+'’s turn';
   const sub='Round '+S.round+' of '+S.maxRounds+' · '+S.players[S.first].name+(S.first===0?' go':' goes')+' first';
 
-  const belt=S.belt.map((b,i)=>'<div class="bslot">'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
+  const belt=S.belt.map((b,i)=>'<div class="bslot'+(b?' tap" role="button" tabindex="0" data-dish="'+i+'" aria-label="'+esc(DISH[b.id].name+': see details')+'"':'"')+'>'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
     (b?plateHTML(b.id,b.w)+labelHTML(b.id):'<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
 
   const market=S.market.map(f=>'<div class="fish"><img class="ic xl" src="'+ingArt(f)+'" alt="'+ING_NAME[f]+'"><span>'+ING_NAME[f]+'</span></div>').join('')||'<p class="hint">The ice is empty.</p>';
-  const regTickets=S.regulars.map(r=>r?'<div class="rtk"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rtx"><b>'+esc(REG[r].name)+'</b><span>'+reqText(REG[r])+'</span></span><span class="rvp num">'+REG[r].vp+'</span></div>'
+  const regTickets=S.regulars.map((r,i)=>r?'<button type="button" class="rtk" data-reg="'+i+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rtx"><b>'+esc(REG[r].name)+'</b><span>'+reqText(REG[r])+'</span></span><span class="rvp num">'+REG[r].vp+'</span></button>'
     :'<div class="rtk"><span class="rtx"><b>Empty seat</b><span>No one left in the queue</span></span></div>').join('');
   const regMini=S.regulars.map((r,i)=>r?'<button type="button" class="rmini" data-reg="'+i+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP')+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span></button>':'').join('');
 
@@ -917,13 +1013,13 @@ function render(){
   const mates=S.players.filter(p=>p.bot).map(p=>{
     const s2=score(p), c=catCounts(p.tableau);
     return '<button type="button" class="mate'+(!S.over&&S.turn===p.color?' on':'')+'" data-open="seats" aria-label="'+esc(p.name+': '+s2.total+' VP, '+p.tableau.length+' plates served, '+p.regulars.length+' regulars. Open details.')+'">'+
-      '<img class="face" src="'+chefArt(p.color)+'" alt=""><span class="mid"><span class="top"><b class="nm">'+esc(p.name)+'</b><span class="vp num">'+s2.total+'</span></span><span class="pips">'+
+      '<img class="face" src="'+chefArt(p.chef)+'" alt=""><span class="mid"><span class="top"><b class="nm">'+esc(p.name)+'</b><span class="vp num">'+s2.total+'</span></span><span class="pips">'+
       CATS.map(k=>'<span class="pip c-'+k+'" title="'+c[k]+' '+CAT_NAME[k]+'"><span class="pd"></span>'+c[k]+'</span>').join('')+
       '<span class="pip" title="Tasting sets"><span class="setb">SET</span>'+Math.min(c.nigiri,c.maki,c.sashimi)+'</span>'+
       '<span class="pip" title="Regulars won"><span class="regb"></span>'+p.regulars.length+'</span>'+
       '<span class="pip" title="Wasabi"><img class="ic" src="'+ingArt('W')+'" alt="">'+p.wasabi+'</span>'+
       '<span class="pip" title="Orders held"><span class="ordb"></span>'+p.orders.length+'</span>'+
-      '<span class="pip" title="Chefs left this round"><img class="face mf" src="'+chefArt(p.color)+'" alt="">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+'</span>'+
+      '<span class="pip" title="Chefs left this round"><img class="face mf" src="'+chefArt(p.chef)+'" alt="">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+'</span>'+
       '</span></span></button>';
   }).join('');
 
@@ -935,15 +1031,17 @@ function render(){
       (d.ab?'<span class="ab">'+abText(d.ab)+'</span>':'')+'</div>';
   }).join('')+Array.from({length:ORDER_LIMIT-me.orders.length},()=>'<div class="slip">Empty order clip</div>').join('');
   const cc=catCounts(me.tableau);
-  const stacks=CATS.map(k=>'<div class="stack c-'+k+'" role="img" aria-label="'+cc[k]+' '+CAT_NAME[k]+' served"><span class="lb">'+CAT_NAME[k]+'</span><span class="cnt num">'+cc[k]+'</span>'+
+  if(!ui.catShown) ui.catShown={...cc};
+  const now=Date.now(); CATS.forEach(k=>{if(cc[k]>ui.catShown[k]) ui.catBump[k]={until:now+1500,n:cc[k]-ui.catShown[k]};}); ui.catShown={...cc};
+  const stacks=CATS.map(k=>'<div class="stack c-'+k+(ui.catBump[k]&&ui.catBump[k].until>now?' bump':'')+'" role="img" aria-label="'+cc[k]+' '+CAT_NAME[k]+' served">'+(ui.catBump[k]&&ui.catBump[k].until>now?'<span class="plus">+'+ui.catBump[k].n+'</span>':'')+'<span class="lb">'+CAT_NAME[k]+'</span><span class="cnt num">'+cc[k]+'</span>'+
     (cc[k]?Array.from({length:Math.min(cc[k],7)},()=>'<span class="pl"></span>').join(''):'<span class="none"></span>')+'</div>').join('');
 
   app.innerHTML=
   '<header class="noren"><div class="in">'+
     '<div class="logo"><span class="jp" lang="ja">回転寿司</span><span class="en">KAITEN</span></div>'+
     '<div class="lanterns" role="img" aria-label="Round '+S.round+' of '+S.maxRounds+'">'+lanterns+'</div>'+
-    '<div class="who-turn"><img class="face turnface" src="'+chefArt(S.over?win.color:cur.color)+'" alt=""><div class="turn" aria-live="polite"><span class="lead'+(my?' mine':'')+'"><span class="lfull">'+esc(lead)+'</span><span class="lshort">'+esc(short)+'</span></span><span class="sub">'+esc(sub)+'</span></div></div>'+
-    '<div class="hanko" role="img" aria-label="Your score: '+sc.total+' VP"><b class="num">'+sc.total+'</b><span>VP</span></div>'+
+    '<div class="who-turn"><img class="face turnface" src="'+chefArt(S.over?win.chef:cur.chef)+'" alt=""><div class="turn" aria-live="polite"><span class="lead'+(my?' mine':'')+'"><span class="lfull">'+esc(lead)+'</span><span class="lshort">'+esc(short)+'</span></span><span class="sub">'+esc(sub)+'</span></div></div>'+
+    '<div class="hanko'+(ui.vpShown!=null&&ui.vpShown!==sc.total?' bump':'')+'" role="img" aria-label="Your score: '+sc.total+' VP"><b class="num">'+(ui.vpShown==null?sc.total:ui.vpShown)+'</b><span>VP</span></div>'+
     '<button type="button" class="burger" data-act="menu" aria-label="Menu" aria-expanded="'+!!ui.menu+'"><span></span><span></span><span></span></button>'+
   '</div>'+
   (ui.menu?'<button type="button" class="menu-veil" data-act="menu" aria-label="Close menu"></button><div class="menu" role="menu">'+
@@ -970,13 +1068,36 @@ function render(){
     '<div class="tcol t-orders"><span class="tlabel">Orders · '+me.orders.length+'/'+ORDER_LIMIT+'</span><div class="orders" data-sk="orders">'+orders+'</div></div>'+
     '<div class="tcol t-regs"><span class="tlabel">Regulars waiting · yours when your plates match</span><div class="rtix">'+regTickets+'</div></div>'+
     '<div class="tcol t-plates"><span class="tlabel">Served plates</span><div class="stacks">'+stacks+'</div><span class="sets">Tasting sets <b class="num">'+Math.min(cc.nigiri,cc.maki,cc.sashimi)+'</b> · 4 VP each</span></div>'+
-    '<div class="tcol t-me"><div class="chefs" aria-label="'+left+(left===1?' chef':' chefs')+' ready">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(0)+'" alt="">').join('')+'</div></div>'+
+    '<div class="tcol t-me"><div class="chefs'+(my?' ready':'')+'" aria-label="'+left+(left===1?' chef':' chefs')+' left. Drag one onto a station, or tap a station.">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(me.chef)+'" alt=""'+(my?' data-drag="1" draggable="false"':'')+'>').join('')+'</div>'+
+      '<span class="myab" title="'+esc(CHAR[me.char].text)+'"><b>'+esc(CHAR[me.char].title)+'</b>'+esc(CHAR[me.char].text)+'</span></div>'+
   '</div></section>'+
-  (ui.welcome?welcomeHTML():'')+sheetHTML(me)+overlayHTML()+
+  (ui.welcome?welcomeHTML():'')+sheetHTML(me)+(ui.fx?serveFxHTML():overlayHTML())+
   (ui.toast?'<div class="toast" role="status">'+esc(ui.toast)+'</div>':'');
 
   app.querySelectorAll('[data-sk]').forEach(el=>{const k=keep[el.dataset.sk]; if(k){el.scrollLeft=k[0]; el.scrollTop=k[1];}});
   saveGame();
+  if(ui.carJump!=null){const c=app.querySelector('.car'); if(c){c.scrollLeft=ui.carJump*c.clientWidth; carDots(c);} ui.carJump=null;}
+  countVP(sc.total);
+}
+// the score stamp counts up to the new total
+function countVP(to){
+  cancelAnimationFrame(ui.vpRaf);
+  if(ui.vpShown==null||ui.vpShown>to){ui.vpShown=to; return;}
+  if(ui.vpShown===to) return;
+  const from=ui.vpShown, t0=performance.now(), dur=Math.min(1600,350+(to-from)*90);
+  const step=t=>{
+    const k=Math.min(1,(t-t0)/dur), v=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));
+    ui.vpShown=v; const b=app.querySelector('.hanko b'); if(b) b.textContent=v;
+    if(k<1) ui.vpRaf=requestAnimationFrame(step); else app.querySelector('.hanko')?.classList.remove('bump');
+  };
+  ui.vpRaf=requestAnimationFrame(step);
+}
+function serveFxHTML(){
+  const f=ui.fx;
+  return '<div class="ov servefx" data-act="fxdone" role="status" aria-label="Order up: '+esc(f.ids.map(id=>DISH[id].name).join(' and '))+', plus '+f.vp+' VP">'+
+    '<div class="sfx-card"><span class="sfx-k"><span lang="ja">お待ち!</span> Order up!</span><div class="sfx-plates">'+f.ids.map((id,k)=>'<span class="sfx-plate" style="--k:'+k+'">'+plateHTML(id,0)+'</span>').join('')+'</div>'+
+    '<h2>'+esc(f.ids.map(id=>DISH[id].name).join(' + '))+'</h2><span class="sfx-vp num">+'+f.vp+'<small>VP</small></span>'+
+    (f.notes.length?'<p>'+f.notes.map(esc).join(' · ')+'</p>':'')+'</div></div>';
 }
 
 /* ----- welcome screen and saved game ----- */
@@ -990,9 +1111,10 @@ function welcomeHTML(){
   return '<div class="welcome" role="dialog" aria-modal="true" aria-label="Kaiten"><div class="wcard" data-sk="welcome">'+
     '<div class="wlogo"><span class="jp" lang="ja">回転寿司</span><span class="en">KAITEN</span></div>'+
     '<p class="wtag">Run the best stall at the sushi bar. Seven rounds, three chefs, one belt.</p>'+
-    '<div class="wchefs" aria-hidden="true">'+[1,0,2,3].map(c=>'<img class="face" src="'+chefArt(c)+'" alt="">').join('')+'</div>'+
     (cont?'<button type="button" class="gbtn wbig" data-act="continue">Continue<small>Round '+S.round+' of '+S.maxRounds+' · '+score(S.players[0]).total+' VP · '+n+' '+(n>1?'rivals':'rival')+', '+LEVEL_INFO[S.level||'normal'][0]+'</small></button>':'')+
     '<div class="wnew"><h2>'+(cont?'Or start a new game':'New game')+'</h2>'+
+      '<div class="wchefs" role="group" aria-label="Choose your chef">'+CHARS.map(c=>'<button type="button" class="wchef'+(c.id===ui.char?' on':'')+'" aria-pressed="'+(c.id===ui.char)+'" data-wc="'+c.id+'"><img class="face" src="'+chefArt(c.art)+'" alt=""><span>'+c.name+'</span></button>').join('')+'</div>'+
+      '<p class="wdesc wab"><b>'+CHAR[ui.char].name+', '+CHAR[ui.char].title.toLowerCase()+'.</b> '+esc(CHAR[ui.char].text)+'</p>'+
       '<div class="wrow"><span class="wl">Rivals</span><div class="seg">'+[1,2,3].map(k=>'<button type="button" class="gbtn'+(k===ui.nBots?' on':' wood')+'" aria-pressed="'+(k===ui.nBots)+'" data-wr="'+k+'">'+k+'</button>').join('')+'</div></div>'+
       '<div class="wrow"><span class="wl">Difficulty</span><div class="seg">'+Object.keys(LEVEL_INFO).map(k=>'<button type="button" class="gbtn'+(k===ui.level?' on':' wood')+'" aria-pressed="'+(k===ui.level)+'" data-wl="'+k+'">'+LEVEL_INFO[k][0]+'</button>').join('')+'</div></div>'+
       '<p class="wdesc">'+esc(LEVEL_INFO[ui.level][1])+'</p>'+
@@ -1008,7 +1130,7 @@ function stationText(L,me){
   return L.text;
 }
 function holesHTML(L,taken,cap){
-  return taken.map(pi=>'<span class="hole" title="'+esc(S.players[pi].name)+'"><img class="face" src="'+chefArt(S.players[pi].color)+'" alt="'+esc(S.players[pi].name)+'"></span>').join('')+
+  return taken.map(pi=>'<span class="hole" title="'+esc(S.players[pi].name)+'"><img class="face" src="'+chefArt(S.players[pi].chef)+'" alt="'+esc(S.players[pi].name)+'"></span>').join('')+
     (cap>20?'<span class="open-all">Open to all</span>':Array.from({length:cap-taken.length},()=>'<span class="hole" aria-hidden="true"></span>').join(''));
 }
 function maxPick(){
@@ -1018,18 +1140,53 @@ function maxPick(){
   if(s==='head') return 2;
   return 1;
 }
+function carouselHTML(cards){
+  return '<div class="carw"><button type="button" class="carr" data-car="-1" aria-label="Previous">‹</button><div class="car" data-sk="car">'+cards.map(c=>'<div class="cslide">'+c+'</div>').join('')+'</div>'+
+    '<button type="button" class="carr" data-car="1" aria-label="Next">›</button></div><div class="dots" aria-hidden="true">'+cards.map((_,i)=>'<span class="cdot'+(i===0?' on':'')+'"></span>').join('')+'</div>';
+}
+// how far a chef is towards a regular: one row per thing they want
+function regProgress(r,tab){
+  const q=r.req, c=catCounts(tab);
+  if(q.cat) return Object.entries(q.cat).map(([k,v])=>({label:CAT_NAME[k],have:Math.min(c[k],v),need:v,cat:k}));
+  if(q.fish) return [{label:'Dishes with '+ING_NAME[q.fish],have:Math.min(tab.filter(id=>DISH[id].cost.includes(q.fish)).length,q.n),need:q.n,fish:q.fish}];
+  if(q.total) return [{label:'Dishes served',have:Math.min(tab.length,q.total),need:q.total}];
+  if(q.allFish) return FISH.map(f=>({label:ING_NAME[f],have:tab.some(id=>DISH[id].cost.includes(f))?1:0,need:1,fish:f}));
+  return [];
+}
+function regCard(r,me){
+  const R=REG[r], rows=regProgress(R,me.tableau), have=rows.reduce((a,x)=>a+x.have,0), need=rows.reduce((a,x)=>a+x.need,0);
+  const best=S.players.filter(p=>p.bot).map(p=>({p,h:regProgress(R,p.tableau).reduce((a,x)=>a+x.have,0)})).sort((a,b)=>b.h-a.h)[0];
+  return '<div class="ccard"><div class="chead"><img class="face regbig" src="'+A('reg-'+r)+'" alt=""><div><h3>'+esc(R.name)+'</h3><p class="cwant">Wants '+reqText(R).toLowerCase()+'</p></div><span class="cvp num">'+R.vp+'<small>VP</small></span></div>'+
+    '<div class="prog"><div class="pbar"><span style="width:'+Math.round(100*have/need)+'%"></span></div><b class="num">'+have+' / '+need+'</b></div>'+
+    '<ul class="preq">'+rows.map(x=>'<li class="'+(x.have>=x.need?'met':'')+'">'+(x.fish?ic(x.fish):x.cat?'<span class="pdot c-'+x.cat+'"></span>':'<span class="pdot"></span>')+'<span class="pl">'+esc(x.label)+'</span><span class="pips">'+
+      Array.from({length:x.need},(_,k)=>'<span class="ppip'+(k<x.have?' on':'')+'"></span>').join('')+'</span></li>').join('')+'</ul>'+
+    '<p class="cnote">'+(have>=need?'You qualify: they join you on your next turn.':'You need '+(need-have)+' more.')+(best?' Closest rival: '+esc(best.p.name)+' with '+best.h+' / '+need+'.':'')+'</p></div>';
+}
+function dishCard(b,i,me){
+  const d=DISH[b.id], st=cookStatus(me,b.id), my=!S.over&&S.turn===0, why=my?whyNot(S,0,'belt'):(S.over?'Service is over':'Wait for your turn');
+  const have={...me.hand};
+  const cost=[...d.cost].map(k=>{const ok=have[k]>0; if(ok) have[k]--; return '<span class="ci'+(ok?' ok':'')+'">'+ic(k)+'</span>';}).join('');
+  return '<div class="ccard"><div class="cdish">'+plateHTML(b.id,b.w)+'</div>'+
+    '<div class="cmeta"><span class="cct c-'+d.cat+'">'+CAT_NAME[d.cat]+'</span>'+(i===0?'<span class="ctag">New</span>':i===4?'<span class="ctag last">Last lap</span>':'')+'</div>'+
+    '<h3>'+esc(d.name)+' <span class="cvpi num">'+d.vp+' VP</span></h3>'+
+    '<div class="ccost">'+cost+'</div><p class="cstat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'You still need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
+    (d.ab?'<p class="cab">'+abText(d.ab)+'</p>':'')+(b.w?'<p class="cab">Comes with '+b.w+' wasabi.</p>':'')+
+    '<button type="button" class="gbtn ctake" data-take="'+i+'"'+(why?' disabled':'')+'>'+(why?esc(why):'Take it · place a chef')+'</button></div>';
+}
 function seatsHTML(){
   return S.players.map((p,i)=>{
     const s2=score(p);
-    return '<div class="seat"><div class="seat-h"><img class="face" src="'+chefArt(p.color)+'" alt=""><b>'+esc(p.name)+'</b>'+(S.first===i?'<span class="firstmark">FIRST</span>':'')+'<span class="sc num">'+s2.total+'</span></div>'+
+    return '<div class="seat"><div class="seat-h"><img class="face" src="'+chefArt(p.chef)+'" alt=""><b>'+esc(p.name)+'</b>'+(S.first===i?'<span class="firstmark">FIRST</span>':'')+'<span class="sc num">'+s2.total+'</span></div>'+
       '<div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
+      '<div class="meta"><b>'+esc(CHAR[p.char].name+', '+CHAR[p.char].title.toLowerCase())+':</b> '+esc(CHAR[p.char].text)+'</div>'+
       '<div class="meta">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+' chefs'+(p.hired&&!p.apprentice?' (+1 next round)':'')+' · '+p.orders.length+' orders · '+p.regulars.length+' regulars'+(p.regulars.length?' ('+p.regulars.map(r=>REG[r].name).join(', ')+')':'')+'</div>'+
       '<div class="dlist">'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(d.ab?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>'+
       '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+(s2.ev?' · events '+s2.ev:'')+'</div></div>';
   }).join('');
 }
 const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over 7 rounds. Send chefs to stations, gather fish and staples, take orders off the belt, and serve dishes. Served plates stay with you, score, and often keep working for you.</p>'+
-  '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, the chef furthest behind goes first.</li></ol>'+
+  '<h3>Your chef</h3><p>Each chef has one edge. Sora (fishmonger) takes 1 extra fish at the Fish Market. Hana (hostess) gains 1 extra wasabi at the Front Door. Ren (rice master) gains 1 wasabi at the Pantry. Ito (old master) scores 1 extra VP for the first dish served each round.</p>'+
+  '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station (tap it, or drag a chef from your tray onto it) and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, the chef furthest behind goes first.</li></ol>'+
   '<h3>Catching up</h3><p>At the start of each round the regulars tip chefs who are behind the leader: 1 wasabi if 6 or more VP behind, 2 wasabi if 15 or more.</p>'+
   '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p>'+
   '<h3>Rivals</h3><p>Easy rivals cook loosely and often miss their best move. Hard rivals rarely slip and start with an extra wasabi.</p><h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>Regulars you win, and effects printed on your dishes.</li></ul></div>';
@@ -1038,7 +1195,7 @@ function sheetHTML(me){
   if(S.over&&ui.endOpen){
     const rk=ranking(S), win=S.players[rk[0].i];
     return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Closing time"><div class="sheet-h"><h2>'+(win.bot?esc(win.name)+' runs the best counter':'You run the best counter')+'</h2><p>Closing time after 7 rounds. Ties go to the chef who served more plates.</p></div>'+
-      '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.color)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+(s.ev?' · events '+s.ev:'')+'</span></div>';}).join('')+'</div></div>'+
+      '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+(s.ev?' · events '+s.ev:'')+'</span></div>';}).join('')+'</div></div>'+
       '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="go">Play again</button></div></div></div>';
   }
   const sh=ui.sheet; if(!sh) return '';
@@ -1073,10 +1230,12 @@ function sheetHTML(me){
     title=L.name; help=stationText(L,me); label='Place chef here'; ok=my&&!why;
     body='<div class="stinfo"><img class="stbig" src="'+A('st-'+L.id)+'" alt=""><div><span class="holes">'+holesHTML(L,taken,cap)+'</span>'+
       '<p>'+(cap>20?'Any number of chefs can work here.':(cap-taken.length)+' of '+cap+' spots free this round.')+'</p></div></div>'+(why&&why!=='Taken'?'<p class="why">'+esc(why)+'</p>':why==='Taken'?'<p class="why">Every spot here is taken this round.</p>':'');
-  } else if(sh.startsWith('reg:')){
-    const r=S.regulars[+sh.slice(4)]; confirm=false;
-    if(r){title=REG[r].name; help='A regular waiting at the door.';
-      body='<div class="stinfo"><img class="face regbig" src="'+A('reg-'+r)+'" alt=""><div><b>Wants: '+reqText(REG[r])+'</b><p>Worth '+REG[r].vp+' VP. They join you the moment your served plates match. Nothing is spent, and you can win one regular per turn.</p></div></div>';}
+  } else if(sh==='reg'){
+    title='Regulars waiting'; help='Swipe to see them all. Each joins the first chef whose served plates match.'; confirm=false;
+    body=carouselHTML(S.regulars.filter(Boolean).map(r=>regCard(r,me)));
+  } else if(sh==='dish'){
+    title='On the belt'; help='Swipe through the dishes. Take one to send a chef to the Kaiten Belt.'; confirm=false;
+    body=carouselHTML(S.belt.map((b,i)=>b?dishCard(b,i,me):'').filter(Boolean));
   } else if(sh==='seats'){
     title='The chefs'; help='Everyone’s pantry, served plates and score so far.'; body=seatsHTML(); confirm=false;
   } else if(sh==='log'){
@@ -1186,17 +1345,17 @@ function maybeRecap(){
 function schedule(){
   clearTimeout(ui.botT);
   if(S.over) return;
-  if(ui.welcome||ui.queue.length||ui.sheet||ui.menu){ui.botT=setTimeout(schedule,400); return;}
+  if(ui.welcome||ui.fx||ui.queue.length||ui.sheet||ui.menu){ui.botT=setTimeout(schedule,400); return;}
   if(!S.players[S.turn].bot){maybeRecap(); if(ui.queue.length){render(); ui.botT=setTimeout(schedule,400);} return;}
   ui.botT=setTimeout(()=>{
-    if(ui.welcome||ui.queue.length||ui.sheet||ui.menu||S.over||!S.players[S.turn].bot) return schedule();
+    if(ui.welcome||ui.fx||ui.queue.length||ui.sheet||ui.menu||S.over||!S.players[S.turn].bot) return schedule();
     botStep(); render(); schedule();
   },SND.quick?650:1500);
 }
 function startNew(){
   clearTimeout(ui.botT);
-  try{localStorage.setItem('kaiten-bots',String(ui.nBots)); localStorage.setItem('kaiten-level',ui.level);}catch(e){}
-  S=newGame({nBots:ui.nBots,level:ui.level}); Object.assign(ui,{welcome:false,live:true,sheet:null,sel:[],endOpen:true,menu:false,queue:[],spot:null,markId:S.logN});
+  try{localStorage.setItem('kaiten-bots',String(ui.nBots)); localStorage.setItem('kaiten-level',ui.level); localStorage.setItem('kaiten-char',ui.char);}catch(e){}
+  S=newGame({nBots:ui.nBots,level:ui.level,you:ui.char}); Object.assign(ui,{vpShown:null,catShown:null,catBump:{},fx:null,welcome:false,live:true,sheet:null,sel:[],endOpen:true,menu:false,queue:[],spot:null,markId:S.logN});
   render(); schedule();
 }
 function defaultRice(){
@@ -1205,7 +1364,17 @@ function defaultRice(){
   if(r<=0&&nn<=0) return Math.ceil(k/2); if(nn<=0) return k; if(r<=0) return 0; return Math.round(k*r/(r+nn));
 }
 function humanAct(loc,args){
-  ui.spot=null; doAct(0,loc,args); sfx('place'); ui.markId=S.logN; render(); schedule();
+  const me=S.players[0], n0=me.tableau.length, vp0=score(me).total;
+  ui.spot=null; const fresh=doAct(0,loc,args); sfx('place'); ui.markId=S.logN;
+  const ids=me.tableau.slice(n0);
+  if(ids.length){
+    const notes=fresh.filter(l=>l.k==='serve'&&/\+\d+ (bonus|event|old master)/.test(l.t)).map(l=>l.t.match(/\((.*)\)/)[1].split(', ').slice(1).join(', '));
+    // VP from regulars is celebrated on its own card, so count plates, bonuses and sets here
+    const regVP=fresh.filter(l=>l.k.startsWith('regular:')&&l.pi===0).reduce((a,l)=>a+REG[l.k.slice(8)].vp,0);
+    ui.fx={ids,vp:score(me).total-vp0-regVP,notes};
+    clearTimeout(ui.fxT); ui.fxT=setTimeout(()=>{if(ui.fx){ui.fx=null; render(); schedule();}},2300);
+  }
+  render(); schedule();
 }
 function pickLoc(id,direct){
   if(isPhone()&&!direct){ui.sheet='st:'+id; ui.sel=[]; return render();}
@@ -1241,7 +1410,7 @@ function overlayHTML(){
   }
   if(q.type==='recap'){
     const rows=S.log.filter(l=>l.id>q.from&&(l.pi!==0||l.k==='tip')).reverse().map(l=>{
-      let icon=l.pi>=0?'<img class="face" src="'+chefArt(S.players[l.pi].color)+'" alt="">':'<span class="sysk" lang="ja">'+(l.k==='event'?EVT[S.event]?.kj||'祭':'回')+'</span>';
+      let icon=l.pi>=0?'<img class="face" src="'+chefArt(S.players[l.pi].chef)+'" alt="">':'<span class="sysk" lang="ja">'+(l.k==='event'?EVT[S.event]?.kj||'祭':'回')+'</span>';
       if(l.k==='tip') icon='<img class="ic" src="'+ingArt('W')+'" alt="">';
       return '<li class="'+(l.k.startsWith('regular')?'won':l.k==='tip'?'tip':'')+'">'+icon+'<span>'+esc(l.t)+'</span></li>';
     }).join('');
@@ -1253,17 +1422,21 @@ function overlayHTML(){
 function actbarHTML(){
   const sp=ui.spot; if(!sp||ui.queue.length||S.players[S.turn]===undefined) return '';
   const p=S.players[sp.pi];
-  return '<div class="actbar pc'+p.color+'" aria-live="polite"><img class="face" src="'+chefArt(p.color)+'" alt=""><span><b>'+LOC[sp.loc].name+'</b> · '+esc(sp.text)+'</span></div>';
+  return '<div class="actbar pc'+p.color+'" aria-live="polite"><img class="face" src="'+chefArt(p.chef)+'" alt=""><span><b>'+LOC[sp.loc].name+'</b> · '+esc(sp.text)+'</span></div>';
 }
 
 app.addEventListener('pointerdown',audioInit);
 app.addEventListener('click',e=>{
-  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-wr],[data-wl],[data-act]');
+  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-wr],[data-wl],[data-wc],[data-dish],[data-take],[data-car],[data-act]');
   if(!t) return;
   const d=t.dataset;
   if(d.loc) return pickLoc(d.loc);
   if(d.open){ui.menu=false; ui.sheet=d.open; ui.sel=[]; return render();}
-  if(d.reg!=null){ui.sheet='reg:'+d.reg; return render();}
+  if(d.reg!=null){ui.sheet='reg'; ui.carJump=S.regulars.slice(0,+d.reg).filter(Boolean).length; return render();}
+  if(d.dish!=null){ui.sheet='dish'; ui.carJump=S.belt.slice(0,+d.dish).filter(Boolean).length; sfx('pick'); return render();}
+  if(d.take!=null){if(t.disabled||S.turn!==0||!legal(S,0,'belt')) return; ui.sheet=null; return humanAct('belt',{slots:[+d.take]});}
+  if(d.car){const c=app.querySelector('.car'); if(c) c.scrollBy({left:(+d.car)*c.clientWidth,behavior:'smooth'}); return;}
+  if(d.wc){ui.char=d.wc; sfx('pick'); return render();}
   if(d.start) return startNew();
   if(d.wr){ui.nBots=+d.wr; sfx('pick'); return render();}
   if(d.wl){ui.level=d.wl; sfx('pick'); return render();}
@@ -1278,7 +1451,8 @@ app.addEventListener('click',e=>{
   switch(d.act){
     case 'menu': ui.menu=!ui.menu; return render();
     case 'welcome': Object.assign(ui,{welcome:true,menu:false,sheet:null,endOpen:false}); clearTimeout(ui.botT); return render();
-    case 'continue': ui.welcome=false; ui.markId=S.logN; render(); return schedule();
+    case 'continue': ui.welcome=false; ui.markId=S.logN; ui.vpShown=null; ui.catShown=null; render(); return schedule();
+    case 'fxdone': clearTimeout(ui.fxT); ui.fx=null; render(); return schedule();
     case 'cancel': ui.sheet=null; ui.sel=[]; render(); return schedule();
     case 'confirm': return confirmSheet();
     case 'closeend': ui.endOpen=false; return render();
@@ -1287,6 +1461,43 @@ app.addEventListener('click',e=>{
     case 'veil': if(e.target===t){ui.sheet=null; ui.sel=[]; render(); schedule();} return;
   }
 });
+function carDots(c){
+  const i=Math.round(c.scrollLeft/Math.max(1,c.clientWidth));
+  c.closest('.sheet-b')?.querySelectorAll('.cdot').forEach((d,k)=>d.classList.toggle('on',k===i));
+}
+app.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('car')) carDots(e.target);},true);
+app.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.dish!=null){e.preventDefault(); e.target.click();}});
+
+/* ----- drag a chef from your tray straight onto a station ----- */
+let drag=null;
+app.addEventListener('pointerdown',e=>{
+  const f=e.target.closest('[data-drag]');
+  if(!f||S.over||S.turn!==0||ui.sheet||ui.queue.length||ui.welcome||ui.fx) return;
+  e.preventDefault(); audioInit();
+  const g=document.createElement('img'); g.src=f.src; g.className='face dragghost'; g.alt=''; document.body.appendChild(g);
+  drag={g,x0:e.clientX,y0:e.clientY,moved:false,over:null};
+  document.body.classList.add('dragging'); dragMove(e);
+});
+function dragMove(e){
+  if(!drag) return;
+  drag.g.style.transform='translate('+(e.clientX-28)+'px,'+(e.clientY-40)+'px) scale('+(drag.moved?1.15:1)+')';
+  if(Math.hypot(e.clientX-drag.x0,e.clientY-drag.y0)>6) drag.moved=true;
+  const b=document.elementFromPoint(e.clientX,e.clientY)?.closest('.board[data-loc]'), loc=b&&b.dataset.loc;
+  if(loc!==drag.over){app.querySelectorAll('.board.drop').forEach(x=>x.classList.remove('drop')); if(b&&legal(S,0,loc)) b.classList.add('drop'); drag.over=loc;}
+}
+function dragEnd(e,cancel){
+  if(!drag) return;
+  const d=drag; drag=null; d.g.remove(); document.body.classList.remove('dragging');
+  app.querySelectorAll('.board.drop').forEach(x=>x.classList.remove('drop'));
+  if(cancel) return;
+  if(!d.moved) return flash('Drag a chef onto a station, or tap a station'), render();
+  if(d.over&&legal(S,0,d.over)) return pickLoc(d.over,true);
+  if(d.over){flash(whyNot(S,0,d.over)||'Not here'); render();}
+}
+document.addEventListener('pointermove',dragMove);
+document.addEventListener('pointerup',e=>dragEnd(e,false));
+document.addEventListener('pointercancel',e=>dragEnd(e,true));
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(ui.sheet||ui.menu)){ui.sheet=null; ui.sel=[]; ui.menu=false; render(); schedule();}});
 // a mouse wheel over the belt or the order clips scrolls them sideways
 app.addEventListener('wheel',e=>{
@@ -1295,11 +1506,12 @@ app.addEventListener('wheel',e=>{
 },{passive:false});
 
 function start(data){
-  try{const k=+localStorage.getItem('kaiten-bots'); if(k>=1&&k<=3) ui.nBots=k; const l=localStorage.getItem('kaiten-level'); if(LEVEL_INFO[l]) ui.level=l;}catch(e){}
+  try{const k=+localStorage.getItem('kaiten-bots'); if(k>=1&&k<=3) ui.nBots=k; const l=localStorage.getItem('kaiten-level'); if(LEVEL_INFO[l]) ui.level=l; const c=localStorage.getItem('kaiten-char'); if(CHAR[c]) ui.char=c;}catch(e){}
   let saved=null; try{saved=JSON.parse(localStorage.getItem('kaiten-save')||'null');}catch(e){}
   if(data&&data.state){S=data.state; Object.assign(ui,data.ui||{},{welcome:false,live:true});}
   else if(saved&&saved.state&&!saved.state.over){S=saved.state; ui.live=true;}
-  else S=newGame({nBots:ui.nBots,level:ui.level});
+  else S=newGame({nBots:ui.nBots,level:ui.level,you:ui.char});
+  S.players.forEach(p=>{if(p.chef==null){p.chef=p.color; p.char=CHARS[p.color].id;}});
   ui.markId=S.logN||0;
   render(); schedule();
 }
