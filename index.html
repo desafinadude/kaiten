@@ -405,8 +405,14 @@ body.dragging .board:not(.can){opacity:.45}
 .xout::after{transform:rotate(-45deg) scaleX(0);animation-name:strike2;animation-delay:.5s}
 @keyframes strike{to{transform:rotate(45deg) scaleX(1)}}
 @keyframes strike2{to{transform:rotate(-45deg) scaleX(1)}}
-.lr-who{position:absolute;right:-30px;bottom:-10px;display:flex;align-items:center;gap:6px;background:#1b140e;color:#fff;font-weight:900;font-size:13px;border-radius:999px;padding:4px 12px 4px 4px;border:2px solid #ffd27a;transform:rotate(-6deg)}
-.lr-who .face{width:30px!important;height:30px!important;filter:none!important;box-shadow:none!important}
+.lr-row{display:flex;align-items:center;gap:14px}
+.lostreg .cel-pic .face{width:150px;height:150px}
+.lr-arrow{font-size:34px;color:#ffd27a;font-weight:900;animation:pop .4s .6s both}
+.lr-rival{display:flex;flex-direction:column;align-items:center;gap:6px;animation:pop .5s .7s cubic-bezier(.2,1.4,.4,1) both}
+.lr-rival .face{width:120px;height:120px;box-shadow:0 0 0 6px var(--pc),0 0 0 12px rgba(255,255,255,.15),0 16px 40px rgba(0,0,0,.5)}
+.lr-rival b{font-family:var(--disp);font-weight:400;font-size:18px}
+.lr-rival .num{background:var(--lac);color:#fff;font-family:var(--disp);font-size:15px;border-radius:999px;padding:2px 12px;box-shadow:0 3px 0 var(--lac-2)}
+@media (max-width:640px){.lostreg .cel-pic .face{width:112px;height:112px}.lr-rival .face{width:88px;height:88px}.lr-row{gap:8px}.lr-arrow{font-size:26px}}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 @keyframes stamp{from{transform:scale(2.4) rotate(-30deg);opacity:0}to{transform:rotate(-12deg)}}
 .petal{position:absolute;top:-30px;left:var(--x);width:14px;height:10px;border-radius:10px 0 10px 0;background:#f7b7c8;opacity:.9;animation:fall var(--d) linear var(--dl) infinite}
@@ -1664,8 +1670,9 @@ function overlayHTML(){
   if(q.type==='lostreg'){
     const r=REG[q.r], p=S.players[q.pi];
     return '<div class="ov lostreg"><div class="cel-card" role="dialog" aria-modal="true" aria-label="Regular lost">'+
-      '<span class="cel-kicker">Regular lost</span><span class="cel-pic"><img class="face" src="'+A('reg-'+q.r)+'" alt=""><span class="xout" aria-hidden="true"></span>'+
-      '<span class="lr-who"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+esc(p.name)+' +'+r.vp+' VP</span></span>'+
+      '<span class="cel-kicker">Regular lost</span><div class="lr-row"><span class="cel-pic"><img class="face" src="'+A('reg-'+q.r)+'" alt=""><span class="xout" aria-hidden="true"></span></span>'+
+      '<span class="lr-arrow" aria-hidden="true">→</span>'+
+      '<span class="lr-rival pc'+p.color+'"><img class="face" src="'+chefArt(p.chef)+'" alt=""><b>'+esc(p.name)+'</b><span class="num">+'+r.vp+' VP</span></span></div>'+
       '<h2>'+esc(p.name)+' won the '+esc(r.name)+'</h2><p>'+esc(reqText(r))+'. They’re off the waiting list now.</p>'+
       '<button type="button" class="gbtn wood" data-act="dq">Next time</button></div></div>';
   }
