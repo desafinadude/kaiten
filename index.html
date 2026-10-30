@@ -70,6 +70,12 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .bsign{position:absolute;top:-4px;left:2px;z-index:2;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:var(--paper);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.25)}
 .bsign.last{background:var(--lac);color:#fff}
 .bempty{width:100px;height:100px;border-radius:50%;border:3px dashed rgba(255,255,255,.35)}
+.bempty.took{display:flex;align-items:center;justify-content:center}
+.bempty.took .face{width:46%;height:46%;opacity:.85}
+.tookby{font-size:11px;font-weight:900;color:#fff;background:rgba(27,20,14,.75);border-radius:999px;padding:2px 9px}
+.pwrap{display:block}
+.pwrap.fresh{animation:beltin .9s cubic-bezier(.2,1.2,.4,1) both}
+@keyframes beltin{from{transform:translateX(-80px) rotate(-30deg);opacity:0}}
 .plate{position:relative;width:100px;height:100px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#fffdf8 0 50%,var(--cat) 51% 60%,#fffdf8 61% 66%,var(--cat) 67% 100%);box-shadow:0 5px 0 rgba(0,0,0,.22),0 9px 14px rgba(0,0,0,.25)}
 .dart{width:82%;height:auto;display:block;margin-top:-4px;pointer-events:none}
 .vpb{position:absolute;top:-4px;right:-4px;width:30px;height:30px;border-radius:50%;background:var(--paper);border:3px solid var(--cat);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:14px;color:var(--ink)}
@@ -144,6 +150,25 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .loglist{list-style:none;margin:0;padding:6px 0 0;display:flex;flex-direction:column;gap:6px;font-size:12.5px}
 .logi{display:flex;gap:7px;align-items:flex-start}
 .logi.sys{color:var(--ink-2);font-style:italic}
+.logi .lt{flex:1;min-width:0}
+.lr{font-size:10px;font-weight:900;color:var(--ink-2);font-style:normal}
+.dv{flex:none;display:flex;flex-direction:column;align-items:flex-end;line-height:1.05;margin-left:auto}
+.dv b{font-family:var(--disp);font-weight:400;font-size:14px;color:#3f6d2a}
+.dv.neg b{color:var(--lac-2)}
+.dv small{font-size:10px;color:var(--ink-2)}
+.lastev .dv b{color:#9fe07a}.lastev .dv small{color:#d8ccb8}
+.recap li .dv{margin-left:auto}
+.logf{display:flex;gap:6px;flex-wrap:wrap;padding:2px 0 8px;position:sticky;top:-8px;z-index:1;background:inherit}
+.logf .gbtn{min-height:36px;padding:0 10px;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 3px 0 #46290f}
+.logf .gbtn.on{box-shadow:0 3px 0 var(--indigo-2)}
+.logf .face{width:22px;height:22px}
+.sorders{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
+.sol{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);width:100%}
+.sord{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;border-radius:8px;background:var(--paper-2);border-left:3px solid var(--cat);font-size:12px}
+.sord.ok{box-shadow:inset 0 0 0 2px #6d9a4a}
+.sord img{width:34px;height:34px;object-fit:contain}
+.sord>span{display:flex;flex-direction:column}
+.sord .cost{display:flex;gap:1px;margin-top:1px}
 .logi .ld{width:9px;height:9px;border-radius:50%;background:var(--pc);flex:none;margin-top:5px}
 .rules p,.rules li{font-size:13px;margin:0}
 .rules p{margin-top:6px}
@@ -699,7 +724,7 @@ const EVENTS=[
   {id:'shortage',name:'Rice Shortage',kj:'品薄',text:'The rice delivery is late. The Pantry gives 1 fewer staple this round.'},
   {id:'matsuri',name:'Summer Matsuri',kj:'祭',text:'The festival is in town. Every chef gains 1 wasabi.'},
   {id:'celebrity',name:'Celebrity Chef',kj:'来店',text:'A famous chef drops in. The first chef to serve a Special this round gains 3 VP.'},
-  {id:'powercut',name:'Power Cut',kj:'停電',text:'The belt has stopped. Nobody can use the Kaiten Belt station this round.'},
+  {id:'powercut',name:'Power Cut',kj:'停電',text:'The belt has stopped. At the Kaiten Belt you can only lift 1 dish off by hand, and its wasabi stays behind.'},
 ];
 const EVT=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
 const marketCount=(s,p)=>Math.min(2+abCount(p,'market')+(s.event==='auction'?1:0),s.market.length);
@@ -799,13 +824,15 @@ function whyNot(s,pi,loc){
   if(!spotFree(s,loc)) return 'Taken';
   switch(loc){
     case 'market': return s.market.length?'':'The ice is empty';
-    case 'belt': if(s.event==='powercut') return 'Closed: power cut'; if(p.orders.length>=ORDER_LIMIT) return 'Your order clips are full'; return s.belt.some(Boolean)?'':'The belt is empty';
+    case 'belt': if(p.orders.length>=ORDER_LIMIT) return 'Your order clips are full'; return s.belt.some(Boolean)?'':'The belt is empty';
     case 'prep': case 'head': return p.orders.some(id=>canCook(p,DISH[id]))?'':'Nothing ready to cook';
     case 'staff': return p.hired?'Already hired':p.wasabi<2?'Needs 2 wasabi':'';
   }
   return '';
 }
 const legal=(s,pi,loc)=>!whyNot(s,pi,loc);
+// how many dishes a chef may take at the belt (only one, by hand, in a power cut)
+const beltRoom=(s,p)=>Math.min(s.event==='powercut'?1:2,ORDER_LIMIT-p.orders.length);
 
 function cook(s,pi,id){
   const p=s.players[pi], d=DISH[id], n=countCost(d.cost);
@@ -845,13 +872,14 @@ function act(s,pi,loc,args){
       log(s,p.name+' took '+[r?r+' Rice':'',k-r?(k-r)+' Nori':''].filter(Boolean).join(' and ')+' from the pantry'+(rw?' and 1 wasabi':'')+'.',pi);
       break;}
     case 'belt':{
-      const room=Math.min(2,ORDER_LIMIT-p.orders.length);
+      const cut=s.event==='powercut', room=beltRoom(s,p);
       const slots=[...new Set(args.slots||[])].filter(i=>s.belt[i]).slice(0,room);
       if(!slots.length) slots.push(s.belt.findIndex(Boolean));
       let w=abCount(p,'belt'); const names=[];
-      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null;});
+      if(!s.taken) s.taken={};
+      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); if(!cut) w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null; s.taken[i]=pi;});
       p.wasabi+=w;
-      log(s,p.name+' took '+names.join(' and ')+' off the belt'+(w?' with '+w+' wasabi':'')+'.',pi);
+      log(s,p.name+(cut?' lifted ':' took ')+names.join(' and ')+' off the '+(cut?'stopped ':'')+'belt'+(w?' with '+w+' wasabi':'')+'.',pi);
       break;}
     case 'prep':{
       let id=args.dish; if(!p.orders.includes(id)||!canCook(p,DISH[id])) id=p.orders.find(x=>canCook(p,DISH[x]));
@@ -893,8 +921,9 @@ function endRound(s){
   const gone=s.belt[4]; if(gone){s.dishDiscard.push(gone.id); log(s,DISH[gone.id].name+' went round the corner.');}
   const rest=s.belt.slice(0,4).filter(Boolean);
   const nb=[null,null,null,null,null]; rest.forEach((b,i)=>{b.w++; nb[5-rest.length+i]=b;});
-  for(let i=0;i<5;i++) if(!nb[i]){const id=drawDish(s); if(id) nb[i]={id,w:0};}
-  s.belt=nb;
+  let added=0; for(let i=0;i<5;i++) if(!nb[i]){const id=drawDish(s); if(id){nb[i]={id,w:0}; added++;}}
+  s.belt=nb; s.taken={};
+  if(s.round<s.maxRounds) log(s,'The belt turns: '+(added===1?'1 new dish arrives':added+' new dishes arrive')+' and the rest pick up a wasabi.');
   LOCS.forEach(l=>s.spots[l.id]=[]);
   s.players.forEach(p=>{p.placed=0; if(p.hired) p.apprentice=true;});
   if(s.doorTaker!=null){s.first=s.doorTaker; s.doorTaker=null;}
@@ -990,11 +1019,11 @@ function botMove(s,pi){
         if(best){sc=best.v+1.2; args={dishes:best.ids};}
         break;}
       case 'belt':{
-        const room=Math.min(2,ORDER_LIMIT-p.orders.length);
+        const room=beltRoom(s,p), bw=b=>s.event==='powercut'?0:b.w;
         const items=s.belt.map((b,i)=>{
-          if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-p.wasabi-b.w);
-          let v=0.5*dishValue(s,p,d)/(1+0.35*sh)+0.85*b.w;
-          if(last) v=sh===0?0.7*dishValue(s,p,d):0.16*b.w;
+          if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-p.wasabi-bw(b));
+          let v=0.5*dishValue(s,p,d)/(1+0.35*sh)+0.85*bw(b);
+          if(last) v=sh===0?0.7*dishValue(s,p,d):0.16*bw(b);
           else if(left===1&&sh>2) v*=0.4;
           return {i,v};
         }).filter(Boolean).sort((a,b)=>b.v-a.v).slice(0,room);
@@ -1082,7 +1111,9 @@ function render(){
   const sub='Round '+S.round+' of '+S.maxRounds+' · '+S.players[S.first].name+(S.first===0?' go':' goes')+' first';
 
   const belt=S.belt.map((b,i)=>'<div class="bslot'+(b?' tap" role="button" tabindex="0" data-dish="'+i+'" data-hc="dish:'+i+'" aria-label="'+esc(DISH[b.id].name+': see details')+'"':'"')+'>'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
-    (b?plateHTML(b.id,b.w)+labelHTML(b.id):'<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
+    (b?'<span class="pwrap'+(ui.beltSeen&&!ui.beltSeen.includes(b.id)?' fresh':'')+'">'+plateHTML(b.id,b.w)+'</span>'+labelHTML(b.id):
+      S.taken&&S.taken[i]!=null?'<div class="bempty took" aria-label="Taken by '+esc(S.players[S.taken[i]].name)+'"><img class="face" src="'+chefArt(S.players[S.taken[i]].chef)+'" alt=""></div><span class="tookby">Taken by '+esc(S.players[S.taken[i]].name)+'</span>':
+      '<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
 
   const market=S.market.map(f=>'<div class="fish"><img class="ic xl" src="'+ingArt(f)+'" alt="'+ING_NAME[f]+'"><span>'+ING_NAME[f]+'</span></div>').join('')||'<p class="hint">The ice is empty.</p>';
   // tray: one portrait per waiting regular; hover or focus names them, tap opens the carousel
@@ -1143,7 +1174,7 @@ function render(){
     '<button type="button" role="menuitemcheckbox" aria-checked="'+SND.quick+'" data-toggle="quick">Quick rivals: '+(SND.quick?'on':'off')+'</button>'+
     '<button type="button" role="menuitem" class="mnew" data-act="welcome">New game</button></div>':'')+
   '</header>'+
-  '<section class="beltzone" aria-label="The belt"><div class="in">'+(S.event==='powercut'&&!S.over?'<span class="cut"><span lang="ja">停電</span> Power cut · belt stopped</span>':'')+'<div class="track'+(S.event==='powercut'&&!S.over?' dark':'')+'" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
+  '<section class="beltzone" aria-label="The belt"><div class="in">'+(S.event==='powercut'&&!S.over?'<span class="cut"><span lang="ja">停電</span> Power cut · 1 dish by hand, no wasabi</span>':'')+'<div class="track'+(S.event==='powercut'&&!S.over?' dark':'')+'" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
   '<main class="table"><div class="in"><div class="tin">'+
     '<section class="pane pane-market" aria-label="Fish market"><div class="scroll" data-sk="market">'+
       '<div class="ph"><h2>Fish market</h2><span class="kj" lang="ja">魚市場</span></div>'+
@@ -1153,7 +1184,7 @@ function render(){
       '<div class="scroll" data-sk="kitchen"><div class="stations">'+stations+'</div></div></section>'+
   '</div></div>'+actbarHTML()+'</main>'+
   '<section class="crew" aria-label="Rival chefs"><div class="in" data-sk="crew">'+(S.event&&!S.over?'<button type="button" class="evchip" data-act="evshow" aria-label="Event this round: '+esc(EVT[S.event].name)+'"><span class="kj" lang="ja">'+EVT[S.event].kj+'</span>'+esc(EVT[S.event].name)+'</button>':'')+mates+
-    '<div class="lastev" aria-live="polite">'+(lastAct?'<span class="ld pc'+S.players[lastAct.pi].color+'"></span>':'')+'<span class="t">'+esc(lastAct?lastAct.t:'The noren goes up.')+'</span></div></div></section>'+
+    '<div class="lastev" aria-live="polite">'+(lastAct?'<span class="ld pc'+S.players[lastAct.pi].color+'"></span>':'')+'<span class="t">'+esc(lastAct?lastAct.t:'The noren goes up.')+'</span>'+(lastAct?dvHTML(lastAct):'')+'</div></div></section>'+
   '<section class="tray" aria-label="Your counter"><div class="in">'+
     '<div class="tcol t-pantry"><span class="tlabel">Your pantry</span><div class="bowls">'+bowls+'</div></div>'+
     '<div class="tcol t-orders"><span class="tlabel">Orders · '+me.orders.length+'/'+ORDER_LIMIT+'</span><div class="orders" data-sk="orders">'+orders+'</div></div>'+
@@ -1167,6 +1198,7 @@ function render(){
 
   app.querySelectorAll('[data-sk]').forEach(el=>{const k=keep[el.dataset.sk]; if(k){el.scrollLeft=k[0]; el.scrollTop=k[1];}});
   saveGame();
+  ui.beltSeen=S.belt.filter(Boolean).map(b=>b.id);
   if(ui.carJump!=null){const c=app.querySelector('.car'); if(c){c.scrollLeft=ui.carJump*c.clientWidth; carDots(c);} ui.carJump=null;}
   countVP(sc.total);
   hcRefresh();
@@ -1228,7 +1260,7 @@ function holesHTML(L,taken,cap){
 function maxPick(){
   const me=S.players[0], s=ui.sheet;
   if(s==='market') return marketCount(S,me);
-  if(s==='belt') return Math.min(2,ORDER_LIMIT-me.orders.length);
+  if(s==='belt') return beltRoom(S,me);
   if(s==='head') return 2;
   return 1;
 }
@@ -1315,6 +1347,7 @@ function dishCard(b,i,me){
     (d.ab?'<p class="cab">'+abText(d.ab)+'</p>':'')+(b.w?'<p class="cab">Comes with '+b.w+' wasabi.</p>':'')+
     '<button type="button" class="gbtn ctake" data-take="'+i+'"'+(why?' disabled':'')+'>'+(why?esc(why):'Take it · place a chef')+'</button></div>';
 }
+const dvHTML=l=>l.dv?'<span class="dv'+(l.dv<0?' neg':'')+'"><b class="num">'+(l.dv>0?'+':'')+l.dv+'</b><small class="num">'+l.tot+' VP</small></span>':'';
 function seatsHTML(){
   return S.players.map((p,i)=>{
     const s2=score(p);
@@ -1322,6 +1355,7 @@ function seatsHTML(){
       '<div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
       '<div class="meta"><b>'+esc(CHAR[p.char].name+', '+CHAR[p.char].title.toLowerCase())+':</b> '+esc(CHAR[p.char].text)+'</div>'+
       '<div class="meta">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+' chefs'+(p.hired&&!p.apprentice?' (+1 next round)':'')+' · '+p.orders.length+' orders · '+p.regulars.length+' regulars'+(p.regulars.length?' ('+p.regulars.map(r=>REG[r].name).join(', ')+')':'')+'</div>'+
+      (p.orders.length?'<div class="sorders"><span class="sol">Orders</span>'+p.orders.map(id=>{const d=DISH[id], ok=canCook(p,d); return '<span class="sord c-'+d.cat+(ok?' ok':'')+'" title="'+esc(d.name+(ok?': ready to cook':''))+'"><img src="'+dishArt(id)+'" alt=""><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(ok?' · ready':'')+'<span class="cost">'+[...d.cost].map(k=>ic(k,'sm')).join('')+'</span></span></span>';}).join('')+'</div>':'')+
       '<div class="dlist">'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(d.ab?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>'+
       '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+(s2.ev?' · events '+s2.ev:'')+'</div></div>';
   }).join('');
@@ -1353,7 +1387,7 @@ function sheetHTML(me){
       '<div class="bigbowl"><div class="bowl"><img class="ic xl" src="'+ingArt('N')+'" alt=""><b class="num">'+(k-ui.rice)+'</b></div>Nori</div>'+
       '<button type="button" class="gbtn wood" aria-label="More rice" data-rice="1">+</button></div>';
   } else if(sh==='belt'){
-    const room=maxPick(); title='Kaiten Belt'; help='Grab up to '+room+' plate'+(room>1?'s':'')+'. Any wasabi riding on them is yours.'; label='Take orders';
+    const room=maxPick(); title='Kaiten Belt'; help=S.event==='powercut'?'Power cut: lift 1 plate off by hand. Its wasabi stays behind.':'Grab up to '+room+' plate'+(room>1?'s':'')+'. Any wasabi riding on them is yours.'; label='Take orders';
     body='<div class="picks">'+S.belt.map((b,i)=>b?'<button type="button" class="pcard'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'">'+plateHTML(b.id,b.w)+labelHTML(b.id,cookStatus(me,b.id).note)+'</button>':'').join('')+'</div>';
     ok=ui.sel.length>=1&&ui.sel.length<=room;
   } else if(sh==='prep'||sh==='head'){
@@ -1381,8 +1415,11 @@ function sheetHTML(me){
   } else if(sh==='seats'){
     title='The chefs'; help='Everyone’s pantry, served plates and score so far.'; body=seatsHTML(); confirm=false;
   } else if(sh==='log'){
-    title='Service log'; help='Everything that happened, newest first.'; confirm=false;
-    body='<ul class="loglist">'+S.log.slice(0,60).map(l=>'<li class="logi'+(l.pi<0?' sys':'')+'">'+(l.pi>=0?'<span class="ld pc'+S.players[l.pi].color+'"></span>':'')+'<span>'+esc(l.t)+'</span></li>').join('')+'</ul>';
+    title='Service log'; help='Everything that happened, newest first. Score changes are on the right.'; confirm=false;
+    const f=ui.logF;
+    body='<div class="logf" role="group" aria-label="Show">'+'<button type="button" class="gbtn'+(f==null?' on':' wood')+'" data-logf="all">All</button>'+
+      S.players.map((p,i)=>'<button type="button" class="gbtn'+(f===i?' on':' wood')+'" data-logf="'+i+'"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+esc(p.name)+' <span class="num">'+score(p).total+'</span></button>').join('')+'</div>'+
+      '<ul class="loglist">'+S.log.filter(l=>f==null||l.pi===f).slice(0,80).map(l=>'<li class="logi'+(l.pi<0?' sys':'')+'">'+(l.pi>=0?'<span class="ld pc'+S.players[l.pi].color+'"></span>':'')+'<span class="lt"><span class="lr">R'+l.r+'</span> '+esc(l.t)+'</span>'+dvHTML(l)+'</li>').join('')+'</ul>';
   } else if(sh==='rules'){
     title='How to play'; help='7 rounds, 3 chefs each, most VP wins.'; body=RULES_HTML; confirm=false;
   }
@@ -1459,8 +1496,10 @@ function setGains(){if(!SND.ctx) return; SND.sfx.gain.value=SND.on?0.6:0; SND.bg
 /* ----- flow ----- */
 function flash(t){ui.toast=t; clearTimeout(ui.toastT); ui.toastT=setTimeout(()=>{ui.toast=''; render();},2000);}
 function doAct(pi,loc,args){
-  const before=S.logN||0, r=S.round; act(S,pi,loc,args);
+  const before=S.logN||0, r=S.round, tot0=S.players.map(p=>score(p).total); act(S,pi,loc,args);
   const fresh=S.log.filter(l=>l.id>before).reverse();
+  // note how each chef's score moved on that chef's newest line, so the log shows where points come from
+  S.players.forEach((p,j)=>{const t=score(p).total, d=t-tot0[j]; if(!d) return; const l=fresh.filter(x=>x.pi===j).pop(); if(l){l.dv=d; l.tot=t;}});
   fresh.forEach(l=>{
     if(l.k==='serve') sfx('serve');
     if(l.k.startsWith('regular:')&&l.pi===0){ui.queue.push({type:'regular',r:l.k.slice(8)}); sfx('fanfare');}
@@ -1554,7 +1593,7 @@ function overlayHTML(){
     const rows=S.log.filter(l=>l.id>q.from&&(l.pi!==0||l.k==='tip')).reverse().map(l=>{
       let icon=l.pi>=0?'<img class="face" src="'+chefArt(S.players[l.pi].chef)+'" alt="">':'<span class="sysk" lang="ja">'+(l.k==='event'?EVT[S.event]?.kj||'祭':'回')+'</span>';
       if(l.k==='tip') icon='<img class="ic" src="'+ingArt('W')+'" alt="">';
-      return '<li class="'+(l.k.startsWith('regular')?'won':l.k==='tip'?'tip':'')+'">'+icon+'<span>'+esc(l.t)+'</span></li>';
+      return '<li class="'+(l.k.startsWith('regular')?'won':l.k==='tip'?'tip':'')+'">'+icon+'<span>'+esc(l.t)+'</span>'+dvHTML(l)+'</li>';
     }).join('');
     return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="While you were cooking"><div class="sheet-h"><h2>While you were cooking…</h2><p>Here’s what happened since your last move.</p></div>'+
       '<div class="sheet-b"><ul class="recap">'+rows+'</ul></div><div class="sheet-f"><button type="button" class="gbtn" data-act="dq">Your turn</button></div></div></div>';
@@ -1569,7 +1608,7 @@ function actbarHTML(){
 
 app.addEventListener('pointerdown',audioInit);
 app.addEventListener('click',e=>{
-  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-wr],[data-wl],[data-wc],[data-dish],[data-take],[data-car],[data-act]');
+  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-wr],[data-wl],[data-wc],[data-dish],[data-take],[data-car],[data-logf],[data-act]');
   if(!t) return;
   const d=t.dataset;
   if(d.loc) return pickLoc(d.loc);
@@ -1579,6 +1618,7 @@ app.addEventListener('click',e=>{
   if(d.take!=null){if(t.disabled||S.turn!==0||!legal(S,0,'belt')) return; ui.sheet=null; return humanAct('belt',{slots:[+d.take]});}
   if(d.car){const c=app.querySelector('.car'); if(c) c.scrollBy({left:(+d.car)*c.clientWidth,behavior:'smooth'}); return;}
   if(d.wc){ui.char=d.wc; sfx('pick'); return render();}
+  if(d.logf){ui.logF=d.logf==='all'?null:+d.logf; return render();}
   if(d.start) return startNew();
   if(d.wr){ui.nBots=+d.wr; sfx('pick'); return render();}
   if(d.wl){ui.level=d.wl; sfx('pick'); return render();}
