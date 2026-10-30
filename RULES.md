@@ -67,7 +67,7 @@ After round 7, score the game.
 | Kaiten Belt | Take up to 2 dishes off the belt as orders, with any Wasabi on them. | 2 (3 with 4 players) |
 | Prep Counter | Cook 1 order. | Unlimited |
 | Head Chef's Board | Cook up to 2 orders. | 1 |
-| Front Door | Take the first-player marker for next round. Gain 1 Wasabi and draw 1 dish from the deck as an order. | 1 |
+| Front Door | Take the first-player marker for next round. Gain 1 Wasabi and draw 1 dish from the deck as an order (no draw in the last round). | 1 |
 | Staff Room | Pay 2 Wasabi to hire your apprentice. They work from next round on (4 chefs). Not available in the last round. | 1 |
 
 ## Chefs
@@ -136,6 +136,9 @@ satisfy several over the game.
 - **Regulars:** the VP on each regular you won.
 - **Game-end cards:** effects that score at the end.
 - **Events:** VP gained from event cards.
+- **Leftovers:** 1 VP for every 3 ingredients you still hold (Rice, Nori
+  and fish; round down). Wasabi doesn't count; it breaks ties.
+- **Unserved orders:** −1 VP for each order still on your clips.
 
 Most VP wins. Ties go to the player with more dishes served, then to the
 player with more Wasabi left.
