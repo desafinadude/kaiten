@@ -152,7 +152,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 
 /* your counter */
 .tray{flex:none;background:url(art/tex-tray.webp) 0 0/420px,linear-gradient(#a87b45,#8b6033);box-shadow:inset 0 4px 0 rgba(255,255,255,.18),0 -6px 14px rgba(0,0,0,.25);color:#fff7e8}
-.tray .in{display:grid;grid-template-columns:auto minmax(0,1fr) 236px auto;grid-template-areas:"pantry orders regs plates" "pantry orders regs me";grid-template-rows:auto 1fr;gap:6px 18px;align-items:start;padding-top:12px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
+.tray .in{display:grid;grid-template-columns:auto minmax(0,1fr) auto auto;grid-template-areas:"pantry orders regs plates" "pantry orders regs me";grid-template-rows:auto 1fr;gap:6px 18px;align-items:start;padding-top:12px;padding-bottom:calc(14px + env(safe-area-inset-bottom,0px))}
 .tlabel{font-size:10px;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#f3dcb5}
 .tcol{display:flex;flex-direction:column;gap:8px;min-width:0}
 .bowls{display:grid;grid-template-columns:repeat(4,46px);gap:8px 6px}
@@ -409,7 +409,17 @@ body.dragging .board:not(.can){opacity:.45}
 .lastev .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lastev .ld{width:9px;height:9px;border-radius:50%;background:var(--pc);flex:none}
 /* regulars in the counter tray, and their phone chips */
-.rtix{display:flex;flex-direction:column;gap:5px}
+.rtix{display:flex;gap:10px;padding-top:4px}
+.rbig{position:relative;border:0;padding:0;background:transparent;cursor:pointer;width:52px;height:52px;flex:none;border-radius:50%}
+.rbig .face{width:52px;height:52px;box-shadow:0 0 0 2px #fffaf0,0 3px 6px rgba(0,0,0,.35)}
+.rbig .rvp{position:absolute;right:-7px;top:-6px;width:22px;height:22px;font-size:10.5px;background:var(--lac);color:#fff;border-color:#fff}
+.rbig .rprog{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);background:#1b140e;color:#fff;font-size:10px;font-weight:900;border-radius:999px;padding:1px 6px;white-space:nowrap}
+.rbig .rprog.met{background:#3f6d2a}
+.rbig:hover .face,.rbig:focus-visible .face{transform:scale(1.08)}
+.rbig::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 10px);left:50%;transform:translateX(-50%);background:#1b140e;color:#fff;font-size:12px;font-weight:700;white-space:nowrap;padding:6px 10px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .15s;z-index:5}
+.rbig:last-child::after{left:auto;right:-6px;transform:none}
+.rbig:hover::after,.rbig:focus-visible::after{opacity:1}
+.rnone{font-size:12px;color:#f3dcb5}
 .rtk{display:flex;align-items:center;gap:7px;background:url(art/tex-paper.webp) 0 0/320px,var(--paper);color:var(--ink);border-radius:4px;padding:3px 8px 3px 4px;box-shadow:0 2px 4px rgba(0,0,0,.25);border-left:3px solid var(--lac)}
 .rtk .face{width:30px;height:30px;box-shadow:none}
 .rtx{display:flex;flex-direction:column;min-width:0;flex:1;line-height:1.15}
@@ -434,7 +444,7 @@ body.dragging .board:not(.can){opacity:.45}
   .tin{grid-template-columns:200px minmax(0,1fr)}
   .stations{grid-template-columns:repeat(auto-fill,minmax(160px,1fr))}
   .logo .en{display:none}
-  .tray .in{grid-template-columns:auto minmax(0,1fr) 220px;grid-template-areas:"pantry orders orders" "plates regs me";grid-template-rows:auto auto}
+  .tray .in{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"pantry orders orders" "plates regs me";grid-template-rows:auto auto}
   .t-me{justify-content:flex-end;align-self:center}
 }
 /* phone */
@@ -529,6 +539,23 @@ body.dragging .board:not(.can){opacity:.45}
   .pane-market .fish{width:44px}
   .pane-market .fish .ic.xl{width:34px;height:34px}
   .pane-market .fish span{font-size:9.5px}
+}
+/* every order clip in view, at any size */
+.orders{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:visible}
+.oticket,.slip{min-width:0}
+@media (min-width:861px) and (max-width:1180px){
+  .tray .in{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"pantry orders regs" "plates orders me";grid-template-rows:auto auto}
+  .t-me{justify-content:flex-start;align-self:end}
+}
+@media (min-width:641px) and (max-width:860px){
+  .tray .in{grid-template-columns:auto minmax(0,1fr) auto;grid-template-areas:"pantry orders orders" "plates regs me";grid-template-rows:auto auto}
+  .t-me{justify-content:flex-end;align-self:center}
+}
+@media (max-width:640px){
+  .orders{gap:6px}
+  .oticket{padding:9px 6px 6px}
+  .oticket .nm{font-size:12px}
+  .oticket .ab{display:none}
 }
 /* small boards drop the description first, then the icon */
 @container (max-height:109px){.board .bt{-webkit-line-clamp:1;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}.board .sticon{width:26px;height:26px}.board .hole{width:28px;height:28px}.board .hole .face{width:24px;height:24px}.board{gap:2px}}
@@ -1021,8 +1048,13 @@ function render(){
     (b?plateHTML(b.id,b.w)+labelHTML(b.id):'<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
 
   const market=S.market.map(f=>'<div class="fish"><img class="ic xl" src="'+ingArt(f)+'" alt="'+ING_NAME[f]+'"><span>'+ING_NAME[f]+'</span></div>').join('')||'<p class="hint">The ice is empty.</p>';
-  const regTickets=S.regulars.map((r,i)=>r?'<button type="button" class="rtk" data-reg="'+i+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rtx"><b>'+esc(REG[r].name)+'</b><span>'+reqText(REG[r])+'</span></span><span class="rvp num">'+REG[r].vp+'</span></button>'
-    :'<div class="rtk"><span class="rtx"><b>Empty seat</b><span>No one left in the queue</span></span></div>').join('');
+  // tray: one portrait per waiting regular; hover or focus names them, tap opens the carousel
+  const regIcons=S.regulars.map((r,i)=>{
+    if(!r) return '';
+    const rows=regProgress(REG[r],me.tableau), h=rows.reduce((a,x)=>a+x.have,0), nd=rows.reduce((a,x)=>a+x.need,0);
+    return '<button type="button" class="rbig" data-reg="'+i+'" data-tip="'+esc(REG[r].name+' · '+reqText(REG[r])+' · '+REG[r].vp+' VP')+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP. You have '+h+' of '+nd+'.')+'">'+
+      '<img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span><span class="rprog num'+(h>=nd?' met':'')+'">'+h+'/'+nd+'</span></button>';
+  }).join('')||'<span class="rnone">No one waiting</span>';
   const regMini=S.regulars.map((r,i)=>r?'<button type="button" class="rmini" data-reg="'+i+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP')+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span></button>':'').join('');
 
   const stations=LOCS.map(L=>{
@@ -1088,7 +1120,7 @@ function render(){
   '<section class="tray" aria-label="Your counter"><div class="in">'+
     '<div class="tcol t-pantry"><span class="tlabel">Your pantry</span><div class="bowls">'+bowls+'</div></div>'+
     '<div class="tcol t-orders"><span class="tlabel">Orders · '+me.orders.length+'/'+ORDER_LIMIT+'</span><div class="orders" data-sk="orders">'+orders+'</div></div>'+
-    '<div class="tcol t-regs"><span class="tlabel">Regulars waiting · yours when your plates match</span><div class="rtix">'+regTickets+'</div></div>'+
+    '<div class="tcol t-regs"><span class="tlabel">Regulars</span><div class="rtix">'+regIcons+'</div></div>'+
     '<div class="tcol t-plates"><span class="tlabel">Served plates</span><div class="stacks">'+stacks+'</div><span class="sets">Tasting sets <b class="num">'+Math.min(cc.nigiri,cc.maki,cc.sashimi)+'</b> · 4 VP each</span></div>'+
     '<div class="tcol t-me"><div class="chefs'+(my?' ready':'')+'" aria-label="'+left+(left===1?' chef':' chefs')+' left. Drag one onto a station, or tap a station.">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(me.chef)+'" alt=""'+(my?' data-drag="1" draggable="false"':'')+'>').join('')+'</div>'+
       '<span class="myab" title="'+esc(CHAR[me.char].text)+'"><b>'+esc(CHAR[me.char].title)+'</b>'+esc(CHAR[me.char].text)+'</span></div>'+
