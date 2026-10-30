@@ -107,6 +107,10 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .board.can{opacity:1;filter:none;cursor:pointer;border-color:var(--lac);box-shadow:0 4px 0 var(--lac-2),0 0 0 3px rgba(194,52,42,.25),0 10px 16px rgba(60,35,10,.3);animation:glow 1.6s ease-in-out infinite}
 .board.can:hover{transform:translateY(-2px)}
 .board.can:active{transform:translateY(2px);box-shadow:0 2px 0 var(--lac-2)}
+.board.combo{border-color:#d2a43c;box-shadow:0 4px 0 #9a7420,0 0 0 4px rgba(210,164,60,.55),0 10px 18px rgba(60,35,10,.3);animation:comboglow 1.2s ease-in-out infinite}
+@keyframes comboglow{50%{box-shadow:0 4px 0 #9a7420,0 0 0 9px rgba(210,164,60,.3),0 10px 18px rgba(60,35,10,.3)}}
+.ribbon{position:absolute;right:8px;bottom:8px;z-index:2;background:linear-gradient(#e7bb4f,#c79622);color:#fff;font-family:var(--disp);font-size:11.5px;letter-spacing:.04em;white-space:nowrap;padding:3px 10px;border-radius:6px;box-shadow:0 2px 0 #8a6516,0 4px 8px rgba(0,0,0,.25);text-shadow:0 1px 0 rgba(0,0,0,.25);pointer-events:none}
+@media (max-width:640px){.ribbon{right:auto;bottom:auto;top:-8px;left:4px;font-size:10px;padding:2px 7px}}
 @keyframes glow{50%{box-shadow:0 4px 0 var(--lac-2),0 0 0 6px rgba(194,52,42,.18),0 10px 16px rgba(60,35,10,.3)}}
 .board.live{opacity:1;filter:none}
 .board .kj{position:absolute;top:8px;right:8px;font-family:var(--disp);font-size:12px;color:var(--lac);opacity:.85;writing-mode:vertical-rl;letter-spacing:.1em}
@@ -691,9 +695,9 @@ const DISHES=[
   D('s8','Odori Ebi','sashimi','EEE',2,{t:'start',g:'W'}),
   D('s9','Tuna Tataki','sashimi','TTS',2,{t:'end',c:'sashimi'}),
   D('s10','Sashimi Boat','sashimi','TSUE',5),
-  D('x1','Chirashi Bowl','special','RRTSE',7),
+  D('x1','Chirashi Bowl','special','RRTSE',6),
   D('x2','Unadon','special','RRUU',4,{t:'start',g:'R'}),
-  D('x3','Omakase','special','RNTSUE',10),
+  D('x3','Omakase','special','RNTSUE',8),
   D('x4','Tempura Platter','special','REEE',3,{t:'market'}),
   D('x5','Kaisendon','special','RRSST',4,{t:'regular'}),
   D('x6','Chawanmushi','special','RNE',1,{t:'start',g:'W'}),
@@ -1071,7 +1075,8 @@ function botMove(s,pi){
           if(last) v=sh===0?0.7*dishValue(s,p,d)-1:-1.5;
           else if(left===1&&sh>2) v*=0.4;
           return {i,v};
-        }).filter(Boolean).sort((a,b)=>b.v-a.v).slice(0,room);
+        }).filter(x=>x&&x.v>0).sort((a,b)=>b.v-a.v).slice(0,room);
+        if(!items.length) break;
         sc=items.reduce((a,x)=>a+x.v,0)+abCount(p,'belt')*0.8; args={slots:items.map(x=>x.i)};
         break;}
       case 'market':{
@@ -1170,11 +1175,15 @@ function render(){
   }).join('')||'<span class="rnone">No one waiting</span>';
   const regMini=S.regulars.map((r,i)=>r?'<button type="button" class="rmini" data-reg="'+i+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP')+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span></button>':'').join('');
 
+  // two orders ready at once: point at the Head Chef
+  let pair=null;
+  if(my) for(let i=0;i<me.orders.length&&!pair;i++) for(let j=i+1;j<me.orders.length;j++) if(canCookAll(me,[DISH[me.orders[i]],DISH[me.orders[j]]])){pair=[me.orders[i],me.orders[j]]; break;}
   const stations=LOCS.map(L=>{
     const cap=locCap(S,L.id), taken=S.spots[L.id], why=my?whyNot(S,0,L.id):'', can=my&&!why;
-    return '<button type="button" class="board'+(can?' can':!my?' live':'')+(ui.spot&&ui.spot.loc===L.id?' just pc'+S.players[ui.spot.pi].color:'')+'" data-loc="'+L.id+'" aria-disabled="'+!can+'" aria-label="'+esc(L.name+(can?', available':why?', '+why:''))+'">'+
+    const combo=L.id==='head'&&pair&&can;
+    return '<button type="button" class="board'+(can?' can':!my?' live':'')+(combo?' combo':'')+(ui.spot&&ui.spot.loc===L.id?' just pc'+S.players[ui.spot.pi].color:'')+'" data-loc="'+L.id+'" aria-disabled="'+!can+'" aria-label="'+esc(L.name+(can?', available':why?', '+why:''))+'">'+
       '<span class="kj" lang="ja" aria-hidden="true">'+L.kj+'</span><span class="top"><img class="sticon" src="'+A('st-'+L.id)+'" alt=""><span class="bn">'+L.name+'</span></span>'+
-      '<span class="bt">'+stationText(L,me)+'</span>'+(my&&why&&why!=='Taken'?'<span class="why">'+why+'</span>':'')+'<span class="holes">'+holesHTML(L,taken,cap)+'</span></button>';
+      (combo?'<span class="ribbon">Serve both!</span>':'')+'<span class="bt">'+(combo?'Serve '+esc(DISH[pair[0]].name)+' + '+esc(DISH[pair[1]].name)+' with one chef.':stationText(L,me))+'</span>'+(my&&why&&why!=='Taken'?'<span class="why">'+why+'</span>':'')+'<span class="holes">'+holesHTML(L,taken,cap)+'</span></button>';
   }).join('');
 
   const mates=S.players.filter(p=>p.bot).map(p=>{

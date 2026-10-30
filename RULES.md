@@ -179,9 +179,9 @@ Ingredients: R Rice · N Nori · T Tuna · S Salmon · U Eel (unagi) · E Shrimp
 | Odori Ebi | Sashimi | E E E | 2 | Each round: gain 1 Wasabi |
 | Tuna Tataki | Sashimi | T T S | 2 | Game end: +1 VP per Sashimi |
 | Sashimi Boat | Sashimi | T S U E | 5 | |
-| Chirashi Bowl | Special | R R T S E | 7 | |
+| Chirashi Bowl | Special | R R T S E | 6 | |
 | Unadon | Special | R R U U | 4 | Each round: gain 1 Rice |
-| Omakase | Special | R N T S U E | 10 | |
+| Omakase | Special | R N T S U E | 8 | |
 | Tempura Platter | Special | R E E E | 3 | Fish Market: take 1 extra fish |
 | Kaisendon | Special | R R S S T | 4 | Game end: +2 VP per regular you won |
 | Chawanmushi | Special | R N E | 1 | Each round: gain 1 Wasabi |
