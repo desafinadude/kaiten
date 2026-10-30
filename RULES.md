@@ -51,7 +51,10 @@ score spread, seat win rates and per-card win rates.
    - Put 1 Wasabi on every dish still on the belt.
    - Fill the empty slots on the left from the dish deck.
    - Everyone takes their chefs back.
-   - If nobody used the Front Door, pass the first-player marker left.
+   - If nobody used the Front Door, the chef with the lowest score takes the
+     first-player marker (ties go to the next chef clockwise).
+4. **Catch-up tips.** Before the next round, every chef 6 or more VP
+   behind the leader gains 1 Wasabi; 15 or more behind gains 2 Wasabi.
 
 After round 7, score the game.
 
@@ -66,6 +69,12 @@ After round 7, score the game.
 | Head Chef's Board | Cook up to 2 orders. | 1 |
 | Front Door | Take the first-player marker for next round. Gain 1 Wasabi and draw 1 dish from the deck as an order. | 1 |
 | Staff Room | Pay 2 Wasabi to hire your apprentice. They work from next round on (4 chefs). | 1 |
+
+## Rival difficulty
+
+The app's rival chefs come in three strengths. Easy rivals often take a weaker
+move than their best. Normal rivals slip now and then. Hard rivals almost never
+slip and start with 1 extra Wasabi.
 
 ## Events
 
@@ -192,3 +201,7 @@ Ingredients: R Rice · N Nori · T Tuna · S Salmon · U Eel (unagi) · E Shrimp
   53 VP (2 players), 48 (3 players) and 42 (4 players). An earlier free Staff
   Room gave the first player a 46% win rate at 3 players, which is why hiring
   now costs 2 Wasabi and nobody starts with more than 1.
+- **Catch-up and difficulty, from 500 simulated games per matchup.** The tips
+  and the furthest-behind-goes-first rule cut the gap between first and last
+  place by about a third. Against two rivals, a Normal player wins about 53%
+  against Easy, 33% against Normal (an even share) and 23% against Hard.
