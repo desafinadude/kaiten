@@ -735,7 +735,7 @@ const EVENTS=[
   {id:'shortage',name:'Rice Shortage',kj:'品薄',text:'The rice delivery is late. The Pantry gives 1 fewer staple this round.'},
   {id:'matsuri',name:'Summer Matsuri',kj:'祭',text:'The festival is in town. Every chef gains 1 wasabi.'},
   {id:'celebrity',name:'Celebrity Chef',kj:'来店',text:'A famous chef drops in. The first chef to serve a Special this round gains 3 VP.'},
-  {id:'powercut',name:'Power Cut',kj:'停電',text:'The belt motor is out. You can still take dishes at the Kaiten Belt as normal, but at the end of this round the belt stays put: nothing goes round the corner and no wasabi is added. Empty spots are refilled by hand.'},
+  {id:'powercut',name:'Power Cut',kj:'停電',text:'The belt motor is out. Only one chef can work the Kaiten Belt this round, and any wasabi on the plates stays behind. At the end of the round the belt stays put: nothing leaves and no wasabi is added.'},
 ];
 const EVT=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
 const marketCount=(s,p)=>Math.min(2+abCount(p,'market')+(s.event==='auction'?1:0),s.market.length);
@@ -792,7 +792,7 @@ function newGame(opts){
     const ch=CHAR[chars[i]];
     s.players.push({name:o.allBots?ch.name+' '+(i+1):i===0?'You':ch.name,bot:o.allBots||i>0,color:i,char:ch.id,chef:ch.art,firstR:0,
       level:o.levels?o.levels[i]:o.level,
-      hand:{R:i?3:2,N:1,T:0,S:0,U:0,E:0},wasabi:1+((o.allBots||i>0)?(LEVELS[o.levels?o.levels[i]:o.level]||LEVELS.normal).head:0),orders:[],tableau:[],bonus:0,ev:0,regulars:[],hired:false,apprentice:false,placed:0});
+      hand:{R:2,N:1,T:0,S:0,U:0,E:0},wasabi:1+((o.allBots||i>0)?(LEVELS[o.levels?o.levels[i]:o.level]||LEVELS.normal).head:0),orders:[],tableau:[],bonus:0,ev:0,regulars:[],hired:false,apprentice:false,placed:0});
   }
   s.fishDeck=[]; FISH.forEach(f=>{for(let i=0;i<12;i++) s.fishDeck.push(f);}); shuffle(s,s.fishDeck); s.fishDiscard=[];
   s.market=[]; refillMarket(s);
@@ -829,7 +829,9 @@ function regMet(r,tab){
 }
 const abCount=(p,t)=>p.tableau.filter(id=>DISH[id].ab&&DISH[id].ab.t===t).length+(p.char&&CHAR[p.char].t===t?CHAR[p.char].n||1:0);
 
-function spotFree(s,loc){return s.spots[loc].length<LOC[loc].cap(s.players.length);}
+// a power cut halves the belt: one chef can work it by hand
+const locCap=(s,loc)=>loc==='belt'&&s.event==='powercut'?1:LOC[loc].cap(s.players.length);
+function spotFree(s,loc){return s.spots[loc].length<locCap(s,loc);}
 function whyNot(s,pi,loc){
   const p=s.players[pi];
   if(!spotFree(s,loc)) return 'Taken';
@@ -883,14 +885,14 @@ function act(s,pi,loc,args){
       log(s,p.name+' took '+[r?r+' Rice':'',k-r?(k-r)+' Nori':''].filter(Boolean).join(' and ')+' from the pantry'+(rw?' and 1 wasabi':'')+'.',pi);
       break;}
     case 'belt':{
-      const room=beltRoom(s,p);
+      const cut=s.event==='powercut', room=beltRoom(s,p);
       const slots=[...new Set(args.slots||[])].filter(i=>s.belt[i]).slice(0,room);
       if(!slots.length) slots.push(s.belt.findIndex(Boolean));
       let w=abCount(p,'belt'); const names=[];
       if(!s.taken) s.taken={};
-      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null; s.taken[i]=pi;});
+      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); if(!cut) w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null; s.taken[i]=pi;});
       p.wasabi+=w;
-      log(s,p.name+' took '+names.join(' and ')+' off the belt'+(w?' with '+w+' wasabi':'')+'.',pi);
+      log(s,p.name+' took '+names.join(' and ')+' off the '+(cut?'stopped ':'')+'belt'+(w?' with '+w+' wasabi':'')+'.',pi);
       break;}
     case 'prep':{
       let id=args.dish; if(!p.orders.includes(id)||!canCook(p,DISH[id])) id=p.orders.find(x=>canCook(p,DISH[x]));
@@ -1038,7 +1040,7 @@ function botMove(s,pi){
         if(best){sc=best.v+1.2; args={dishes:best.ids};}
         break;}
       case 'belt':{
-        const room=beltRoom(s,p), bw=b=>b.w;
+        const room=beltRoom(s,p), bw=b=>s.event==='powercut'?0:b.w;
         const items=s.belt.map((b,i)=>{
           if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-p.wasabi-bw(b));
           let v=0.5*dishValue(s,p,d)/(1+0.35*sh)+0.85*bw(b);
@@ -1145,7 +1147,7 @@ function render(){
   const regMini=S.regulars.map((r,i)=>r?'<button type="button" class="rmini" data-reg="'+i+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP')+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span></button>':'').join('');
 
   const stations=LOCS.map(L=>{
-    const cap=L.cap(n), taken=S.spots[L.id], why=my?whyNot(S,0,L.id):'', can=my&&!why;
+    const cap=locCap(S,L.id), taken=S.spots[L.id], why=my?whyNot(S,0,L.id):'', can=my&&!why;
     return '<button type="button" class="board'+(can?' can':!my?' live':'')+(ui.spot&&ui.spot.loc===L.id?' just pc'+S.players[ui.spot.pi].color:'')+'" data-loc="'+L.id+'" aria-disabled="'+!can+'" aria-label="'+esc(L.name+(can?', available':why?', '+why:''))+'">'+
       '<span class="kj" lang="ja" aria-hidden="true">'+L.kj+'</span><span class="top"><img class="sticon" src="'+A('st-'+L.id)+'" alt=""><span class="bn">'+L.name+'</span></span>'+
       '<span class="bt">'+stationText(L,me)+'</span>'+(my&&why&&why!=='Taken'?'<span class="why">'+why+'</span>':'')+'<span class="holes">'+holesHTML(L,taken,cap)+'</span></button>';
@@ -1193,7 +1195,7 @@ function render(){
     '<button type="button" role="menuitemcheckbox" aria-checked="'+SND.quick+'" data-toggle="quick">Quick rivals: '+(SND.quick?'on':'off')+'</button>'+
     '<button type="button" role="menuitem" class="mnew" data-act="welcome">New game</button></div>':'')+
   '</header>'+
-  '<section class="beltzone" aria-label="The belt"><div class="in">'+(S.event==='powercut'&&!S.over?'<span class="cut"><span lang="ja">停電</span> Power cut · the belt won’t turn this round</span>':'')+'<div class="track'+(S.event==='powercut'&&!S.over?' dark':'')+'" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
+  '<section class="beltzone" aria-label="The belt"><div class="in">'+(S.event==='powercut'&&!S.over?'<span class="cut"><span lang="ja">停電</span> Power cut · 1 chef at the belt, no wasabi</span>':'')+'<div class="track'+(S.event==='powercut'&&!S.over?' dark':'')+'" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
   '<main class="table"><div class="in"><div class="tin">'+
     '<section class="pane pane-market" aria-label="Fish market"><div class="scroll" data-sk="market">'+
       '<div class="ph"><h2>Fish market</h2><span class="kj" lang="ja">魚市場</span></div>'+
@@ -1310,7 +1312,7 @@ function hcDishHTML(b,i,me){
   const d=DISH[b.id], st=cookStatus(me,b.id), have={...me.hand};
   const cost=[...d.cost].map(k=>{const ok=have[k]>0; if(ok) have[k]--; return '<span class="ci'+(ok?' ok':'')+'">'+ic(k)+'</span>';}).join('');
   return '<div class="hc-top"><img class="hc-dish" src="'+dishArt(b.id)+'" alt=""><div class="hc-tt"><span class="hc-kind cat">'+CAT_NAME[d.cat]+(i===0?' · new':i===4?' · last lap':'')+'</span><b>'+esc(d.name)+'</b>'+
-    (b.w?'<span class="hc-sub">'+ic('W','sm')+' comes with '+b.w+' wasabi</span>':'')+'</div><span class="hc-vp num">'+d.vp+'<small>VP</small></span></div>'+
+    (b.w?'<span class="hc-sub">'+ic('W','sm')+(S.event==='powercut'?' '+b.w+' wasabi stays behind (power cut)':' comes with '+b.w+' wasabi')+'</span>':'')+'</div><span class="hc-vp num">'+d.vp+'<small>VP</small></span></div>'+
     '<div class="hc-cost">'+cost+'</div><p class="hc-stat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'Need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
     (d.ab?'<p class="hc-ab">'+abText(d.ab)+'</p>':'')+'<p class="hc-foot">Click for details or to take it.</p>';
 }
@@ -1363,7 +1365,7 @@ function dishCard(b,i,me){
     '<div class="cmeta"><span class="cct c-'+d.cat+'">'+CAT_NAME[d.cat]+'</span>'+(i===0?'<span class="ctag">New</span>':i===4?'<span class="ctag last">Last lap</span>':'')+'</div>'+
     '<h3>'+esc(d.name)+' <span class="cvpi num">'+d.vp+' VP</span></h3>'+
     '<div class="ccost">'+cost+'</div><p class="cstat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'You still need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
-    (d.ab?'<p class="cab">'+abText(d.ab)+'</p>':'')+(b.w?'<p class="cab">Comes with '+b.w+' wasabi.</p>':'')+
+    (d.ab?'<p class="cab">'+abText(d.ab)+'</p>':'')+(b.w?'<p class="cab">'+(S.event==='powercut'?'Power cut: its '+b.w+' wasabi stays behind.':'Comes with '+b.w+' wasabi.')+'</p>':'')+
     '<button type="button" class="gbtn ctake" data-take="'+i+'"'+(why?' disabled':'')+'>'+(why?esc(why):'Take it · place a chef')+'</button></div>';
 }
 // the whole game as plain text, oldest first, for pasting into a chat
@@ -1421,7 +1423,7 @@ function sheetHTML(me){
       '<div class="bigbowl"><div class="bowl"><img class="ic xl" src="'+ingArt('N')+'" alt=""><b class="num">'+(k-ui.rice)+'</b></div>Nori</div>'+
       '<button type="button" class="gbtn wood" aria-label="More rice" data-rice="1">+</button></div>';
   } else if(sh==='belt'){
-    const room=maxPick(); title='Kaiten Belt'; help=S.event==='powercut'?'Power cut: the belt won’t turn tonight, but you can take plates as normal. Grab up to '+room+'.':'Grab up to '+room+' plate'+(room>1?'s':'')+'. Any wasabi riding on them is yours.'; label='Take orders';
+    const room=maxPick(); title='Kaiten Belt'; help=S.event==='powercut'?'Power cut: grab up to '+room+' plate'+(room>1?'s':'')+' by hand. Their wasabi stays behind.':'Grab up to '+room+' plate'+(room>1?'s':'')+'. Any wasabi riding on them is yours.'; label='Take orders';
     body='<div class="picks">'+S.belt.map((b,i)=>b?'<button type="button" class="pcard'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'">'+plateHTML(b.id,b.w)+labelHTML(b.id,cookStatus(me,b.id).note)+'</button>':'').join('')+'</div>';
     ok=ui.sel.length>=1&&ui.sel.length<=room;
   } else if(sh==='prep'||sh==='head'){
@@ -1435,7 +1437,7 @@ function sheetHTML(me){
     ok=ui.sel.length>=1;
   } else if(sh.startsWith('st:')){
     // phone: a station tile opens its details first
-    const L=LOC[sh.slice(3)], my=!S.over&&S.turn===0, taken=S.spots[L.id], cap=L.cap(S.players.length);
+    const L=LOC[sh.slice(3)], my=!S.over&&S.turn===0, taken=S.spots[L.id], cap=locCap(S,L.id);
     const why=my?whyNot(S,0,L.id):(S.over?'Service is over.':'Wait for your turn.');
     title=L.name; help=stationText(L,me); label='Place chef here'; ok=my&&!why;
     body='<div class="stinfo"><img class="stbig" src="'+A('st-'+L.id)+'" alt=""><div><span class="holes">'+holesHTML(L,taken,cap)+'</span>'+
