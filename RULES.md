@@ -68,7 +68,7 @@ After round 7, score the game.
 | Prep Counter | Cook 1 order. | Unlimited |
 | Head Chef's Board | Cook up to 2 orders. | 1 |
 | Front Door | Take the first-player marker for next round. Gain 1 Wasabi and draw 1 dish from the deck as an order. | 1 |
-| Staff Room | Pay 2 Wasabi to hire your apprentice. They work from next round on (4 chefs). | 1 |
+| Staff Room | Pay 2 Wasabi to hire your apprentice. They work from next round on (4 chefs). Not available in the last round. | 1 |
 
 ## Chefs
 

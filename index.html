@@ -156,6 +156,11 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .dv b{font-family:var(--disp);font-weight:400;font-size:14px;color:#3f6d2a}
 .dv.neg b{color:var(--lac-2)}
 .dv small{font-size:10px;color:var(--ink-2)}
+.dv .why2{font-size:9.5px;opacity:.85;max-width:150px;text-align:right}
+.lastev .dv .why2{display:none}
+.dvs{display:flex;flex-wrap:wrap;gap:4px;margin-left:auto;flex:none;max-width:50%;justify-content:flex-end}
+.dvx{display:flex;align-items:center;gap:3px;font-size:11px;font-style:normal;background:var(--paper-2);border-radius:999px;padding:1px 7px}
+.dvx b{color:#3f6d2a}
 .lastev .dv b{color:#9fe07a}.lastev .dv small{color:#d8ccb8}
 .recap li .dv{margin-left:auto}
 .logf{display:flex;gap:6px;flex-wrap:wrap;padding:2px 0 8px;position:sticky;top:-8px;z-index:1;background:inherit}
@@ -839,7 +844,7 @@ function whyNot(s,pi,loc){
     case 'market': return s.market.length?'':'The ice is empty';
     case 'belt': if(p.orders.length>=ORDER_LIMIT) return 'Your order clips are full'; return s.belt.some(Boolean)?'':'The belt is empty';
     case 'prep': case 'head': return p.orders.some(id=>canCook(p,DISH[id]))?'':'Nothing ready to cook';
-    case 'staff': return p.hired?'Already hired':p.wasabi<2?'Needs 2 wasabi':'';
+    case 'staff': return s.round>=s.maxRounds?'No rounds left to use them':p.hired?'Already hired':p.wasabi<2?'Needs 2 wasabi':'';
   }
   return '';
 }
@@ -1374,7 +1379,9 @@ function logText(){
   S.players.forEach(p=>{const c=score(p); lines.push(p.name+' ('+CHAR[p.char].name+', '+CHAR[p.char].title+'): '+c.total+' VP = plates '+c.dishes+', bonuses '+c.bonus+', sets '+c.sets+', regulars '+c.regs+', end '+c.end+(c.ev?', events '+c.ev:'')+
     ' | served '+p.tableau.length+', regulars '+(p.regulars.map(r=>REG[r].name).join(', ')||'none')+', orders '+(p.orders.map(id=>DISH[id].name).join(', ')||'none')+', wasabi '+p.wasabi);});
   lines.push('');
-  S.log.slice().reverse().forEach(l=>lines.push('R'+l.r+' '+l.t+(l.dv?'  ['+(l.dv>0?'+':'')+l.dv+' → '+l.tot+' VP]':'')));
+  const sg=d=>(d>0?'+':'')+d;
+  S.log.slice().reverse().forEach(l=>lines.push('R'+l.r+' '+l.t+(l.dv?'  ['+sg(l.dv)+' → '+l.tot+' VP'+(l.why?': '+l.why:'')+']':'')+
+    (l.dvs?'  ['+l.dvs.map(x=>S.players[x.pi].name+' '+sg(x.d)+' → '+x.tot+(x.why?' ('+x.why+')':'')).join('; ')+']':'')));
   return lines.join('\n');
 }
 async function copyLog(){
@@ -1383,7 +1390,9 @@ async function copyLog(){
   // clipboard blocked (some embeds): show the text selected so it can be copied by hand
   ui.sheet='logtext'; render(); const ta=app.querySelector('.logtext'); if(ta){ta.focus(); ta.select();}
 }
-const dvHTML=l=>l.dv?'<span class="dv'+(l.dv<0?' neg':'')+'"><b class="num">'+(l.dv>0?'+':'')+l.dv+'</b><small class="num">'+l.tot+' VP</small></span>':'';
+const SCORE_PARTS=[['dishes','plates'],['bonus','bonuses'],['sets','sets'],['regs','regulars'],['end','end'],['ev','events']];
+const dvHTML=l=>(l.dv?'<span class="dv'+(l.dv<0?' neg':'')+'"'+(l.why?' title="'+esc(l.why)+'"':'')+'><b class="num">'+(l.dv>0?'+':'')+l.dv+'</b><small class="num">'+l.tot+' VP</small>'+(l.why?'<small class="why2">'+esc(l.why)+'</small>':'')+'</span>':'')+
+  (l.dvs?'<span class="dvs">'+l.dvs.map(x=>'<span class="dvx" title="'+esc(x.why)+'"><span class="ld pc'+S.players[x.pi].color+'"></span>'+esc(S.players[x.pi].name)+' <b class="num">'+(x.d>0?'+':'')+x.d+'</b></span>').join('')+'</span>':'');
 function seatsHTML(){
   return S.players.map((p,i)=>{
     const s2=score(p);
@@ -1406,7 +1415,7 @@ const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over
 function sheetHTML(me){
   if(S.over&&ui.endOpen){
     const rk=ranking(S), win=S.players[rk[0].i];
-    return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Closing time"><div class="sheet-h"><h2>'+(win.bot?esc(win.name)+' runs the best counter':'You run the best counter')+'</h2><p>Closing time after 7 rounds. Ties go to the chef who served more plates.</p></div>'+
+    return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Closing time"><div class="sheet-h"><h2>'+(win.bot?esc(win.name)+' runs the best counter':'You run the best counter')+'</h2><p>'+(rk[1]&&rk[1].sc.total===rk[0].sc.total?'Tied on '+rk[0].sc.total+' VP: '+(win.bot?esc(win.name)+' wins':'you win')+' by serving more plates ('+rk[0].n+' to '+rk[1].n+').':'Closing time after 7 rounds. Ties go to the chef who served more plates.')+'</p></div>'+
       '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+(s.ev?' · events '+s.ev:'')+'</span></div>';}).join('')+'</div></div>'+
       '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="copylog">Copy log</button><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="go">Play again</button></div></div></div>';
   }
@@ -1535,10 +1544,17 @@ function setGains(){if(!SND.ctx) return; SND.sfx.gain.value=SND.on?0.6:0; SND.bg
 /* ----- flow ----- */
 function flash(t){ui.toast=t; clearTimeout(ui.toastT); ui.toastT=setTimeout(()=>{ui.toast=''; render();},2000);}
 function doAct(pi,loc,args){
-  const before=S.logN||0, r=S.round, tot0=S.players.map(p=>score(p).total); act(S,pi,loc,args);
+  const before=S.logN||0, r=S.round, sc0=S.players.map(p=>score(p)); act(S,pi,loc,args);
   const fresh=S.log.filter(l=>l.id>before).reverse();
   // note how each chef's score moved on that chef's newest line, so the log shows where points come from
-  S.players.forEach((p,j)=>{const t=score(p).total, d=t-tot0[j]; if(!d) return; const l=fresh.filter(x=>x.pi===j).pop(); if(l){l.dv=d; l.tot=t;}});
+  // a score change lands on that chef's newest line, or on the event/round line that caused it (e.g. an inspection)
+  S.players.forEach((p,j)=>{
+    const c=score(p), d=c.total-sc0[j].total; if(!d) return;
+    const parts=SCORE_PARTS.filter(([k])=>c[k]!==sc0[j][k]).map(([k,n])=>n+' '+(c[k]>sc0[j][k]?'+':'')+(c[k]-sc0[j][k]));
+    const l=fresh.filter(x=>x.pi===j).pop();
+    if(l){l.dv=d; l.tot=c.total; l.why=parts.join(', ');}
+    else {const e=fresh.filter(x=>x.pi<0).pop()||fresh[fresh.length-1]; if(e) (e.dvs=e.dvs||[]).push({pi:j,d,tot:c.total,why:parts.join(', ')});}
+  });
   fresh.forEach(l=>{
     if(l.k==='serve') sfx('serve');
     if(l.k.startsWith('regular:')&&l.pi===0){ui.queue.push({type:'regular',r:l.k.slice(8)}); sfx('fanfare');}
