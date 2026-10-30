@@ -34,7 +34,7 @@ score spread, seat win rates and per-card win rates.
 3. Shuffle the dish deck and fill the **belt**'s 5 slots, left to right.
 4. Deal each player 2 dishes as **orders** (face up in front of you).
 5. Each player takes 3 chefs (put the 4th, the apprentice, aside), 2 Rice,
-   1 Nori and 1 Wasabi. Every player after the first takes 1 extra Rice.
+   1 Nori and 1 Wasabi.
 6. Shuffle the regulars, deal **players + 4** of them into a face-down queue
    and return the rest to the box. Turn the top 3 face up at the door.
 
@@ -103,7 +103,7 @@ round only.
 | Rice Shortage | The Pantry gives 1 fewer staple this round (at least 1). |
 | Summer Matsuri | Every chef gains 1 wasabi. |
 | Celebrity Chef | The first chef to serve a Special this round gains 3 VP. |
-| Power Cut | The belt motor is out. The Kaiten Belt works as normal, but at the end of the round the belt stays put: nothing leaves and no Wasabi is added. Empty spots are refilled. |
+| Power Cut | The belt motor is out. Only one chef can use the Kaiten Belt this round, and Wasabi on the plates taken stays behind. At the end of the round the belt stays put: nothing leaves and no Wasabi is added. Empty spots are refilled. |
 
 VP from events counts toward your final score.
 
