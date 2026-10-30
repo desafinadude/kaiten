@@ -23,7 +23,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .k{height:100%;overflow:hidden;display:flex;flex-direction:column;color:var(--ink);font-family:"Zen Kaku Gothic New",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:14px;line-height:1.4;background:radial-gradient(120% 70% at 50% 0%,#3d3026 0%,var(--wall) 70%)}
 .k *{box-sizing:border-box;scrollbar-width:none}
 .k *::-webkit-scrollbar{display:none;width:0;height:0}
-.k button{font:inherit;color:inherit}
+.k :where(button){font:inherit;color:inherit}
 .k :focus-visible{outline:3px solid var(--gold);outline-offset:2px}
 .in{max-width:1200px;margin:0 auto;width:100%;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .num{font-variant-numeric:tabular-nums}
@@ -55,13 +55,15 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .hanko{width:52px;height:52px;border-radius:50%;background:var(--lac);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:inset 0 0 0 3px rgba(255,255,255,.35),0 3px 0 var(--lac-2);flex:none}
 .hanko b{font-family:var(--disp);font-weight:400;font-size:20px;line-height:1}
 .hanko span{font-size:8px;letter-spacing:.2em;font-weight:900}
-.tag{border:0;background:linear-gradient(#ecd3a6,#d3b07a);color:var(--ink);font-weight:900;border-radius:8px;padding:0 14px;min-height:40px;box-shadow:0 3px 0 var(--wood-dk);cursor:pointer}
-.tag:active{transform:translateY(2px);box-shadow:0 1px 0 var(--wood-dk)}
 
 /* belt */
 .beltzone{flex:none;padding-top:16px}
 .track{position:relative;border-radius:16px;padding:12px 10px 10px;background:url(art/tex-belt.webp) 0 0/200px 100%,repeating-linear-gradient(90deg,var(--steel) 0 46px,var(--steel-2) 46px 48px);box-shadow:inset 0 7px 0 #b9c2c4,inset 0 -7px 0 #4d5658,0 6px 14px rgba(0,0,0,.45);animation:roll 14s linear infinite;overflow-x:auto;overflow-y:hidden}
 @keyframes roll{to{background-position:200px 0,48px 0}}
+.track.dark{animation:none;filter:brightness(.5) saturate(.6)}
+.beltzone .in{position:relative}
+.cut{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-2deg);z-index:3;background:#1b140e;color:#fff;border:2px solid #ffd27a;border-radius:8px;padding:6px 14px;font-weight:900;font-size:13px;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.5);pointer-events:none}
+.cut span{font-family:var(--disp);color:#ffd27a;margin-right:4px}
 .belt{display:grid;grid-template-columns:repeat(5,minmax(132px,1fr));gap:10px;min-width:min-content}
 .bslot{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:0;position:relative}
 .bsign{position:absolute;top:-4px;left:2px;z-index:2;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:var(--paper);color:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.25)}
@@ -194,6 +196,26 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .gbtn:disabled{background:#a3968a;box-shadow:0 4px 0 #776b60;color:#fff;cursor:not-allowed}
 .gbtn.wood{background:linear-gradient(#8f6436,#6b4520);color:#fff;box-shadow:0 4px 0 #46290f}
 .gbtn.on{background:var(--indigo);box-shadow:0 4px 0 var(--indigo-2)}
+.welcome{position:fixed;inset:0;z-index:19;display:flex;align-items:center;justify-content:center;padding:16px;background:radial-gradient(90% 60% at 50% 20%,rgba(33,56,91,.55),rgba(20,14,9,.92)),url(art/tex-noren.webp) 0 0/420px,var(--indigo)}
+.wcard{width:100%;max-width:440px;max-height:100%;overflow:auto;scrollbar-width:none;display:flex;flex-direction:column;align-items:center;gap:14px;color:#fff;text-align:center;padding:8px 2px}
+.wcard::-webkit-scrollbar{display:none}
+.wlogo{display:flex;flex-direction:column;align-items:center;gap:4px}
+.wlogo .jp{font-family:var(--disp);font-size:clamp(40px,12vw,60px);line-height:1;text-shadow:0 4px 0 var(--lac-2),0 10px 30px rgba(0,0,0,.5)}
+.wlogo .en{font-family:var(--disp);font-size:15px;letter-spacing:.5em;color:#ffd27a;margin-right:-.5em}
+.wtag{margin:0;color:#e5dccb;max-width:32ch}
+.wchefs{display:flex;justify-content:center}
+.wchefs .face{width:64px;height:64px;margin:0 -6px;border:3px solid #1b140e;box-shadow:0 6px 14px rgba(0,0,0,.4)}
+.wchefs .face:nth-child(2){width:78px;height:78px;z-index:1;margin-top:-10px}
+.gbtn.wbig{width:100%;min-height:58px;font-size:19px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 16px}
+.gbtn.wbig small{font-family:"Zen Kaku Gothic New",system-ui,sans-serif;font-size:12px;font-weight:700;opacity:.85}
+.wnew{width:100%;display:flex;flex-direction:column;gap:12px;background:rgba(27,20,14,.72);border:2px solid rgba(255,210,122,.35);border-radius:14px;padding:14px}
+.wnew h2{margin:0;font-family:var(--disp);font-weight:400;font-size:17px;color:#ffd27a}
+.wrow{display:flex;align-items:center;gap:10px}
+.wl{flex:0 0 76px;text-align:left;font-weight:900;font-size:13px;color:#e5dccb}
+.seg{flex:1;display:flex;gap:8px}
+.seg .gbtn{flex:1;padding:0 6px;min-height:44px;font-size:14px}
+.wdesc{margin:-2px 0 0;font-size:13px;color:#e5dccb;min-height:2.8em}
+.wlink{border:0;background:transparent;color:#ffd27a;font-weight:900;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:44px;padding:0 12px}
 .picks{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px 10px;padding-top:6px}
 .pcard{border:0;background:transparent;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;padding:8px 4px;border-radius:14px}
 .pcard.sel{background:rgba(194,52,42,.12);box-shadow:inset 0 0 0 3px var(--lac)}
@@ -202,6 +224,9 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .pick-ice{justify-content:flex-start}
 .fbtn{border:0;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 6px;border-radius:10px;font-size:11px;font-weight:900;min-width:56px;min-height:56px;color:#2c3c42}
 .fbtn.sel{background:#fff;box-shadow:inset 0 0 0 3px var(--lac)}
+.fbtn .fl{background:var(--indigo);color:#fff;border-radius:999px;padding:2px 9px}
+.fbtn.sel .fl{background:var(--lac)}
+.recap li.tip{font-weight:700}
 .stepper{display:flex;align-items:center;justify-content:center;gap:14px;padding:12px 0}
 .stepper .gbtn{width:50px;padding:0;font-size:22px}
 .bigbowl{display:flex;flex-direction:column;align-items:center;gap:8px;font-weight:900}
@@ -314,7 +339,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .regmini{display:none}
 .rmini{position:relative;border:0;background:var(--paper);border-radius:50%;padding:0;width:42px;height:42px;cursor:pointer;flex:none}
 .rmini .face{width:42px;height:42px}
-.rmini .rvp{position:absolute;right:-6px;bottom:-6px;width:21px;height:21px;font-size:10px}
+.rmini .rvp{position:absolute;right:-6px;bottom:-6px;width:21px;height:21px;font-size:10px;background:var(--lac);color:#fff;border-color:#fff}
 .stinfo{display:flex;align-items:center;gap:14px;padding:6px 0}
 .stbig{width:72px;height:72px;flex:none}
 .regbig{width:84px;height:84px}
@@ -485,6 +510,8 @@ const LOCS=[
 ];
 const LOC=Object.fromEntries(LOCS.map(l=>[l.id,l]));
 const BOT_NAMES=['Hana','Ren','Ito'];
+// rival strength: random wobble on each option's value, and how often they take a worse option outright
+const LEVELS={easy:{noise:5,slip:0.4,head:0},normal:{noise:1.6,slip:0.08,head:0},hard:{noise:0.3,slip:0,head:1}};
 
 // Events turn up at the start of rounds 2, 4 and 6 and last that round.
 const EVENT_ROUNDS=[2,4,6];
@@ -542,13 +569,14 @@ function drawDish(s){
 function refillMarket(s){while(s.market.length<5){const f=drawFish(s); if(!f) break; s.market.push(f);}}
 
 function newGame(opts){
-  const o=Object.assign({nBots:2,seed:(Math.random()*1e9)|0,allBots:false},opts||{});
+  const o=Object.assign({nBots:2,seed:(Math.random()*1e9)|0,allBots:false,level:'normal',levels:null,catchup:true},opts||{});
   const n=o.nBots+1;
-  const s={rng:o.seed|0,seed:o.seed|0,round:1,maxRounds:ROUNDS,log:[],over:false,doorTaker:null};
+  const s={rng:o.seed|0,seed:o.seed|0,round:1,maxRounds:ROUNDS,log:[],over:false,doorTaker:null,level:o.level,catchup:o.catchup};
   s.players=[];
   for(let i=0;i<n;i++){
     s.players.push({name:o.allBots?'Bot '+(i+1):i===0?'You':BOT_NAMES[i-1],bot:o.allBots||i>0,color:i,
-      hand:{R:i?3:2,N:1,T:0,S:0,U:0,E:0},wasabi:1,orders:[],tableau:[],bonus:0,ev:0,regulars:[],hired:false,apprentice:false,placed:0});
+      level:o.levels?o.levels[i]:o.level,
+      hand:{R:i?3:2,N:1,T:0,S:0,U:0,E:0},wasabi:1+((o.allBots||i>0)?(LEVELS[o.levels?o.levels[i]:o.level]||LEVELS.normal).head:0),orders:[],tableau:[],bonus:0,ev:0,regulars:[],hired:false,apprentice:false,placed:0});
   }
   s.fishDeck=[]; FISH.forEach(f=>{for(let i=0;i<12;i++) s.fishDeck.push(f);}); shuffle(s,s.fishDeck); s.fishDiscard=[];
   s.market=[]; refillMarket(s);
@@ -687,12 +715,24 @@ function endRound(s){
   s.belt=nb;
   LOCS.forEach(l=>s.spots[l.id]=[]);
   s.players.forEach(p=>{p.placed=0; if(p.hired) p.apprentice=true;});
-  if(s.doorTaker!=null){s.first=s.doorTaker; s.doorTaker=null;} else s.first=(s.first+1)%s.players.length;
+  if(s.doorTaker!=null){s.first=s.doorTaker; s.doorTaker=null;}
+  else if(s.catchup){
+    // catch-up: with nobody at the Front Door, the chef furthest behind goes first
+    const n=s.players.length; let best=null;
+    for(let k=1;k<=n;k++){const j=(s.first+k)%n, t=score(s.players[j]).total; if(best===null||t<best.t) best={j,t};}
+    s.first=best.j;
+  } else s.first=(s.first+1)%s.players.length;
   s.round++; s.event=null; s.celebDone=false;
   if(s.round>s.maxRounds){s.over=true; s.round=s.maxRounds; log(s,'Closing time. Final scores are in.'); return;}
   s.turn=s.first;
   if(EVENT_ROUNDS.includes(s.round)&&s.eventDeck.length) startEvent(s,s.eventDeck.pop());
   log(s,'Round '+s.round+' begins. '+s.players[s.first].name+(s.players[s.first].bot?' goes':' go')+' first.');
+  if(s.catchup){
+    // catch-up: regulars tip the chefs who are falling behind
+    const tot=s.players.map(p=>score(p).total), lead=Math.max(...tot);
+    s.players.forEach((p,i)=>{const gap=lead-tot[i]; const tip=gap>=15?2:gap>=6?1:0;
+      if(tip){p.wasabi+=tip; log(s,'Regulars tip '+(p.bot?p.name:'you')+' '+tip+' wasabi to help '+(p.bot?'them':'you')+' catch up.',i,'tip');}});
+  }
   s.players.forEach(p=>p.tableau.forEach(id=>{
     const a=DISH[id].ab; if(!a||a.t!=='start') return;
     if(a.g==='W') p.wasabi++; else if(a.g==='F'){const f=drawFish(s); if(f) p.hand[f]++;} else p.hand[a.g]++;
@@ -751,7 +791,8 @@ function demand(s,p){
 }
 function botMove(s,pi){
   const p=s.players[pi], left=s.maxRounds-s.round, last=left===0;
-  const opts=[]; const noise=()=>rnd(s)*0.6;
+  const lv=LEVELS[p.level]||LEVELS.normal;
+  const opts=[]; const noise=()=>rnd(s)*lv.noise;
   const cookable=p.orders.filter(id=>canCook(p,DISH[id])).map(id=>({id,v:dishValue(s,p,DISH[id])})).sort((a,b)=>b.v-a.v);
   for(const L of LOCS){
     if(!legal(s,pi,L.id)) continue;
@@ -798,6 +839,7 @@ function botMove(s,pi){
     if(sc>-1) opts.push({loc:L.id,args,sc:sc+noise()});
   }
   opts.sort((a,b)=>b.sc-a.sc);
+  if(opts.length>1&&rnd(s)<lv.slip) return opts[1+Math.floor(rnd(s)*(opts.length-1))];
   return opts[0]||{loc:'pantry',args:{}};
 }
 
@@ -821,7 +863,7 @@ const ingArt=k=>A('ing-'+k);
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let S=null;
-const ui={menu:false,sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0,queue:[],spot:null,markId:0};
+const ui={welcome:true,live:false,level:'normal',menu:false,sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0,queue:[],spot:null,markId:0};
 const app=document.getElementById('app');
 
 const ic=(k,cls)=>'<img class="ic'+(cls?' '+cls:'')+'" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">';
@@ -908,11 +950,11 @@ function render(){
     '<button type="button" role="menuitem" data-open="seats">Chefs &amp; scores</button><button type="button" role="menuitem" data-open="log">Service log</button>'+
     '<button type="button" role="menuitem" data-open="rules">How to play</button>'+
     '<button type="button" role="menuitemcheckbox" aria-checked="'+SND.on+'" data-toggle="on">Sound effects: '+(SND.on?'on':'off')+'</button>'+
-    '<button type="button" role="menuitemcheckbox" aria-checked="'+SND.music+'" data-toggle="music">Music &amp; restaurant: '+(SND.music?'on':'off')+'</button>'+
+    '<button type="button" role="menuitemcheckbox" aria-checked="'+SND.music+'" data-toggle="music">Music: '+(SND.music?'on':'off')+'</button>'+
     '<button type="button" role="menuitemcheckbox" aria-checked="'+SND.quick+'" data-toggle="quick">Quick rivals: '+(SND.quick?'on':'off')+'</button>'+
-    '<button type="button" role="menuitem" class="mnew" data-open="new">New game</button></div>':'')+
+    '<button type="button" role="menuitem" class="mnew" data-act="welcome">New game</button></div>':'')+
   '</header>'+
-  '<section class="beltzone" aria-label="The belt"><div class="in"><div class="track" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
+  '<section class="beltzone" aria-label="The belt"><div class="in">'+(S.event==='powercut'&&!S.over?'<span class="cut"><span lang="ja">停電</span> Power cut · belt stopped</span>':'')+'<div class="track'+(S.event==='powercut'&&!S.over?' dark':'')+'" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
   '<main class="table"><div class="in"><div class="tin">'+
     '<section class="pane pane-market" aria-label="Fish market"><div class="scroll" data-sk="market">'+
       '<div class="ph"><h2>Fish market</h2><span class="kj" lang="ja">魚市場</span></div>'+
@@ -930,10 +972,34 @@ function render(){
     '<div class="tcol t-plates"><span class="tlabel">Served plates</span><div class="stacks">'+stacks+'</div><span class="sets">Tasting sets <b class="num">'+Math.min(cc.nigiri,cc.maki,cc.sashimi)+'</b> · 4 VP each</span></div>'+
     '<div class="tcol t-me"><div class="chefs" aria-label="'+left+(left===1?' chef':' chefs')+' ready">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(0)+'" alt="">').join('')+'</div></div>'+
   '</div></section>'+
-  sheetHTML(me)+overlayHTML()+
+  (ui.welcome?welcomeHTML():'')+sheetHTML(me)+overlayHTML()+
   (ui.toast?'<div class="toast" role="status">'+esc(ui.toast)+'</div>':'');
 
   app.querySelectorAll('[data-sk]').forEach(el=>{const k=keep[el.dataset.sk]; if(k){el.scrollLeft=k[0]; el.scrollTop=k[1];}});
+  saveGame();
+}
+
+/* ----- welcome screen and saved game ----- */
+const LEVEL_INFO={easy:['Easy','Relaxed rivals who often miss their best move.'],normal:['Normal','Sharp rivals who sometimes slip.'],hard:['Hard','Rivals who rarely slip, and start with an extra wasabi.']};
+function saveGame(){
+  if(!ui.live) return;
+  try{if(S.over) localStorage.removeItem('kaiten-save'); else localStorage.setItem('kaiten-save',JSON.stringify({state:S,nBots:ui.nBots}));}catch(e){}
+}
+function welcomeHTML(){
+  const cont=ui.live&&!S.over, n=S.players.length-1;
+  return '<div class="welcome" role="dialog" aria-modal="true" aria-label="Kaiten"><div class="wcard" data-sk="welcome">'+
+    '<div class="wlogo"><span class="jp" lang="ja">回転寿司</span><span class="en">KAITEN</span></div>'+
+    '<p class="wtag">Run the best stall at the sushi bar. Seven rounds, three chefs, one belt.</p>'+
+    '<div class="wchefs" aria-hidden="true">'+[1,0,2,3].map(c=>'<img class="face" src="'+chefArt(c)+'" alt="">').join('')+'</div>'+
+    (cont?'<button type="button" class="gbtn wbig" data-act="continue">Continue<small>Round '+S.round+' of '+S.maxRounds+' · '+score(S.players[0]).total+' VP · '+n+' '+(n>1?'rivals':'rival')+', '+LEVEL_INFO[S.level||'normal'][0]+'</small></button>':'')+
+    '<div class="wnew"><h2>'+(cont?'Or start a new game':'New game')+'</h2>'+
+      '<div class="wrow"><span class="wl">Rivals</span><div class="seg">'+[1,2,3].map(k=>'<button type="button" class="gbtn'+(k===ui.nBots?' on':' wood')+'" aria-pressed="'+(k===ui.nBots)+'" data-wr="'+k+'">'+k+'</button>').join('')+'</div></div>'+
+      '<div class="wrow"><span class="wl">Difficulty</span><div class="seg">'+Object.keys(LEVEL_INFO).map(k=>'<button type="button" class="gbtn'+(k===ui.level?' on':' wood')+'" aria-pressed="'+(k===ui.level)+'" data-wl="'+k+'">'+LEVEL_INFO[k][0]+'</button>').join('')+'</div></div>'+
+      '<p class="wdesc">'+esc(LEVEL_INFO[ui.level][1])+'</p>'+
+      '<button type="button" class="gbtn wbig'+(cont?' wood':'')+'" data-start="go">'+(cont?'Start new game':'Start cooking')+'</button>'+
+    '</div>'+
+    '<button type="button" class="wlink" data-open="rules">How to play</button>'+
+  '</div></div>';
 }
 
 function stationText(L,me){
@@ -945,7 +1011,6 @@ function holesHTML(L,taken,cap){
   return taken.map(pi=>'<span class="hole" title="'+esc(S.players[pi].name)+'"><img class="face" src="'+chefArt(S.players[pi].color)+'" alt="'+esc(S.players[pi].name)+'"></span>').join('')+
     (cap>20?'<span class="open-all">Open to all</span>':Array.from({length:cap-taken.length},()=>'<span class="hole" aria-hidden="true"></span>').join(''));
 }
-function newOpts(){return [1,2,3].map(k=>'<button type="button" class="gbtn'+(k===ui.nBots?' on':' wood')+'" data-start="'+k+'">'+k+' rival'+(k>1?'s':'')+'</button>').join('');}
 function maxPick(){
   const me=S.players[0], s=ui.sheet;
   if(s==='market') return marketCount(S,me);
@@ -964,22 +1029,23 @@ function seatsHTML(){
   }).join('');
 }
 const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over 7 rounds. Send chefs to stations, gather fish and staples, take orders off the belt, and serve dishes. Served plates stay with you, score, and often keep working for you.</p>'+
-  '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, first player passes left.</li></ol>'+
+  '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, the chef furthest behind goes first.</li></ol>'+
+  '<h3>Catching up</h3><p>At the start of each round the regulars tip chefs who are behind the leader: 1 wasabi if 6 or more VP behind, 2 wasabi if 15 or more.</p>'+
   '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p>'+
-  '<h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>Regulars you win, and effects printed on your dishes.</li></ul></div>';
+  '<h3>Rivals</h3><p>Easy rivals cook loosely and often miss their best move. Hard rivals rarely slip and start with an extra wasabi.</p><h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>Regulars you win, and effects printed on your dishes.</li></ul></div>';
 
 function sheetHTML(me){
   if(S.over&&ui.endOpen){
     const rk=ranking(S), win=S.players[rk[0].i];
     return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Closing time"><div class="sheet-h"><h2>'+(win.bot?esc(win.name)+' runs the best counter':'You run the best counter')+'</h2><p>Closing time after 7 rounds. Ties go to the chef who served more plates.</p></div>'+
       '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.color)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+(s.ev?' · events '+s.ev:'')+'</span></div>';}).join('')+'</div></div>'+
-      '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="'+ui.nBots+'">Play again</button></div></div></div>';
+      '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="go">Play again</button></div></div></div>';
   }
   const sh=ui.sheet; if(!sh) return '';
   let title='', help='', body='', ok=false, label='Place chef', confirm=true;
   if(sh==='market'){
     const k=maxPick(); title='Fish Market'; help='Pick '+k+' fish off the ice.'; label='Buy fish';
-    body='<div class="ice pick-ice">'+S.market.map((f,i)=>'<button type="button" class="fbtn'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'"><img class="ic xl" src="'+ingArt(f)+'" alt="">'+ING_NAME[f]+'</button>').join('')+'</div>';
+    body='<div class="ice pick-ice">'+S.market.map((f,i)=>'<button type="button" class="fbtn'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'"><img class="ic xl" src="'+ingArt(f)+'" alt=""><span class="fl">'+ING_NAME[f]+'</span></button>').join('')+'</div>';
     ok=ui.sel.length===k;
   } else if(sh==='pantry'){
     const k=pantryCount(S,me); title='Pantry'; help='Split '+k+' staples between Rice and Nori.'; label='Take staples'; ok=true;
@@ -1018,9 +1084,6 @@ function sheetHTML(me){
     body='<ul class="loglist">'+S.log.slice(0,60).map(l=>'<li class="logi'+(l.pi<0?' sys':'')+'">'+(l.pi>=0?'<span class="ld pc'+S.players[l.pi].color+'"></span>':'')+'<span>'+esc(l.t)+'</span></li>').join('')+'</ul>';
   } else if(sh==='rules'){
     title='How to play'; help='7 rounds, 3 chefs each, most VP wins.'; body=RULES_HTML; confirm=false;
-  } else if(sh==='new'){
-    title='New game'; help='How many rival chefs? This game will be lost.'; confirm=false;
-    body='<div class="newrow">'+newOpts()+'</div>';
   }
   return '<div class="veil" data-act="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="sheet-h"><h2>'+esc(title)+'</h2><p>'+esc(help)+'</p></div>'+
     '<div class="sheet-b">'+body+'</div><div class="sheet-f"><button type="button" class="gbtn wood" data-act="cancel">'+(confirm?'Cancel':'Close')+'</button>'+
@@ -1039,14 +1102,6 @@ function audioInit(){
   const c=new AC(); SND.ctx=c;
   SND.sfx=c.createGain(); SND.sfx.gain.value=SND.on?0.6:0; SND.sfx.connect(c.destination);
   SND.bg=c.createGain(); SND.bg.gain.value=SND.music?1:0; SND.bg.connect(c.destination);
-  // restaurant murmur: brown noise through a slowly wandering band-pass
-  const len=c.sampleRate*6, buf=c.createBuffer(1,len,c.sampleRate), d=buf.getChannelData(0); let last=0;
-  for(let i=0;i<len;i++){last=(last+0.02*(Math.random()*2-1))/1.02; d[i]=last*3.5;}
-  for(let i=0;i<2000;i++){d[i]*=i/2000; d[len-1-i]*=i/2000;}
-  const src=c.createBufferSource(); src.buffer=buf; src.loop=true;
-  const bp=c.createBiquadFilter(); bp.type='bandpass'; bp.frequency.value=430; bp.Q.value=0.8;
-  const lfo=c.createOscillator(); lfo.frequency.value=0.11; const lg=c.createGain(); lg.gain.value=170; lfo.connect(lg); lg.connect(bp.frequency); lfo.start();
-  const ag=c.createGain(); ag.gain.value=0.07; src.connect(bp); bp.connect(ag); ag.connect(SND.bg); src.start();
   SND.next=c.currentTime+0.4; SND.step=0;
   setInterval(musicTick,150);
 }
@@ -1083,7 +1138,6 @@ function musicTick(){
       pluck(SCALE[SND.idx],t+Math.random()*0.02,0.03+Math.random()*0.02,SND.bg);
       if(Math.random()<0.12) pluck(SCALE[Math.max(0,SND.idx-2)],t+0.07,0.02,SND.bg);
     }
-    if(Math.random()<0.06) clink(t+Math.random()*0.4,SND.bg,0.012);
     SND.next+=b%8===7?0.9:0.45;
   }
 }
@@ -1109,6 +1163,7 @@ function doAct(pi,loc,args){
   fresh.forEach(l=>{
     if(l.k==='serve') sfx('serve');
     if(l.k.startsWith('regular:')&&l.pi===0){ui.queue.push({type:'regular',r:l.k.slice(8)}); sfx('fanfare');}
+    if(l.k==='tip'&&l.pi===0) setTimeout(()=>flash(l.t),900);
     if(l.k==='event'){ui.queue.push({type:'event',id:S.event}); setTimeout(()=>sfx('gong'),350);}
   });
   if(S.over){ui.endOpen=true; ui.sheet=null; sfx('fanfare');}
@@ -1125,23 +1180,23 @@ function botStep(){
 function maybeRecap(){
   if(S.over||S.turn!==0||ui.queue.some(q=>q.type==='recap')) return;
   const from=ui.markId||0;
-  if(S.log.some(l=>l.id>from&&l.pi!==0)) ui.queue.push({type:'recap',from});
+  if(S.log.some(l=>l.id>from&&(l.pi!==0||l.k==='tip'))) ui.queue.push({type:'recap',from});
   ui.markId=S.logN;
 }
 function schedule(){
   clearTimeout(ui.botT);
   if(S.over) return;
-  if(ui.queue.length||ui.sheet||ui.menu){ui.botT=setTimeout(schedule,400); return;}
+  if(ui.welcome||ui.queue.length||ui.sheet||ui.menu){ui.botT=setTimeout(schedule,400); return;}
   if(!S.players[S.turn].bot){maybeRecap(); if(ui.queue.length){render(); ui.botT=setTimeout(schedule,400);} return;}
   ui.botT=setTimeout(()=>{
-    if(ui.queue.length||ui.sheet||ui.menu||S.over||!S.players[S.turn].bot) return schedule();
+    if(ui.welcome||ui.queue.length||ui.sheet||ui.menu||S.over||!S.players[S.turn].bot) return schedule();
     botStep(); render(); schedule();
   },SND.quick?650:1500);
 }
-function startNew(k){
-  clearTimeout(ui.botT); ui.nBots=k;
-  try{localStorage.setItem('kaiten-bots',String(k));}catch(e){}
-  S=newGame({nBots:k}); Object.assign(ui,{sheet:null,sel:[],endOpen:true,menu:false,queue:[],spot:null,markId:S.logN});
+function startNew(){
+  clearTimeout(ui.botT);
+  try{localStorage.setItem('kaiten-bots',String(ui.nBots)); localStorage.setItem('kaiten-level',ui.level);}catch(e){}
+  S=newGame({nBots:ui.nBots,level:ui.level}); Object.assign(ui,{welcome:false,live:true,sheet:null,sel:[],endOpen:true,menu:false,queue:[],spot:null,markId:S.logN});
   render(); schedule();
 }
 function defaultRice(){
@@ -1185,9 +1240,10 @@ function overlayHTML(){
       '<button type="button" class="gbtn" data-act="dq">Irasshaimase!</button></div></div>';
   }
   if(q.type==='recap'){
-    const rows=S.log.filter(l=>l.id>q.from&&l.pi!==0).reverse().map(l=>{
-      const icon=l.pi>=0?'<img class="face" src="'+chefArt(S.players[l.pi].color)+'" alt="">':'<span class="sysk" lang="ja">'+(l.k==='event'?EVT[S.event]?.kj||'祭':'回')+'</span>';
-      return '<li class="'+(l.k.startsWith('regular')?'won':'')+'">'+icon+'<span>'+esc(l.t)+'</span></li>';
+    const rows=S.log.filter(l=>l.id>q.from&&(l.pi!==0||l.k==='tip')).reverse().map(l=>{
+      let icon=l.pi>=0?'<img class="face" src="'+chefArt(S.players[l.pi].color)+'" alt="">':'<span class="sysk" lang="ja">'+(l.k==='event'?EVT[S.event]?.kj||'祭':'回')+'</span>';
+      if(l.k==='tip') icon='<img class="ic" src="'+ingArt('W')+'" alt="">';
+      return '<li class="'+(l.k.startsWith('regular')?'won':l.k==='tip'?'tip':'')+'">'+icon+'<span>'+esc(l.t)+'</span></li>';
     }).join('');
     return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="While you were cooking"><div class="sheet-h"><h2>While you were cooking…</h2><p>Here’s what happened since your last move.</p></div>'+
       '<div class="sheet-b"><ul class="recap">'+rows+'</ul></div><div class="sheet-f"><button type="button" class="gbtn" data-act="dq">Your turn</button></div></div></div>';
@@ -1202,13 +1258,15 @@ function actbarHTML(){
 
 app.addEventListener('pointerdown',audioInit);
 app.addEventListener('click',e=>{
-  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-act]');
+  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-wr],[data-wl],[data-act]');
   if(!t) return;
   const d=t.dataset;
   if(d.loc) return pickLoc(d.loc);
   if(d.open){ui.menu=false; ui.sheet=d.open; ui.sel=[]; return render();}
   if(d.reg!=null){ui.sheet='reg:'+d.reg; return render();}
-  if(d.start) return startNew(+d.start);
+  if(d.start) return startNew();
+  if(d.wr){ui.nBots=+d.wr; sfx('pick'); return render();}
+  if(d.wl){ui.level=d.wl; sfx('pick'); return render();}
   if(d.toggle){SND[d.toggle]=!SND[d.toggle]; saveSnd(); setGains(); return render();}
   if(d.rice){const k=pantryCount(S,S.players[0]); ui.rice=Math.max(0,Math.min(k,ui.rice+(+d.rice))); sfx('pick'); return render();}
   if(d.pick!=null){
@@ -1219,6 +1277,8 @@ app.addEventListener('click',e=>{
   }
   switch(d.act){
     case 'menu': ui.menu=!ui.menu; return render();
+    case 'welcome': Object.assign(ui,{welcome:true,menu:false,sheet:null,endOpen:false}); clearTimeout(ui.botT); return render();
+    case 'continue': ui.welcome=false; ui.markId=S.logN; render(); return schedule();
     case 'cancel': ui.sheet=null; ui.sel=[]; render(); return schedule();
     case 'confirm': return confirmSheet();
     case 'closeend': ui.endOpen=false; return render();
@@ -1235,8 +1295,11 @@ app.addEventListener('wheel',e=>{
 },{passive:false});
 
 function start(data){
-  try{const k=+localStorage.getItem('kaiten-bots'); if(k>=1&&k<=3) ui.nBots=k;}catch(e){}
-  if(data&&data.state){S=data.state; Object.assign(ui,data.ui||{});} else S=newGame({nBots:ui.nBots});
+  try{const k=+localStorage.getItem('kaiten-bots'); if(k>=1&&k<=3) ui.nBots=k; const l=localStorage.getItem('kaiten-level'); if(LEVEL_INFO[l]) ui.level=l;}catch(e){}
+  let saved=null; try{saved=JSON.parse(localStorage.getItem('kaiten-save')||'null');}catch(e){}
+  if(data&&data.state){S=data.state; Object.assign(ui,data.ui||{},{welcome:false,live:true});}
+  else if(saved&&saved.state&&!saved.state.over){S=saved.state; ui.live=true;}
+  else S=newGame({nBots:ui.nBots,level:ui.level});
   ui.markId=S.logN||0;
   render(); schedule();
 }
