@@ -557,6 +557,42 @@ body.dragging .board:not(.can){opacity:.45}
   .oticket .nm{font-size:12px}
   .oticket .ab{display:none}
 }
+.hovercard{position:fixed;z-index:40;width:250px;font-family:"Zen Kaku Gothic New",system-ui,-apple-system,"Segoe UI",sans-serif;pointer-events:none;color:var(--ink);background:url(art/tex-paper.webp) 0 0/320px,var(--paper);border-radius:10px;padding:10px 12px 9px;border-top:5px solid var(--cat,var(--lac));box-shadow:0 2px 0 var(--paper-2),0 14px 30px rgba(0,0,0,.45);display:flex;flex-direction:column;gap:7px;font-size:12.5px;line-height:1.3}
+.hovercard.reg{--cat:var(--indigo)}
+.hovercard.in{animation:hcin .16s ease-out both}
+@keyframes hcin{from{opacity:0;transform:translateY(var(--hy,6px)) scale(.97)}}
+.hovercard[data-side="below"]{--hy:-6px}
+.hovercard::after{content:"";position:absolute;left:var(--ax);width:12px;height:12px;margin-left:-6px;background:var(--paper);transform:rotate(45deg)}
+.hovercard[data-side="above"]::after{bottom:-6px;box-shadow:2px 2px 3px rgba(0,0,0,.15)}
+.hovercard[data-side="below"]::after{top:-11px;background:var(--cat,var(--lac))}
+.hc-top{display:flex;align-items:center;gap:9px}
+.hc-face{width:48px;height:48px}
+.hc-dish{width:58px;height:58px;object-fit:contain;flex:none;filter:drop-shadow(0 3px 3px rgba(0,0,0,.25))}
+.hc-tt{flex:1;min-width:0;display:flex;flex-direction:column;gap:1px}
+.hc-tt b{font-family:var(--disp);font-weight:400;font-size:15px;line-height:1.15}
+.hc-kind{font-size:9.5px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.hc-kind.cat{color:var(--cat)}
+.hc-sub{font-size:11.5px;color:var(--ink-2);display:flex;align-items:center;gap:4px}
+.hc-vp{flex:none;width:42px;height:42px;border-radius:50%;background:var(--lac);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);font-size:16px;line-height:1;transform:rotate(-8deg);box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.hc-vp small{font-size:7.5px;letter-spacing:.1em}
+.hc-prog{display:flex;align-items:center;gap:8px}
+.hc-prog .pbar{height:9px}
+.hc-prog b{font-size:12px}
+.hc-req{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.hc-req li{display:flex;align-items:center;gap:6px;padding:3px 7px;border-radius:7px;background:var(--paper-2)}
+.hc-req li.met{background:#dfeccf}
+.hc-req .pl{flex:1;font-weight:700;font-size:11.5px}
+.hc-req .pips{display:flex;gap:3px}
+.hc-req .ppip{width:10px;height:10px;border-width:2px}
+.hc-req .pdot{width:10px;height:10px}
+.hc-cost{display:flex;gap:4px;flex-wrap:wrap}
+.hc-cost .ci{padding:3px;border-radius:7px}
+.hc-cost .ci .ic{width:20px;height:20px}
+.hc-stat{margin:0;font-weight:700;color:var(--lac-2)}.hc-stat.ok{color:#3f6d2a}
+.hc-ab{margin:0;padding:5px 8px;border-radius:7px;background:rgba(210,164,60,.16);border-left:3px solid var(--gold);font-size:12px}
+.hc-foot{margin:0;font-size:11px;color:var(--ink-2);border-top:1px dashed var(--paper-2);padding-top:6px}
+@media (hover: hover) and (pointer: fine) and (min-width: 641px){.rbig::after{display:none}}
+@media (prefers-reduced-motion: reduce){.hovercard.in{animation:none}}
 /* small boards drop the description first, then the icon */
 @container (max-height:109px){.board .bt{-webkit-line-clamp:1;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden}.board .sticon{width:26px;height:26px}.board .hole{width:28px;height:28px}.board .hole .face{width:24px;height:24px}.board{gap:2px}}
 @container (max-height:70px){.board .bt{display:none}}
@@ -1044,7 +1080,7 @@ function render(){
   const short=S.over?'Closing time':my?'Your turn':cur.name+'’s turn';
   const sub='Round '+S.round+' of '+S.maxRounds+' · '+S.players[S.first].name+(S.first===0?' go':' goes')+' first';
 
-  const belt=S.belt.map((b,i)=>'<div class="bslot'+(b?' tap" role="button" tabindex="0" data-dish="'+i+'" aria-label="'+esc(DISH[b.id].name+': see details')+'"':'"')+'>'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
+  const belt=S.belt.map((b,i)=>'<div class="bslot'+(b?' tap" role="button" tabindex="0" data-dish="'+i+'" data-hc="dish:'+i+'" aria-label="'+esc(DISH[b.id].name+': see details')+'"':'"')+'>'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
     (b?plateHTML(b.id,b.w)+labelHTML(b.id):'<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
 
   const market=S.market.map(f=>'<div class="fish"><img class="ic xl" src="'+ingArt(f)+'" alt="'+ING_NAME[f]+'"><span>'+ING_NAME[f]+'</span></div>').join('')||'<p class="hint">The ice is empty.</p>';
@@ -1052,7 +1088,7 @@ function render(){
   const regIcons=S.regulars.map((r,i)=>{
     if(!r) return '';
     const rows=regProgress(REG[r],me.tableau), h=rows.reduce((a,x)=>a+x.have,0), nd=rows.reduce((a,x)=>a+x.need,0);
-    return '<button type="button" class="rbig" data-reg="'+i+'" data-tip="'+esc(REG[r].name+' · '+reqText(REG[r])+' · '+REG[r].vp+' VP')+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP. You have '+h+' of '+nd+'.')+'">'+
+    return '<button type="button" class="rbig" data-reg="'+i+'" data-hc="reg:'+i+'" data-tip="'+esc(REG[r].name+' · '+reqText(REG[r])+' · '+REG[r].vp+' VP')+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP. You have '+h+' of '+nd+'.')+'">'+
       '<img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span><span class="rprog num'+(h>=nd?' met':'')+'">'+h+'/'+nd+'</span></button>';
   }).join('')||'<span class="rnone">No one waiting</span>';
   const regMini=S.regulars.map((r,i)=>r?'<button type="button" class="rmini" data-reg="'+i+'" aria-label="'+esc(REG[r].name+': '+reqText(REG[r])+', '+REG[r].vp+' VP')+'"><img class="face" src="'+A('reg-'+r)+'" alt=""><span class="rvp num">'+REG[r].vp+'</span></button>':'').join('');
@@ -1132,6 +1168,7 @@ function render(){
   saveGame();
   if(ui.carJump!=null){const c=app.querySelector('.car'); if(c){c.scrollLeft=ui.carJump*c.clientWidth; carDots(c);} ui.carJump=null;}
   countVP(sc.total);
+  hcRefresh();
 }
 // the score stamp counts up to the new total
 function countVP(to){
@@ -1207,6 +1244,56 @@ function regProgress(r,tab){
   if(q.allFish) return FISH.map(f=>({label:ING_NAME[f],have:tab.some(id=>DISH[id].cost.includes(f))?1:0,need:1,fish:f}));
   return [];
 }
+/* ----- desktop hover cards: a small paper card beside a regular or a belt dish ----- */
+function hcRegHTML(r,me){
+  const R=REG[r], rows=regProgress(R,me.tableau), have=rows.reduce((a,x)=>a+x.have,0), need=rows.reduce((a,x)=>a+x.need,0);
+  const best=S.players.filter(p=>p.bot).map(p=>({p,h:regProgress(R,p.tableau).reduce((a,x)=>a+x.have,0)})).sort((a,b)=>b.h-a.h)[0];
+  return '<div class="hc-top"><img class="face hc-face" src="'+A('reg-'+r)+'" alt=""><div class="hc-tt"><span class="hc-kind">Regular</span><b>'+esc(R.name)+'</b><span class="hc-sub">Wants '+esc(reqText(R).toLowerCase())+'</span></div><span class="hc-vp num">'+R.vp+'<small>VP</small></span></div>'+
+    '<div class="hc-prog"><div class="pbar"><span style="width:'+Math.round(100*have/need)+'%"></span></div><b class="num">'+have+'/'+need+'</b></div>'+
+    '<ul class="hc-req">'+rows.map(x=>'<li class="'+(x.have>=x.need?'met':'')+'">'+(x.fish?ic(x.fish,'sm'):'<span class="pdot c-'+(x.cat||'')+'"></span>')+'<span class="pl">'+esc(x.label)+'</span><span class="pips">'+
+      Array.from({length:x.need},(_,k)=>'<span class="ppip'+(k<x.have?' on':'')+'"></span>').join('')+'</span></li>').join('')+'</ul>'+
+    '<p class="hc-foot">'+(have>=need?'You qualify on your next turn.':(need-have)+' more to win them.')+(best?' '+esc(best.p.name)+' has '+best.h+'/'+need+'.':'')+'</p>';
+}
+function hcDishHTML(b,i,me){
+  const d=DISH[b.id], st=cookStatus(me,b.id), have={...me.hand};
+  const cost=[...d.cost].map(k=>{const ok=have[k]>0; if(ok) have[k]--; return '<span class="ci'+(ok?' ok':'')+'">'+ic(k)+'</span>';}).join('');
+  return '<div class="hc-top"><img class="hc-dish" src="'+dishArt(b.id)+'" alt=""><div class="hc-tt"><span class="hc-kind cat">'+CAT_NAME[d.cat]+(i===0?' · new':i===4?' · last lap':'')+'</span><b>'+esc(d.name)+'</b>'+
+    (b.w?'<span class="hc-sub">'+ic('W','sm')+' comes with '+b.w+' wasabi</span>':'')+'</div><span class="hc-vp num">'+d.vp+'<small>VP</small></span></div>'+
+    '<div class="hc-cost">'+cost+'</div><p class="hc-stat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'Need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
+    (d.ab?'<p class="hc-ab">'+abText(d.ab)+'</p>':'')+'<p class="hc-foot">Click for details or to take it.</p>';
+}
+const hc={el:null,key:null,x:-1,y:-1};
+const hcOn=()=>window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 641px)').matches;
+function hcShow(t){
+  if(!hcOn()||!t||ui.sheet||ui.welcome||ui.queue.length||ui.fx||drag) return hcHide();
+  const [kind,ix]=t.dataset.hc.split(':'), me=S.players[0];
+  let html='', cat='';
+  if(kind==='reg'){const r=S.regulars[+ix]; if(!r) return hcHide(); html=hcRegHTML(r,me);}
+  else {const b=S.belt[+ix]; if(!b) return hcHide(); html=hcDishHTML(b,+ix,me); cat=' c-'+DISH[b.id].cat;}
+  if(!hc.el){hc.el=document.createElement('div'); hc.el.setAttribute('role','tooltip'); document.body.appendChild(hc.el);}
+  const fresh=hc.key!==t.dataset.hc;
+  hc.key=t.dataset.hc; hc.el.className='hovercard '+kind+cat+(fresh?' in':''); hc.el.innerHTML=html;
+  // sit above the icon if there is room, otherwise below; never off-screen
+  const r=t.getBoundingClientRect(), w=hc.el.offsetWidth, h=hc.el.offsetHeight, m=8;
+  const above=r.top-h-12>=m, top=above?r.top-h-12:Math.min(window.innerHeight-h-m,r.bottom+12);
+  const left=Math.max(m,Math.min(window.innerWidth-w-m,r.left+r.width/2-w/2));
+  hc.el.style.top=top+'px'; hc.el.style.left=left+'px'; hc.el.dataset.side=above?'above':'below';
+  hc.el.style.setProperty('--ax',Math.max(14,Math.min(w-14,r.left+r.width/2-left))+'px');
+}
+function hcHide(){if(hc.el){hc.el.remove(); hc.el=null;} hc.key=null;}
+// after a re-render, keep the card on whatever is now under the pointer
+function hcRefresh(){
+  if(!hc.key) return;
+  const t=document.elementFromPoint(hc.x,hc.y)?.closest('[data-hc]');
+  if(t&&t.dataset.hc===hc.key) hcShow(t); else hcHide();
+}
+app.addEventListener('pointerover',e=>{if(e.pointerType!=='mouse') return; hc.x=e.clientX; hc.y=e.clientY; const t=e.target.closest('[data-hc]'); if(t&&t.dataset.hc!==hc.key) hcShow(t);});
+app.addEventListener('pointermove',e=>{hc.x=e.clientX; hc.y=e.clientY;});
+app.addEventListener('pointerout',e=>{const t=e.target.closest('[data-hc]'); if(t&&!(e.relatedTarget&&t.contains(e.relatedTarget))) hcHide();});
+app.addEventListener('focusin',e=>{const t=e.target.closest('[data-hc]'); if(t) hcShow(t);});
+app.addEventListener('focusout',e=>{if(e.target.closest('[data-hc]')) hcHide();});
+app.addEventListener('pointerdown',()=>hcHide());
+
 function regCard(r,me){
   const R=REG[r], rows=regProgress(R,me.tableau), have=rows.reduce((a,x)=>a+x.have,0), need=rows.reduce((a,x)=>a+x.need,0);
   const best=S.players.filter(p=>p.bot).map(p=>({p,h:regProgress(R,p.tableau).reduce((a,x)=>a+x.have,0)})).sort((a,b)=>b.h-a.h)[0];
