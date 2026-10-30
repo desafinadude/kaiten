@@ -60,7 +60,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .beltzone{flex:none;padding-top:16px}
 .track{position:relative;border-radius:16px;padding:12px 10px 10px;background:url(art/tex-belt.webp) 0 0/200px 100%,repeating-linear-gradient(90deg,var(--steel) 0 46px,var(--steel-2) 46px 48px);box-shadow:inset 0 7px 0 #b9c2c4,inset 0 -7px 0 #4d5658,0 6px 14px rgba(0,0,0,.45);animation:roll 14s linear infinite;overflow-x:auto;overflow-y:hidden}
 @keyframes roll{to{background-position:200px 0,48px 0}}
-.track.dark{animation:none;filter:brightness(.5) saturate(.6)}
+.track.dark{animation:none}
 .beltzone .in{position:relative}
 .cut{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%) rotate(-2deg);z-index:3;background:#1b140e;color:#fff;border:2px solid #ffd27a;border-radius:8px;padding:6px 14px;font-weight:900;font-size:13px;white-space:nowrap;box-shadow:0 6px 16px rgba(0,0,0,.5);pointer-events:none}
 .cut span{font-family:var(--disp);color:#ffd27a;margin-right:4px}
@@ -162,6 +162,7 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .logf .gbtn{min-height:36px;padding:0 10px;font-size:13px;display:flex;align-items:center;gap:6px;box-shadow:0 3px 0 #46290f}
 .logf .gbtn.on{box-shadow:0 3px 0 var(--indigo-2)}
 .logf .face{width:22px;height:22px}
+.logtext{width:100%;min-height:300px;height:50vh;font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;border:1px solid var(--paper-2);border-radius:8px;padding:8px;background:#fffdf7;color:var(--ink);resize:none}
 .sorders{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0}
 .sol{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2);width:100%}
 .sord{display:flex;align-items:center;gap:6px;padding:4px 8px 4px 4px;border-radius:8px;background:var(--paper-2);border-left:3px solid var(--cat);font-size:12px}
@@ -391,6 +392,16 @@ body.dragging .board:not(.can){opacity:.45}
 .cel-vp small{font-size:10px;letter-spacing:.2em}
 .cel-card h2{font-family:var(--disp);font-weight:400;font-size:30px;margin:6px 0 0;text-shadow:0 3px 0 rgba(0,0,0,.35)}
 .cel-card p{margin:0 0 6px;color:#f7ead5}
+.lostreg{background:radial-gradient(circle at 50% 42%,rgba(120,130,150,.45),rgba(20,12,6,.9) 68%)}
+.lostreg .cel-kicker{color:#f0a49a}
+.lostreg .cel-pic .face{filter:grayscale(.85) brightness(.85);box-shadow:0 0 0 6px #8a8f99,0 20px 50px rgba(0,0,0,.5)}
+.xout{position:absolute;inset:0;pointer-events:none}
+.xout::before,.xout::after{content:"";position:absolute;left:50%;top:50%;width:118%;height:12px;margin:-6px 0 0 -59%;background:var(--lac);border-radius:6px;box-shadow:0 3px 0 var(--lac-2);transform:rotate(45deg) scaleX(0);animation:strike .35s .3s ease-out forwards}
+.xout::after{transform:rotate(-45deg) scaleX(0);animation-name:strike2;animation-delay:.5s}
+@keyframes strike{to{transform:rotate(45deg) scaleX(1)}}
+@keyframes strike2{to{transform:rotate(-45deg) scaleX(1)}}
+.lr-who{position:absolute;right:-30px;bottom:-10px;display:flex;align-items:center;gap:6px;background:#1b140e;color:#fff;font-weight:900;font-size:13px;border-radius:999px;padding:4px 12px 4px 4px;border:2px solid #ffd27a;transform:rotate(-6deg)}
+.lr-who .face{width:30px!important;height:30px!important;filter:none!important;box-shadow:none!important}
 @keyframes pop{from{transform:scale(.6);opacity:0}}
 @keyframes stamp{from{transform:scale(2.4) rotate(-30deg);opacity:0}to{transform:rotate(-12deg)}}
 .petal{position:absolute;top:-30px;left:var(--x);width:14px;height:10px;border-radius:10px 0 10px 0;background:#f7b7c8;opacity:.9;animation:fall var(--d) linear var(--dl) infinite}
@@ -724,7 +735,7 @@ const EVENTS=[
   {id:'shortage',name:'Rice Shortage',kj:'品薄',text:'The rice delivery is late. The Pantry gives 1 fewer staple this round.'},
   {id:'matsuri',name:'Summer Matsuri',kj:'祭',text:'The festival is in town. Every chef gains 1 wasabi.'},
   {id:'celebrity',name:'Celebrity Chef',kj:'来店',text:'A famous chef drops in. The first chef to serve a Special this round gains 3 VP.'},
-  {id:'powercut',name:'Power Cut',kj:'停電',text:'The belt has stopped. At the Kaiten Belt you can only lift 1 dish off by hand, and its wasabi stays behind.'},
+  {id:'powercut',name:'Power Cut',kj:'停電',text:'The belt motor is out. You can still take dishes at the Kaiten Belt as normal, but at the end of this round the belt stays put: nothing goes round the corner and no wasabi is added. Empty spots are refilled by hand.'},
 ];
 const EVT=Object.fromEntries(EVENTS.map(e=>[e.id,e]));
 const marketCount=(s,p)=>Math.min(2+abCount(p,'market')+(s.event==='auction'?1:0),s.market.length);
@@ -759,7 +770,7 @@ function rnd(s){
   return ((t^(t>>>14))>>>0)/4294967296;
 }
 function shuffle(s,a){for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd(s)*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
-function log(s,text,pi,kind){s.logN=(s.logN||0)+1; s.log.unshift({id:s.logN,r:s.round,t:text,pi:pi==null?-1:pi,k:kind||''}); if(s.log.length>120) s.log.length=120;}
+function log(s,text,pi,kind){s.logN=(s.logN||0)+1; s.log.unshift({id:s.logN,r:s.round,t:text,pi:pi==null?-1:pi,k:kind||''}); if(s.log.length>400) s.log.length=400;}
 function drawFish(s){
   if(!s.fishDeck.length){if(!s.fishDiscard.length) return null; s.fishDeck=shuffle(s,s.fishDiscard); s.fishDiscard=[];}
   return s.fishDeck.pop();
@@ -831,8 +842,8 @@ function whyNot(s,pi,loc){
   return '';
 }
 const legal=(s,pi,loc)=>!whyNot(s,pi,loc);
-// how many dishes a chef may take at the belt (only one, by hand, in a power cut)
-const beltRoom=(s,p)=>Math.min(s.event==='powercut'?1:2,ORDER_LIMIT-p.orders.length);
+// how many dishes a chef may take at the belt
+const beltRoom=(s,p)=>Math.min(2,ORDER_LIMIT-p.orders.length);
 
 function cook(s,pi,id){
   const p=s.players[pi], d=DISH[id], n=countCost(d.cost);
@@ -872,14 +883,14 @@ function act(s,pi,loc,args){
       log(s,p.name+' took '+[r?r+' Rice':'',k-r?(k-r)+' Nori':''].filter(Boolean).join(' and ')+' from the pantry'+(rw?' and 1 wasabi':'')+'.',pi);
       break;}
     case 'belt':{
-      const cut=s.event==='powercut', room=beltRoom(s,p);
+      const room=beltRoom(s,p);
       const slots=[...new Set(args.slots||[])].filter(i=>s.belt[i]).slice(0,room);
       if(!slots.length) slots.push(s.belt.findIndex(Boolean));
       let w=abCount(p,'belt'); const names=[];
       if(!s.taken) s.taken={};
-      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); if(!cut) w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null; s.taken[i]=pi;});
+      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null; s.taken[i]=pi;});
       p.wasabi+=w;
-      log(s,p.name+(cut?' lifted ':' took ')+names.join(' and ')+' off the '+(cut?'stopped ':'')+'belt'+(w?' with '+w+' wasabi':'')+'.',pi);
+      log(s,p.name+' took '+names.join(' and ')+' off the belt'+(w?' with '+w+' wasabi':'')+'.',pi);
       break;}
     case 'prep':{
       let id=args.dish; if(!p.orders.includes(id)||!canCook(p,DISH[id])) id=p.orders.find(x=>canCook(p,DISH[x]));
@@ -917,13 +928,21 @@ function advance(s){
   endRound(s);
 }
 function endRound(s){
+  let nb;
+  if(s.event==='powercut'){
+    // power cut: the belt stays put; empty spots are filled by hand, nothing leaves, no wasabi
+    let added=0; for(let i=0;i<5;i++) if(!s.belt[i]){const id=drawDish(s); if(id){s.belt[i]={id,w:0}; added++;}}
+    nb=s.belt;
+    if(s.round<s.maxRounds) log(s,'The belt stays put after the power cut'+(added?': '+added+' new dish'+(added>1?'es':'')+' placed by hand.':'.'));
+  } else {
   // the belt turns: the oldest dish goes round the corner, the rest slide along and pick up wasabi
   const gone=s.belt[4]; if(gone){s.dishDiscard.push(gone.id); log(s,DISH[gone.id].name+' went round the corner.');}
   const rest=s.belt.slice(0,4).filter(Boolean);
-  const nb=[null,null,null,null,null]; rest.forEach((b,i)=>{b.w++; nb[5-rest.length+i]=b;});
+  nb=[null,null,null,null,null]; rest.forEach((b,i)=>{b.w++; nb[5-rest.length+i]=b;});
   let added=0; for(let i=0;i<5;i++) if(!nb[i]){const id=drawDish(s); if(id){nb[i]={id,w:0}; added++;}}
-  s.belt=nb; s.taken={};
   if(s.round<s.maxRounds) log(s,'The belt turns: '+(added===1?'1 new dish arrives':added+' new dishes arrive')+' and the rest pick up a wasabi.');
+  }
+  s.belt=nb; s.taken={};
   LOCS.forEach(l=>s.spots[l.id]=[]);
   s.players.forEach(p=>{p.placed=0; if(p.hired) p.apprentice=true;});
   if(s.doorTaker!=null){s.first=s.doorTaker; s.doorTaker=null;}
@@ -1019,7 +1038,7 @@ function botMove(s,pi){
         if(best){sc=best.v+1.2; args={dishes:best.ids};}
         break;}
       case 'belt':{
-        const room=beltRoom(s,p), bw=b=>s.event==='powercut'?0:b.w;
+        const room=beltRoom(s,p), bw=b=>b.w;
         const items=s.belt.map((b,i)=>{
           if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-p.wasabi-bw(b));
           let v=0.5*dishValue(s,p,d)/(1+0.35*sh)+0.85*bw(b);
@@ -1174,7 +1193,7 @@ function render(){
     '<button type="button" role="menuitemcheckbox" aria-checked="'+SND.quick+'" data-toggle="quick">Quick rivals: '+(SND.quick?'on':'off')+'</button>'+
     '<button type="button" role="menuitem" class="mnew" data-act="welcome">New game</button></div>':'')+
   '</header>'+
-  '<section class="beltzone" aria-label="The belt"><div class="in">'+(S.event==='powercut'&&!S.over?'<span class="cut"><span lang="ja">停電</span> Power cut · 1 dish by hand, no wasabi</span>':'')+'<div class="track'+(S.event==='powercut'&&!S.over?' dark':'')+'" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
+  '<section class="beltzone" aria-label="The belt"><div class="in">'+(S.event==='powercut'&&!S.over?'<span class="cut"><span lang="ja">停電</span> Power cut · the belt won’t turn this round</span>':'')+'<div class="track'+(S.event==='powercut'&&!S.over?' dark':'')+'" data-sk="belt"><div class="belt">'+belt+'</div></div></div></section>'+
   '<main class="table"><div class="in"><div class="tin">'+
     '<section class="pane pane-market" aria-label="Fish market"><div class="scroll" data-sk="market">'+
       '<div class="ph"><h2>Fish market</h2><span class="kj" lang="ja">魚市場</span></div>'+
@@ -1347,6 +1366,21 @@ function dishCard(b,i,me){
     (d.ab?'<p class="cab">'+abText(d.ab)+'</p>':'')+(b.w?'<p class="cab">Comes with '+b.w+' wasabi.</p>':'')+
     '<button type="button" class="gbtn ctake" data-take="'+i+'"'+(why?' disabled':'')+'>'+(why?esc(why):'Take it · place a chef')+'</button></div>';
 }
+// the whole game as plain text, oldest first, for pasting into a chat
+function logText(){
+  const lines=['KAITEN · '+(S.over?'final':'round '+S.round+' of '+S.maxRounds)+' · rivals: '+(S.level||'normal')+(S.catchup?' · catch-up on':'')];
+  S.players.forEach(p=>{const c=score(p); lines.push(p.name+' ('+CHAR[p.char].name+', '+CHAR[p.char].title+'): '+c.total+' VP = plates '+c.dishes+', bonuses '+c.bonus+', sets '+c.sets+', regulars '+c.regs+', end '+c.end+(c.ev?', events '+c.ev:'')+
+    ' | served '+p.tableau.length+', regulars '+(p.regulars.map(r=>REG[r].name).join(', ')||'none')+', orders '+(p.orders.map(id=>DISH[id].name).join(', ')||'none')+', wasabi '+p.wasabi);});
+  lines.push('');
+  S.log.slice().reverse().forEach(l=>lines.push('R'+l.r+' '+l.t+(l.dv?'  ['+(l.dv>0?'+':'')+l.dv+' → '+l.tot+' VP]':'')));
+  return lines.join('\n');
+}
+async function copyLog(){
+  const t=logText();
+  try{await navigator.clipboard.writeText(t); flash('Log copied'); return render();}catch(e){}
+  // clipboard blocked (some embeds): show the text selected so it can be copied by hand
+  ui.sheet='logtext'; render(); const ta=app.querySelector('.logtext'); if(ta){ta.focus(); ta.select();}
+}
 const dvHTML=l=>l.dv?'<span class="dv'+(l.dv<0?' neg':'')+'"><b class="num">'+(l.dv>0?'+':'')+l.dv+'</b><small class="num">'+l.tot+' VP</small></span>':'';
 function seatsHTML(){
   return S.players.map((p,i)=>{
@@ -1372,10 +1406,10 @@ function sheetHTML(me){
     const rk=ranking(S), win=S.players[rk[0].i];
     return '<div class="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="Closing time"><div class="sheet-h"><h2>'+(win.bot?esc(win.name)+' runs the best counter':'You run the best counter')+'</h2><p>Closing time after 7 rounds. Ties go to the chef who served more plates.</p></div>'+
       '<div class="sheet-b"><div class="endt">'+rk.map((r,k)=>{const p=S.players[r.i],s=r.sc; return '<div class="erow'+(k===0?' win':'')+'"><span class="who"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+(k+1)+'. '+esc(p.name)+'</span><span class="tot num">'+s.total+'</span><span class="bk">Plates '+s.dishes+' · bonuses '+s.bonus+' · sets '+s.sets+' · regulars '+s.regs+' · end '+s.end+(s.ev?' · events '+s.ev:'')+'</span></div>';}).join('')+'</div></div>'+
-      '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="go">Play again</button></div></div></div>';
+      '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="copylog">Copy log</button><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="go">Play again</button></div></div></div>';
   }
   const sh=ui.sheet; if(!sh) return '';
-  let title='', help='', body='', ok=false, label='Place chef', confirm=true;
+  let title='', help='', body='', ok=false, label='Place chef', confirm=true, extra='';
   if(sh==='market'){
     const k=maxPick(); title='Fish Market'; help='Pick '+k+' fish off the ice.'; label='Buy fish';
     body='<div class="ice pick-ice">'+S.market.map((f,i)=>'<button type="button" class="fbtn'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'"><img class="ic xl" src="'+ingArt(f)+'" alt=""><span class="fl">'+ING_NAME[f]+'</span></button>').join('')+'</div>';
@@ -1387,7 +1421,7 @@ function sheetHTML(me){
       '<div class="bigbowl"><div class="bowl"><img class="ic xl" src="'+ingArt('N')+'" alt=""><b class="num">'+(k-ui.rice)+'</b></div>Nori</div>'+
       '<button type="button" class="gbtn wood" aria-label="More rice" data-rice="1">+</button></div>';
   } else if(sh==='belt'){
-    const room=maxPick(); title='Kaiten Belt'; help=S.event==='powercut'?'Power cut: lift 1 plate off by hand. Its wasabi stays behind.':'Grab up to '+room+' plate'+(room>1?'s':'')+'. Any wasabi riding on them is yours.'; label='Take orders';
+    const room=maxPick(); title='Kaiten Belt'; help=S.event==='powercut'?'Power cut: the belt won’t turn tonight, but you can take plates as normal. Grab up to '+room+'.':'Grab up to '+room+' plate'+(room>1?'s':'')+'. Any wasabi riding on them is yours.'; label='Take orders';
     body='<div class="picks">'+S.belt.map((b,i)=>b?'<button type="button" class="pcard'+(ui.sel.includes(i)?' sel':'')+'" aria-pressed="'+ui.sel.includes(i)+'" data-pick="'+i+'">'+plateHTML(b.id,b.w)+labelHTML(b.id,cookStatus(me,b.id).note)+'</button>':'').join('')+'</div>';
     ok=ui.sel.length>=1&&ui.sel.length<=room;
   } else if(sh==='prep'||sh==='head'){
@@ -1415,16 +1449,19 @@ function sheetHTML(me){
   } else if(sh==='seats'){
     title='The chefs'; help='Everyone’s pantry, served plates and score so far.'; body=seatsHTML(); confirm=false;
   } else if(sh==='log'){
-    title='Service log'; help='Everything that happened, newest first. Score changes are on the right.'; confirm=false;
+    title='Service log'; help='Everything that happened, newest first. Score changes are on the right.'; confirm=false; extra='<button type="button" class="gbtn" data-act="copylog">Copy log</button>';
     const f=ui.logF;
     body='<div class="logf" role="group" aria-label="Show">'+'<button type="button" class="gbtn'+(f==null?' on':' wood')+'" data-logf="all">All</button>'+
       S.players.map((p,i)=>'<button type="button" class="gbtn'+(f===i?' on':' wood')+'" data-logf="'+i+'"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+esc(p.name)+' <span class="num">'+score(p).total+'</span></button>').join('')+'</div>'+
       '<ul class="loglist">'+S.log.filter(l=>f==null||l.pi===f).slice(0,80).map(l=>'<li class="logi'+(l.pi<0?' sys':'')+'">'+(l.pi>=0?'<span class="ld pc'+S.players[l.pi].color+'"></span>':'')+'<span class="lt"><span class="lr">R'+l.r+'</span> '+esc(l.t)+'</span>'+dvHTML(l)+'</li>').join('')+'</ul>';
+  } else if(sh==='logtext'){
+    title='Copy the log'; help='Copying was blocked here. The text is selected: press Ctrl+C or ⌘C (or long-press and Copy).'; confirm=false;
+    body='<textarea class="logtext" readonly>'+esc(logText())+'</textarea>';
   } else if(sh==='rules'){
     title='How to play'; help='7 rounds, 3 chefs each, most VP wins.'; body=RULES_HTML; confirm=false;
   }
   return '<div class="veil" data-act="veil"><div class="sheet" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="sheet-h"><h2>'+esc(title)+'</h2><p>'+esc(help)+'</p></div>'+
-    '<div class="sheet-b">'+body+'</div><div class="sheet-f"><button type="button" class="gbtn wood" data-act="cancel">'+(confirm?'Cancel':'Close')+'</button>'+
+    '<div class="sheet-b">'+body+'</div><div class="sheet-f">'+extra+'<button type="button" class="gbtn wood" data-act="cancel">'+(confirm?'Cancel':'Close')+'</button>'+
     (confirm?'<button type="button" class="gbtn" data-act="confirm"'+(ok?'':' disabled')+'>'+label+'</button>':'')+'</div></div></div>';
 }
 
@@ -1503,6 +1540,7 @@ function doAct(pi,loc,args){
   fresh.forEach(l=>{
     if(l.k==='serve') sfx('serve');
     if(l.k.startsWith('regular:')&&l.pi===0){ui.queue.push({type:'regular',r:l.k.slice(8)}); sfx('fanfare');}
+    else if(l.k.startsWith('regular:')) ui.queue.push({type:'lostreg',r:l.k.slice(8),pi:l.pi});
     if(l.k==='tip'&&l.pi===0) setTimeout(()=>flash(l.t),900);
     if(l.k==='event'){ui.queue.push({type:'event',id:S.event}); setTimeout(()=>sfx('gong'),350);}
   });
@@ -1589,6 +1627,14 @@ function overlayHTML(){
       '<h2>The '+esc(r.name)+' is yours</h2><p>'+esc(reqText(r))+': served. They’ll be back every week.</p>'+
       '<button type="button" class="gbtn" data-act="dq">Irasshaimase!</button></div></div>';
   }
+  if(q.type==='lostreg'){
+    const r=REG[q.r], p=S.players[q.pi];
+    return '<div class="ov lostreg"><div class="cel-card" role="dialog" aria-modal="true" aria-label="Regular lost">'+
+      '<span class="cel-kicker">Regular lost</span><span class="cel-pic"><img class="face" src="'+A('reg-'+q.r)+'" alt=""><span class="xout" aria-hidden="true"></span>'+
+      '<span class="lr-who"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+esc(p.name)+' +'+r.vp+' VP</span></span>'+
+      '<h2>'+esc(p.name)+' won the '+esc(r.name)+'</h2><p>'+esc(reqText(r))+'. They’re off the waiting list now.</p>'+
+      '<button type="button" class="gbtn wood" data-act="dq">Next time</button></div></div>';
+  }
   if(q.type==='recap'){
     const rows=S.log.filter(l=>l.id>q.from&&(l.pi!==0||l.k==='tip')).reverse().map(l=>{
       let icon=l.pi>=0?'<img class="face" src="'+chefArt(S.players[l.pi].chef)+'" alt="">':'<span class="sysk" lang="ja">'+(l.k==='event'?EVT[S.event]?.kj||'祭':'回')+'</span>';
@@ -1632,6 +1678,7 @@ app.addEventListener('click',e=>{
   }
   switch(d.act){
     case 'menu': ui.menu=!ui.menu; return render();
+    case 'copylog': copyLog(); return;
     case 'welcome': Object.assign(ui,{welcome:true,menu:false,sheet:null,endOpen:false}); clearTimeout(ui.botT); return render();
     case 'continue': ui.welcome=false; ui.markId=S.logN; ui.vpShown=null; ui.catShown=null; render(); return schedule();
     case 'fxdone': clearTimeout(ui.fxT); ui.fx=null; render(); return schedule();
