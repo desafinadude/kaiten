@@ -103,7 +103,7 @@ round only.
 | Rice Shortage | The Pantry gives 1 fewer staple this round (at least 1). |
 | Summer Matsuri | Every chef gains 1 wasabi. |
 | Celebrity Chef | The first chef to serve a Special this round gains 3 VP. |
-| Power Cut | The belt stops. At the Kaiten Belt you may take only 1 dish, and its Wasabi stays behind (the belt still turns at the end). |
+| Power Cut | The belt motor is out. The Kaiten Belt works as normal, but at the end of the round the belt stays put: nothing leaves and no Wasabi is added. Empty spots are refilled. |
 
 VP from events counts toward your final score.
 
