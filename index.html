@@ -416,6 +416,20 @@ body.dragging .board:not(.can){opacity:.45}
 .table{position:relative}
 .actbar{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:4;display:flex;align-items:center;gap:8px;max-width:min(580px,calc(100% - 24px));background:rgba(27,20,14,.93);color:#fff;border-radius:999px;padding:5px 16px 5px 5px;box-shadow:0 6px 18px rgba(0,0,0,.35);border:2px solid var(--pc);font-size:13px;animation:slidein .35s ease both;pointer-events:none}
 .actbar .face{width:32px;height:32px}
+.actbar.mv{padding:6px 16px 6px 6px;font-size:14px;align-items:center;animation:mvin .35s ease both;min-width:min(360px,calc(100% - 24px))}
+@keyframes mvin{from{opacity:0;margin-top:-12px}}
+.mvt{flex:1;min-width:0}
+@media (max-width:640px){.actbar.mv{left:10px;right:10px;transform:none;max-width:none;min-width:0;border-radius:16px;font-size:13px}}
+.actbar.mv .face{width:40px;height:40px}
+.mvst{width:30px;height:30px;flex:none;animation:hop .9s ease-in-out infinite}
+.actbar.done .mvst{animation:none}
+@keyframes hop{50%{transform:translateY(-4px)}}
+.mvt{display:flex!important;flex-direction:column;gap:3px;-webkit-line-clamp:unset!important}
+.mvb{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.mvi{width:24px;height:24px;object-fit:contain;animation:chippop .4s cubic-bezier(.2,1.8,.4,1) both}
+.mvd{width:30px;height:30px;object-fit:contain;animation:chippop .45s cubic-bezier(.2,1.8,.4,1) both}
+.mvw{display:inline-flex;align-items:center;gap:1px;font-weight:900;color:#9fe07a}
+.mvv{font-family:var(--disp);color:#fff;background:var(--lac);border-radius:999px;padding:1px 8px;font-size:12px;animation:chippop .45s .1s cubic-bezier(.2,1.8,.4,1) both}
 .actbar b{color:#ffd27a}
 .actbar span{overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 @keyframes slidein{from{transform:translate(-50%,-12px);opacity:0}}
@@ -1785,28 +1799,46 @@ function doAct(pi,loc,args){
   else if(S.round!==r){flash('Round '+S.round+' · the belt turns'); sfx('belt');}
   return fresh;
 }
-function botStep(){
-  const pi=S.turn, m=botMove(S,pi), L=LOC[m.loc];
-  const fresh=doAct(pi,m.loc,m.args);
-  ui.spot={loc:m.loc,pi,text:fresh.filter(l=>l.pi===pi).map(l=>l.t).join(' ')||L.name};
+// a rival's move plays out in two beats: they walk a chef to a station, then the result lands
+const STATION_PHRASE={market:'the Fish Market',pantry:'the Pantry',belt:'the Kaiten Belt',prep:'the Prep Counter',head:'the Head Chef’s station',door:'the Front Door',staff:'the Staff Room'};
+const andList=a=>a.length<2?(a[0]||''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];
+function botIntent(){
+  const pi=S.turn, m=botMove(S,pi);
+  ui.spot={loc:m.loc,pi,phase:'go',m,text:S.players[pi].name+' sends a chef to '+STATION_PHRASE[m.loc]+'…'};
   sfx('rival');
 }
-// when play comes back to you, show what the rivals did since your last move
-function maybeRecap(){
-  if(S.over||S.turn!==0||ui.queue.some(q=>q.type==='recap')) return;
-  const from=ui.markId||0;
-  if(S.log.some(l=>l.id>from&&l.pi!==0&&l.k!=='morning'&&l.k!=='tip')) ui.queue.push({type:'recap',from});
-  ui.markId=S.logN;
+function botResolve(){
+  const sp=ui.spot, pi=sp.pi, p=S.players[pi], m=sp.m;
+  const h0={...p.hand}, w0=p.wasabi, o0=p.orders.slice(), t0=p.tableau.length, v0=score(p).total;
+  const fresh=doAct(pi,m.loc,m.args);
+  const got=[]; ING_KEYS.forEach(k=>{for(let i=0;i<p.hand[k]-h0[k];i++) got.push(k);});
+  const took=p.orders.filter(id=>!o0.includes(id)), served=p.tableau.slice(t0), dw=p.wasabi-w0, dv=score(p).total-v0;
+  const won=fresh.filter(l=>l.pi===pi&&l.k.startsWith('regular:')).map(l=>REG[l.k.slice(8)].name);
+  let what;
+  switch(m.loc){
+    case 'market': what='buys '+andList(got.filter(k=>FISH.includes(k)).map(k=>ING_NAME[k])); break;
+    case 'pantry': {const r=got.filter(k=>k==='R').length, n=got.filter(k=>k==='N').length; what='takes '+andList([r?r+' Rice':'',n?n+' Nori':''].filter(Boolean)); break;}
+    case 'belt': what='grabs '+andList(took.map(id=>DISH[id].name))+' off the belt'; break;
+    case 'prep': case 'head': what='serves '+andList(served.map(id=>DISH[id].name)); break;
+    case 'door': what='opens the front door and will go first next round'; break;
+    case 'staff': what='hires an apprentice for next round'; break;
+  }
+  if(won.length) what+=', and wins over the '+won[0]+'!';
+  ui.spot={loc:m.loc,pi,phase:'done',text:p.name+' '+what+(won.length?'':'.'),got,took,served,dw,dv};
+  sfx(served.length?'serve':'place');
 }
+// when play comes back to you, show what the rivals did since your last move
 function schedule(){
   clearTimeout(ui.botT);
   if(S.over) return;
   if(ui.welcome||ui.fx||ui.queue.length||ui.sheet||ui.menu){ui.botT=setTimeout(schedule,400); return;}
-  if(!S.players[S.turn].bot){maybeRecap(); if(ui.queue.length){render(); ui.botT=setTimeout(schedule,400);} return;}
+  if(!S.players[S.turn].bot){ui.markId=S.logN; if(ui.spot&&ui.spot.phase==='done') ui.botT=setTimeout(()=>{if(S.players[S.turn]&&!S.players[S.turn].bot&&ui.spot&&ui.spot.phase==='done'){ui.spot.fading=true; render();}},2200); return;}
+  const q=SND.quick, going=ui.spot&&ui.spot.phase==='go';
   ui.botT=setTimeout(()=>{
     if(ui.welcome||ui.fx||ui.queue.length||ui.sheet||ui.menu||S.over||!S.players[S.turn].bot) return schedule();
-    botStep(); render(); schedule();
-  },SND.quick?650:1500);
+    if(going) botResolve(); else botIntent();
+    render(); schedule();
+  },going?(q?450:1000):(q?500:1500));
 }
 function startNew(){
   clearTimeout(ui.botT);
@@ -1900,9 +1932,16 @@ function overlayHTML(){
   return '';
 }
 function actbarHTML(){
-  const sp=ui.spot; if(!sp||ui.queue.length||S.players[S.turn]===undefined) return '';
+  const sp=ui.spot; if(!sp||sp.fading||ui.queue.length||S.players[S.turn]===undefined) return '';
   const p=S.players[sp.pi];
-  return '<div class="actbar pc'+p.color+'" aria-live="polite"><img class="face" src="'+chefArt(p.chef)+'" alt=""><span><b>'+LOC[sp.loc].name+'</b> · '+esc(sp.text)+'</span></div>';
+  let bits='';
+  if(sp.phase==='done'){
+    bits=sp.got.filter(k=>sp.loc!=='market'||FISH.includes(k)).map(k=>'<img class="mvi" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">').join('')+
+      sp.took.map(id=>'<img class="mvd" src="'+dishArt(id)+'" alt="">').join('')+sp.served.map(id=>'<img class="mvd" src="'+dishArt(id)+'" alt="">').join('')+
+      (sp.dw>0?'<span class="mvw"><img class="mvi" src="'+ingArt('W')+'" alt="">+'+sp.dw+'</span>':'')+(sp.dv>0?'<span class="mvv num">+'+sp.dv+' VP</span>':'');
+  }
+  return '<div class="actbar mv pc'+p.color+(sp.phase==='go'?' go':' done')+'" aria-live="polite"><img class="face" src="'+chefArt(p.chef)+'" alt="">'+
+    '<img class="mvst" src="'+A('st-'+sp.loc)+'" alt=""><span class="mvt">'+esc(sp.text)+(bits?'<span class="mvb">'+bits+'</span>':'')+'</span></div>';
 }
 
 app.addEventListener('pointerdown',audioInit);
