@@ -153,7 +153,9 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .seat-h .face{width:34px;height:34px}
 .seat-h b{font-weight:900;font-size:15px;flex:1}
 .seat-h .sc{font-family:var(--disp);font-size:17px;color:var(--lac)}
-.firstmark{font-size:10px;font-weight:900;letter-spacing:.1em;background:var(--ink);color:var(--paper);border-radius:4px;padding:1px 5px}
+.firstmark{font-size:10px;font-weight:900;letter-spacing:.1em;background:var(--ink);color:var(--paper);border-radius:4px;padding:1px 5px;vertical-align:middle;white-space:nowrap}
+.firstmark.rank{background:#8a7a62}
+.firstmark.r1{background:var(--gold);color:#2b1f14}
 .res{display:flex;flex-wrap:wrap;gap:3px 8px;font-size:12px;font-weight:700;align-items:center}
 .res>span{display:inline-flex;align-items:center;gap:3px}
 .res .z{opacity:.4}
@@ -1644,10 +1646,12 @@ function engineTable(){
 }
 const dvHTML=l=>(l.dv?'<span class="dv'+(l.dv<0?' neg':'')+'"'+(l.why?' title="'+esc(l.why)+'"':'')+'><b class="num">'+(l.dv>0?'+':'')+l.dv+'</b><small class="num">'+l.tot+' VP</small>'+(l.why?'<small class="why2">'+esc(l.why)+'</small>':'')+'</span>':'')+
   (l.dvs?'<span class="dvs">'+l.dvs.map(x=>'<span class="dvx" title="'+esc(x.why)+'"><span class="ld pc'+S.players[x.pi].color+'"></span>'+esc(S.players[x.pi].name)+' <b class="num">'+(x.d>0?'+':'')+x.d+'</b></span>').join('')+'</span>':'');
+// finishing position at closing time, with the same tie-break as the end screen
+const place=i=>ranking(S).findIndex(r=>r.i===i)+1;
 function seatCards(){
   return S.players.map((p,i)=>{
     const s2=score(p), cc=catCounts(p.tableau);
-    const html='<div class="schead pc'+p.color+'"><img class="face" src="'+chefArt(p.chef)+'" alt=""><div><h3>'+esc(p.name)+(S.first===i?' <span class="firstmark">FIRST</span>':'')+'</h3>'+
+    const html='<div class="schead pc'+p.color+'"><img class="face" src="'+chefArt(p.chef)+'" alt=""><div><h3>'+esc(p.name)+(S.over?' <span class="firstmark rank r'+place(i)+'">'+['','1st','2nd','3rd','4th'][place(i)]+(place(i)===1?' · winner':'')+'</span>':S.first===i?' <span class="firstmark" title="Places the first chef this round">PLAYS FIRST</span>':'')+'</h3>'+
         '<span class="cwant">'+esc(CHAR[p.char].name+', '+CHAR[p.char].title.toLowerCase())+(chefOn(p)?': '+esc(CHAR[p.char].text):'')+'</span></div><span class="cvp num">'+s2.total+'<small>VP</small></span></div>'+
       '<div class="sgrid"><span class="sl">Pantry</span><div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
       '<span class="sl">Chefs</span><span>'+(S.over?0:chefsLeft(p))+' of '+chefsOf(p)+' left this round'+(p.hired&&!p.apprentice?' (+1 next round)':'')+'</span>'+
