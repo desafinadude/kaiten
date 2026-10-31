@@ -526,7 +526,15 @@ body.dragging .board:not(.can){opacity:.45}
 .tog.on{background:rgba(47,125,74,.55);border-color:#6d9a4a}
 .tog .tk{flex:none;width:18px;height:18px;border-radius:5px;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:12px}
 .tog.on .tk{background:#fff;color:#2f7d4a}
-.g-round{background:#2f7d4a}.g-st{background:#7a532b}.g-vp{background:var(--lac)}.g-end{background:var(--indigo)}
+.g-round{background:#2f7d4a}
+.g-once{background:#8a7a62}
+.bdot{display:none}
+@media (max-width:640px){
+  .bdot{position:absolute;right:-3px;bottom:-3px;z-index:2;width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-family:var(--disp);font-size:10px;line-height:1;box-shadow:0 0 0 2px #fff,0 2px 4px rgba(0,0,0,.35)}
+  .bdot img{width:15px;height:15px;object-fit:contain}
+  .oticket .bdot{left:auto;right:-7px;top:34px;width:20px;height:20px}
+  .oticket .bdot img{width:13px;height:13px}
+}.g-st{background:#7a532b}.g-vp{background:var(--lac)}.g-end{background:var(--indigo)}
 .echips:empty::after{content:"Serve dishes with effects to build it";font-size:11px;color:#f3dcb5;font-weight:700}
 .eh{margin:4px 0 6px;font-family:var(--disp);font-weight:400;font-size:16px}
 .etable{width:100%;border-collapse:collapse;font-size:12px;margin-bottom:14px}
@@ -826,6 +834,8 @@ const REGULARS=[
 ];
 const REG=Object.fromEntries(REGULARS.map(r=>[r.id,r]));
 
+// the Staff Room's price for an apprentice
+const HIRE_COST=3;
 const LOCS=[
   {id:'market',name:'Fish Market',kj:'魚市場',text:'Take 2 fish from the ice.',cap:n=>n>=4?3:2},
   {id:'pantry',name:'Pantry',kj:'食料庫',text:'Take 2 Rice or Nori, any mix.',cap:()=>99},
@@ -833,7 +843,7 @@ const LOCS=[
   {id:'prep',name:'Prep Counter',kj:'仕込み',text:'Cook 1 order.',cap:()=>99},
   {id:'head',name:'Head Chef',kj:'板長',text:'Cook up to 2 orders.',cap:()=>1},
   {id:'door',name:'Front Door',kj:'暖簾',text:'Go first next round. Gain 1 wasabi and draw an order.',cap:()=>1},
-  {id:'staff',name:'Staff Room',kj:'控室',text:'Pay 2 wasabi: hire a 4th chef from next round.',cap:()=>1},
+  {id:'staff',name:'Staff Room',kj:'控室',text:'Pay '+HIRE_COST+' wasabi: hire a 4th chef from next round.',cap:()=>1},
 ];
 const LOC=Object.fromEntries(LOCS.map(l=>[l.id,l]));
 // the four chefs; each brings one small edge to the counter (art is chef-<art>.webp)
@@ -974,7 +984,7 @@ function whyNot(s,pi,loc){
     case 'market': return s.market.length?'':'The ice is empty';
     case 'belt': if(p.orders.length>=ORDER_LIMIT) return 'Your order clips are full'; return s.belt.some(Boolean)?'':'The belt is empty';
     case 'prep': case 'head': return p.orders.some(id=>canCook(p,DISH[id]))?'':'Nothing ready to cook';
-    case 'staff': return s.round>=s.maxRounds?'No rounds left to use them':p.hired?'Already hired':p.wasabi<2?'Needs 2 wasabi':'';
+    case 'staff': return s.round>=s.maxRounds?'No rounds left to use them':p.hired?'Already hired':p.wasabi<HIRE_COST?'Needs '+HIRE_COST+' wasabi':'';
   }
   return '';
 }
@@ -1047,7 +1057,7 @@ function act(s,pi,loc,args){
       log(s,p.name+' opened the front door: first next round, +'+(1+abCount(p,'door'))+' wasabi'+drew+'.',pi);
       break;}
     case 'staff':{
-      p.hired=true; p.wasabi-=2; log(s,p.name+' paid 2 wasabi and hired an apprentice.',pi); break;}
+      p.hired=true; p.wasabi-=HIRE_COST; log(s,p.name+' paid '+HIRE_COST+' wasabi and hired an apprentice.',pi); break;}
   }
   claimRegular(s,pi);
   advance(s);
@@ -1276,9 +1286,17 @@ const costRow=(c,skip)=>{let done=false; return '<span class="cost">'+[...c].map
 // how a belt dish would cook for me if I took it (the last-lap spot comes with the bargain)
 const asTaken=(me,b,i)=>i===LAST_LAP?{...me,bargain:(me.bargain||[]).concat([b.id])}:me;
 const wasabiRow=w=>w?'<span class="wsb" aria-label="'+w+' wasabi riding on this plate">'+Array.from({length:Math.min(w,5)},()=>'<img class="ic" src="'+ingArt('W')+'" alt="">').join('')+'</span>':'';
+// phone: a tiny circle on a dish shows its bonus at a glance, coloured like the engine chips
+function bonusDot(d){
+  const a=d.ab; if(!a||!abText(a)) return '';
+  const ic2=src=>'<img src="'+src+'" alt="">';
+  const [cls,inner]={start:['g-round',a.g==='F'?ic2(A('st-market')):ic2(ingArt(a.g))],market:['g-st',ic2(A('st-market'))],pantry:['g-st',ic2(A('st-pantry'))],belt:['g-st',ic2(A('st-belt'))],
+    cook:['g-vp','+2'],end:['g-end','×1'],regular:['g-end','+2'],now:['g-once',ic2(ingArt('W'))]}[a.t]||['',''];
+  return '<span class="bdot '+cls+'" title="'+esc(abText(a))+'">'+inner+'</span>';
+}
 function plateHTML(id,w){
   const d=DISH[id];
-  return '<span class="plate c-'+d.cat+'"><img class="dart" src="'+dishArt(id)+'" alt=""><span class="vpb num" title="Victory points">'+d.vp+'</span>'+wasabiRow(w)+'</span>';
+  return '<span class="plate c-'+d.cat+'"><img class="dart" src="'+dishArt(id)+'" alt=""><span class="vpb num" title="Victory points">'+d.vp+'</span>'+wasabiRow(w)+bonusDot(d)+'</span>';
 }
 const BARGAIN_BADGE='<span class="bgn" title="Last-lap bargain: cook it with 1 ingredient less">−1</span>';
 function labelHTML(id,note,last){
@@ -1351,7 +1369,7 @@ function render(){
   const orders=me.orders.map(id=>{
     const d=DISH[id], st=cookStatus(me,id);
     const sk=bargainSkip(me,d,me.hand);
-    return '<div class="oticket c-'+d.cat+'">'+(isBargain(me,d)?BARGAIN_BADGE:'')+'<span class="nm">'+esc(d.name)+'</span><span class="vpb num">'+d.vp+'</span><img class="thumb" src="'+dishArt(id)+'" alt="">'+costRow(d.cost,sk)+
+    return '<div class="oticket c-'+d.cat+'">'+(isBargain(me,d)?BARGAIN_BADGE:'')+'<span class="nm">'+esc(d.name)+'</span><span class="vpb num">'+d.vp+'</span>'+bonusDot(d)+'<img class="thumb" src="'+dishArt(id)+'" alt="">'+costRow(d.cost,sk)+
       (st.ok?'<span class="ready">'+(st.miss.length?'READY · '+st.miss.length+' WASABI':'READY')+'</span>':'<span class="need">NEED '+st.miss.map(k=>ic(k)).join('')+'</span>')+
       (d.ab?'<span class="ab">'+abText(d.ab)+'</span>':'')+'</div>';
   }).join('')+Array.from({length:ORDER_LIMIT-me.orders.length},()=>'<div class="slip">Empty order clip</div>').join('');

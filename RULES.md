@@ -68,7 +68,7 @@ After round 7, score the game.
 | Prep Counter | Cook 1 order. | Unlimited |
 | Head Chef's Board | Cook up to 2 orders. | 1 |
 | Front Door | Take the first-player marker for next round. Gain 1 Wasabi and draw 1 dish from the deck as an order (no draw in the last round). | 1 |
-| Staff Room | Pay 2 Wasabi to hire your apprentice. They work from next round on (4 chefs). Not available in the last round. | 1 |
+| Staff Room | Pay 3 Wasabi to hire your apprentice. They work from next round on (4 chefs). Not available in the last round. | 1 |
 
 ## Chefs
 
@@ -150,7 +150,7 @@ card turned sideways on your order clip until you serve it, as a reminder.
   Spent fish go to a discard pile, which you shuffle into a new deck when the
   deck runs out.
 - **Wasabi** is wild. When you cook, each Wasabi stands in for any one
-  ingredient. You can also spend 2 Wasabi to hire your apprentice.
+  ingredient. You can also spend 3 Wasabi to hire your apprentice.
 - You may hold at most **3 orders**. To **cook**, pay the ingredients printed
   on one of your orders and move it to your counter. Its effect starts now.
 - You never cook straight off the belt. A dish must be an order first.
@@ -253,7 +253,10 @@ Ingredients: R Rice · N Nori · T Tuna · S Salmon · U Eel (unagi) · E Shrimp
   within about 3 points of even at 2, 3 and 4 players. Average scores run about
   53 VP (2 players), 48 (3 players) and 42 (4 players). An earlier free Staff
   Room gave the first player a 46% win rate at 3 players, which is why hiring
-  now costs 2 Wasabi and nobody starts with more than 1.
+  costs Wasabi and nobody starts with more than 1. Later, with leftovers and
+  the last-lap bargain making every action richer, being able to hire at 2
+  Wasabi was worth about 4.5 win-percentage points; at 3 Wasabi it is
+  neutral, so the price is now 3.
 - **Catch-up and difficulty, from 500 simulated games per matchup.** The tips
   and the furthest-behind-goes-first rule cut the gap between first and last
   place by about a third. Against two rivals, a Normal player wins about 53%
