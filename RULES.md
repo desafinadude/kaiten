@@ -141,6 +141,10 @@ VP from events counts toward your final score.
 
 ## Ingredients, orders and cooking
 
+**Last-lap bargain (−1).** A dish taken from the *last lap* spot (far right) is
+cooked with 1 ingredient less: skip any one ingredient of its recipe. Keep the
+card turned sideways on your order clip until you serve it, as a reminder.
+
 - **Rice** and **Nori** are staples and come from the Pantry.
 - **Tuna, Salmon, Eel, Shrimp** are fish and come from the Fish Market.
   Spent fish go to a discard pile, which you shuffle into a new deck when the

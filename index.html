@@ -71,6 +71,17 @@ body{height:100%;margin:0;overflow:hidden;background:var(--wall);color:var(--ink
 .bsign.last{background:var(--lac);color:#fff}
 .bempty{width:100px;height:100px;border-radius:50%;border:3px dashed rgba(255,255,255,.35)}
 .bempty.took{display:flex;align-items:center;justify-content:center}
+.pwrap{position:relative}
+.bgn{position:absolute;left:-6px;bottom:2px;z-index:2;min-width:28px;height:28px;padding:0 4px;border-radius:14px;background:#2f7d4a;color:#fff;font-family:var(--disp);font-size:14px;line-height:28px;text-align:center;box-shadow:0 0 0 2px #fff,0 3px 6px rgba(0,0,0,.35);transform:rotate(-8deg)}
+.oticket .bgn{left:auto;right:auto;top:-10px;bottom:auto;left:-8px;width:26px;min-width:26px;height:26px;line-height:26px;font-size:13px}
+.hc-bgn .bgn,.cbgn .bgn{position:static;display:inline-block;transform:none;vertical-align:middle;margin-right:4px;height:22px;line-height:22px;min-width:24px;font-size:12px}
+.hc-bgn,.cbgn{margin:0;font-weight:700;color:#2f7d4a}
+.bgnote{color:#2f7d4a!important}
+.belt .plabel .ab.bgnote{display:block}
+.bgnote b{font-family:var(--disp);font-weight:400}
+.cost .skip,.ci.skip{position:relative;opacity:.45}
+.cost .skip::after,.ci.skip::after{content:"";position:absolute;left:-2px;right:-2px;top:50%;height:2px;background:#2f7d4a;transform:rotate(-35deg)}
+.cost .skip{display:inline-block}
 .bempty.took .face{width:46%;height:46%;opacity:.85}
 .tookby{font-size:11px;font-weight:900;color:#fff;background:rgba(27,20,14,.75);border-radius:999px;padding:2px 9px}
 .pwrap{display:block}
@@ -907,13 +918,21 @@ const chefsOf=p=>3+(p.apprentice?1:0);
 const chefsLeft=p=>chefsOf(p)-p.placed;
 function countCost(cost){const c={R:0,N:0,T:0,S:0,U:0,E:0}; for(const ch of cost) c[ch]++; return c;}
 function shortfall(hand,d){const n=countCost(d.cost); let sh=0; for(const k in n) sh+=Math.max(0,n[k]-hand[k]); return sh;}
-function canCook(p,d){return shortfall(p.hand,d)<=p.wasabi;}
+// last-lap bargain: an order taken from the last-lap spot skips one ingredient, preferably one you're missing, else a fish
+const isBargain=(p,d)=>!!(p.bargain&&p.bargain.includes(d.id));
+function bargainSkip(p,d,h){
+  if(!isBargain(p,d)) return null;
+  const n=countCost(d.cost), order=['T','S','U','E','N','R'];
+  return order.find(k=>n[k]>h[k])||order.find(k=>n[k]>0)||null;
+}
+function needOf(p,d,h){const n=countCost(d.cost), k=bargainSkip(p,d,h); if(k) n[k]--; return n;}
+function canCook(p,d){const n=needOf(p,d,p.hand); let sh=0; for(const k in n) sh+=Math.max(0,n[k]-p.hand[k]); return sh<=p.wasabi;}
 function canCookAll(p,ds){
   const h={...p.hand}; let w=p.wasabi;
-  for(const d of ds){const n=countCost(d.cost); for(const k in n){const u=Math.min(n[k],h[k]); h[k]-=u; w-=n[k]-u;} if(w<0) return false;}
+  for(const d of ds){const n=needOf(p,d,h); for(const k in n){const u=Math.min(n[k],h[k]); h[k]-=u; w-=n[k]-u;} if(w<0) return false;}
   return true;
 }
-function missingList(p,d){const n=countCost(d.cost); const out=[]; for(const k of ING_KEYS){const m=n[k]-p.hand[k]; for(let i=0;i<m;i++) out.push(k);} return out;}
+function missingList(p,d){const n=needOf(p,d,p.hand); const out=[]; for(const k of ING_KEYS){const m=n[k]-p.hand[k]; for(let i=0;i<m;i++) out.push(k);} return out;}
 function catCounts(tab){const c={nigiri:0,maki:0,sashimi:0,special:0}; tab.forEach(id=>c[DISH[id].cat]++); return c;}
 function regMet(r,tab){
   const q=r.req;
@@ -948,13 +967,16 @@ function whyNot(s,pi,loc){
 const legal=(s,pi,loc)=>!whyNot(s,pi,loc);
 // closing time: every 3 leftover ingredients (not wasabi) score 1 VP; every order still held costs 1 VP
 const LEFTOVER_PER_VP=3;
+// the belt's far-right spot: its dish leaves at round end, and whoever takes it cooks it with one ingredient less
+const LAST_LAP=4;
 // how many dishes a chef may take at the belt
 const beltRoom=(s,p)=>Math.min(2,ORDER_LIMIT-p.orders.length);
 
 function cook(s,pi,id){
-  const p=s.players[pi], d=DISH[id], n=countCost(d.cost);
+  const p=s.players[pi], d=DISH[id], n=needOf(p,d,p.hand), bargain=isBargain(p,d);
   for(const k in n){const u=Math.min(n[k],p.hand[k]); p.hand[k]-=u; if(FISH.includes(k)) for(let i=0;i<u;i++) s.fishDiscard.push(k); p.wasabi-=n[k]-u;}
   p.orders.splice(p.orders.indexOf(id),1);
+  if(bargain) p.bargain=p.bargain.filter(x=>x!==id);
   const trig=p.tableau.filter(t=>{const a=abOf(p,t); return a&&a.t==='cook'&&a.c===d.cat;}).length;
   p.bonus+=2*trig; p.tableau.push(id);
   if(abOn(p,d.ab)&&d.ab.t==='now') p.wasabi+=d.ab.w;
@@ -994,7 +1016,7 @@ function act(s,pi,loc,args){
       if(!slots.length) slots.push(s.belt.findIndex(Boolean));
       let w=abCount(p,'belt'); const names=[];
       if(!s.taken) s.taken={};
-      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); if(!cut) w+=b.w; names.push(DISH[b.id].name); s.belt[i]=null; s.taken[i]=pi;});
+      slots.forEach(i=>{const b=s.belt[i]; p.orders.push(b.id); if(!cut) w+=b.w; names.push(DISH[b.id].name+(i===LAST_LAP?' (last-lap bargain: 1 ingredient less)':'')); if(i===LAST_LAP) (p.bargain=p.bargain||[]).push(b.id); s.belt[i]=null; s.taken[i]=pi;});
       p.wasabi+=w;
       log(s,p.name+' took '+names.join(' and ')+' off the '+(cut?'stopped ':'')+'belt'+(w?' with '+w+' wasabi':'')+'.',pi);
       break;}
@@ -1175,7 +1197,7 @@ function botMove(s,pi){
       case 'belt':{
         const room=beltRoom(s,p), bw=b=>s.event==='powercut'?0:b.w;
         const items=s.belt.map((b,i)=>{
-          if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-p.wasabi-bw(b));
+          if(!b) return null; const d=DISH[b.id]; const sh=Math.max(0,shortfall(p.hand,d)-(i===LAST_LAP?1:0)-p.wasabi-bw(b));
           let v=0.5*dishValue(s,p,d)/(1+0.35*sh)+0.85*bw(b);
           if(last) v=sh===0?0.7*dishValue(s,p,d)-1:-1.5;
           else if(left===1&&sh>2) v*=0.4;
@@ -1236,16 +1258,19 @@ const ui={rules:{...RULES_ALL},welcome:true,live:false,level:'normal',char:'sora
 const app=document.getElementById('app');
 
 const ic=(k,cls)=>'<img class="ic'+(cls?' '+cls:'')+'" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">';
-const costRow=c=>'<span class="cost">'+[...c].map(k=>ic(k)).join('')+'</span>';
+const costRow=(c,skip)=>{let done=false; return '<span class="cost">'+[...c].map(k=>{if(skip&&k===skip&&!done){done=true; return '<span class="skip" title="Skipped: last-lap bargain">'+ic(k)+'</span>';} return ic(k);}).join('')+'</span>';};
+// how a belt dish would cook for me if I took it (the last-lap spot comes with the bargain)
+const asTaken=(me,b,i)=>i===LAST_LAP?{...me,bargain:(me.bargain||[]).concat([b.id])}:me;
 const wasabiRow=w=>w?'<span class="wsb" aria-label="'+w+' wasabi riding on this plate">'+Array.from({length:Math.min(w,5)},()=>'<img class="ic" src="'+ingArt('W')+'" alt="">').join('')+'</span>':'';
 function plateHTML(id,w){
   const d=DISH[id];
   return '<span class="plate c-'+d.cat+'"><img class="dart" src="'+dishArt(id)+'" alt=""><span class="vpb num" title="Victory points">'+d.vp+'</span>'+wasabiRow(w)+'</span>';
 }
-function labelHTML(id,note){
+const BARGAIN_BADGE='<span class="bgn" title="Last-lap bargain: cook it with 1 ingredient less">−1</span>';
+function labelHTML(id,note,last){
   const d=DISH[id];
   return '<span class="plabel c-'+d.cat+'"><span class="ct">'+CAT_NAME[d.cat]+'</span><span class="nm">'+esc(d.name)+'</span>'+costRow(d.cost)+
-    (note?'<span class="ab"><b>'+esc(note)+'</b></span>':'')+(d.ab?'<span class="ab">'+abText(d.ab)+'</span>':'')+'</span>';
+    (last?'<span class="ab bgnote"><b>−1</b> Bargain: skip 1 ingredient</span>':'')+(note?'<span class="ab"><b>'+esc(note)+'</b></span>':'')+(d.ab?'<span class="ab">'+abText(d.ab)+'</span>':'')+'</span>';
 }
 function cookStatus(p,id){
   const d=DISH[id], miss=missingList(p,d), ok=canCook(p,d);
@@ -1269,7 +1294,7 @@ function render(){
   const sub='Round '+S.round+' of '+S.maxRounds+' · '+S.players[S.first].name+(S.first===0?' go':' goes')+' first';
 
   const belt=S.belt.map((b,i)=>'<div class="bslot'+(b?' tap" role="button" tabindex="0" data-dish="'+i+'" data-hc="dish:'+i+'" aria-label="'+esc(DISH[b.id].name+': see details')+'"':'"')+'>'+(i===0?'<span class="bsign">New</span>':i===4?'<span class="bsign last">Last lap</span>':'')+
-    (b?'<span class="pwrap'+(ui.beltSeen&&!ui.beltSeen.includes(b.id)?' fresh':'')+'">'+plateHTML(b.id,b.w)+'</span>'+labelHTML(b.id):
+    (b?'<span class="pwrap'+(ui.beltSeen&&!ui.beltSeen.includes(b.id)?' fresh':'')+'">'+plateHTML(b.id,b.w)+(i===LAST_LAP?BARGAIN_BADGE:'')+'</span>'+labelHTML(b.id,null,i===LAST_LAP):
       S.taken&&S.taken[i]!=null?'<div class="bempty took" aria-label="Taken by '+esc(S.players[S.taken[i]].name)+'"><img class="face" src="'+chefArt(S.players[S.taken[i]].chef)+'" alt=""></div><span class="tookby">Taken by '+esc(S.players[S.taken[i]].name)+'</span>':
       '<div class="bempty" aria-label="Empty spot on the belt"></div>')+'</div>').join('');
 
@@ -1311,7 +1336,8 @@ function render(){
   const bowls=ING_KEYS.map(k=>[k,me.hand[k]]).concat([['W',me.wasabi]]).map(([k,v])=>'<div class="bowl'+(v?'':' z')+'" role="img" aria-label="'+v+' '+ING_NAME[k]+'"><img class="ic lg" src="'+ingArt(k)+'" alt=""><b class="num">'+v+'</b></div>').join('');
   const orders=me.orders.map(id=>{
     const d=DISH[id], st=cookStatus(me,id);
-    return '<div class="oticket c-'+d.cat+'"><span class="nm">'+esc(d.name)+'</span><span class="vpb num">'+d.vp+'</span><img class="thumb" src="'+dishArt(id)+'" alt="">'+costRow(d.cost)+
+    const sk=bargainSkip(me,d,me.hand);
+    return '<div class="oticket c-'+d.cat+'">'+(isBargain(me,d)?BARGAIN_BADGE:'')+'<span class="nm">'+esc(d.name)+'</span><span class="vpb num">'+d.vp+'</span><img class="thumb" src="'+dishArt(id)+'" alt="">'+costRow(d.cost,sk)+
       (st.ok?'<span class="ready">'+(st.miss.length?'READY · '+st.miss.length+' WASABI':'READY')+'</span>':'<span class="need">NEED '+st.miss.map(k=>ic(k)).join('')+'</span>')+
       (d.ab?'<span class="ab">'+abText(d.ab)+'</span>':'')+'</div>';
   }).join('')+Array.from({length:ORDER_LIMIT-me.orders.length},()=>'<div class="slip">Empty order clip</div>').join('');
@@ -1459,11 +1485,11 @@ function hcRegHTML(r,me){
     '<p class="hc-foot">'+(have>=need?'You qualify on your next turn.':(need-have)+' more to win them.')+(best?' '+esc(best.p.name)+' has '+best.h+'/'+need+'.':'')+'</p>';
 }
 function hcDishHTML(b,i,me){
-  const d=DISH[b.id], st=cookStatus(me,b.id), have={...me.hand};
-  const cost=[...d.cost].map(k=>{const ok=have[k]>0; if(ok) have[k]--; return '<span class="ci'+(ok?' ok':'')+'">'+ic(k)+'</span>';}).join('');
+  const pm=asTaken(me,b,i), d=DISH[b.id], st=cookStatus(pm,b.id), have={...me.hand}, sk=bargainSkip(pm,d,me.hand); let skd=false;
+  const cost=[...d.cost].map(k=>{if(sk===k&&!skd){skd=true; return '<span class="ci skip" title="Skipped: last-lap bargain">'+ic(k)+'</span>';} const ok=have[k]>0; if(ok) have[k]--; return '<span class="ci'+(ok?' ok':'')+'">'+ic(k)+'</span>';}).join('');
   return '<div class="hc-top"><img class="hc-dish" src="'+dishArt(b.id)+'" alt=""><div class="hc-tt"><span class="hc-kind cat">'+CAT_NAME[d.cat]+(i===0?' · new':i===4?' · last lap':'')+'</span><b>'+esc(d.name)+'</b>'+
     (b.w?'<span class="hc-sub">'+ic('W','sm')+(S.event==='powercut'?' '+b.w+' wasabi stays behind (power cut)':' comes with '+b.w+' wasabi')+'</span>':'')+'</div><span class="hc-vp num">'+d.vp+'<small>VP</small></span></div>'+
-    '<div class="hc-cost">'+cost+'</div><p class="hc-stat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'Need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
+    (i===LAST_LAP?'<p class="hc-bgn">'+BARGAIN_BADGE+' Last-lap bargain: cook it with 1 ingredient less.</p>':'')+'<div class="hc-cost">'+cost+'</div><p class="hc-stat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'Need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
     (d.ab?'<p class="hc-ab">'+abText(d.ab)+'</p>':'')+'<p class="hc-foot">Click for details or to take it.</p>';
 }
 const hc={el:null,key:null,x:-1,y:-1};
@@ -1508,13 +1534,13 @@ function regCard(r,me){
     '<p class="cnote">'+(have>=need?'You qualify: they join you on your next turn.':'You need '+(need-have)+' more.')+(best?' Closest rival: '+esc(best.p.name)+' with '+best.h+' / '+need+'.':'')+'</p></div>';
 }
 function dishCard(b,i,me){
-  const d=DISH[b.id], st=cookStatus(me,b.id), my=!S.over&&S.turn===0, why=my?whyNot(S,0,'belt'):(S.over?'Service is over':'Wait for your turn');
-  const have={...me.hand};
-  const cost=[...d.cost].map(k=>{const ok=have[k]>0; if(ok) have[k]--; return '<span class="ci'+(ok?' ok':'')+'">'+ic(k)+'</span>';}).join('');
+  const pm=asTaken(me,b,i), d=DISH[b.id], st=cookStatus(pm,b.id), my=!S.over&&S.turn===0, why=my?whyNot(S,0,'belt'):(S.over?'Service is over':'Wait for your turn');
+  const have={...me.hand}, sk=bargainSkip(pm,d,me.hand); let skd=false;
+  const cost=[...d.cost].map(k=>{if(sk===k&&!skd){skd=true; return '<span class="ci skip" title="Skipped: last-lap bargain">'+ic(k)+'</span>';} const ok=have[k]>0; if(ok) have[k]--; return '<span class="ci'+(ok?' ok':'')+'">'+ic(k)+'</span>';}).join('');
   return '<div class="ccard"><div class="cdish">'+plateHTML(b.id,b.w)+'</div>'+
     '<div class="cmeta"><span class="cct c-'+d.cat+'">'+CAT_NAME[d.cat]+'</span>'+(i===0?'<span class="ctag">New</span>':i===4?'<span class="ctag last">Last lap</span>':'')+'</div>'+
     '<h3>'+esc(d.name)+' <span class="cvpi num">'+d.vp+' VP</span></h3>'+
-    '<div class="ccost">'+cost+'</div><p class="cstat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'You still need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
+    (i===LAST_LAP?'<p class="cbgn">'+BARGAIN_BADGE+' Last-lap bargain: cook it with 1 ingredient less.</p>':'')+'<div class="ccost">'+cost+'</div><p class="cstat'+(st.ok?' ok':'')+'">'+esc(st.ok?st.note:'You still need '+st.miss.map(k=>ING_NAME[k]).join(', '))+'</p>'+
     (d.ab?'<p class="cab">'+abText(d.ab)+'</p>':'')+(b.w?'<p class="cab">'+(S.event==='powercut'?'Power cut: its '+b.w+' wasabi stays behind.':'Comes with '+b.w+' wasabi.')+'</p>':'')+
     '<button type="button" class="gbtn ctake" data-take="'+i+'"'+(why?' disabled':'')+'>'+(why?esc(why):'Take it · place a chef')+'</button></div>';
 }
@@ -1604,7 +1630,7 @@ const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over
   '<h3>Your chef</h3><p>Each chef has one edge. Sora (fishmonger) takes 1 extra fish at the Fish Market. Hana (hostess) gains 1 extra wasabi at the Front Door. Ren (rice master) gains 1 wasabi at the Pantry. Ito (old master) scores 1 extra VP for the first dish served each round.</p>'+
   '<h3>Each round</h3><ol><li>Served dishes with “Each round” pay out.</li><li>Take turns placing one chef on a free station (tap it, or drag a chef from your tray onto it) and do its action at once, until all chefs are out.</li><li>The belt turns: the last-lap dish leaves, the rest slide right and gain 1 wasabi, new dishes fill in. If nobody used the Front Door, the chef furthest behind goes first.</li></ol>'+
   '<h3>Catching up</h3><p>At the start of each round the regulars tip chefs who are behind the leader: 1 wasabi if 6 or more VP behind, 2 wasabi if 15 or more.</p>'+
-  '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p>'+
+  '<h3>Cooking</h3><p>Rice and Nori come from the Pantry, fish from the Fish Market. Wasabi is wild for any one ingredient. Hold up to 3 orders; pay one’s ingredients to serve it.</p><p><b>Last-lap bargain (−1):</b> a dish taken from the last-lap spot is cooked with 1 ingredient less.</p>'+
   '<h3>Rivals</h3><p>Easy rivals cook loosely and often miss their best move. Hard rivals rarely slip and start with an extra wasabi.</p><h3>Scoring</h3><ul><li>The number on each plate.</li><li>4 VP per Nigiri + Maki + Sashimi set. Specials don’t count.</li><li>At closing: 1 VP per 3 leftover ingredients (wasabi doesn’t count), and −1 VP for each order you still hold.</li><li>Regulars you win, and effects printed on your dishes.</li></ul></div>';
 
 function sheetHTML(me){
