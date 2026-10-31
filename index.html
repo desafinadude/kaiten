@@ -1783,10 +1783,14 @@ function doAct(pi,loc,args){
     // closing-time leftovers and unserved orders go on their own closing line
     const fin=fresh.find(x=>x.pi===j&&x.k==='final');
     if(fin){const fd=c.left+c.unserved; fin.dv=fd; fin.tot=c.total; fin.why=[c.left?'leftovers +'+c.left:'',c.unserved?'unserved orders '+c.unserved:''].filter(Boolean).join(', '); d-=fd; if(!d) return;}
-    const parts=SCORE_PARTS.filter(([k])=>!(fin&&(k==='left'||k==='unserved'))&&c[k]!==sc0[j][k]).map(([k,n])=>n+' '+(c[k]>sc0[j][k]?'+':'')+(c[k]-sc0[j][k]));
-    const l=fresh.filter(x=>x.pi===j&&x.k!=='final').pop();
+    // points from an event that started during this move (e.g. the inspection) go on the event line
+    const evl=fresh.filter(x=>x.k==='event').pop(), evd=evl?c.ev-sc0[j].ev:0;
+    if(evd){(evl.dvs=evl.dvs||[]).push({pi:j,d:evd,tot:c.total,why:'events +'+evd}); d-=evd; if(!d) return;}
+    const parts=SCORE_PARTS.filter(([k])=>!(fin&&(k==='left'||k==='unserved'))&&!(evd&&k==='ev')&&c[k]!==sc0[j][k]).map(([k,n])=>n+' '+(c[k]>sc0[j][k]?'+':'')+(c[k]-sc0[j][k]));
+    // round-start lines (morning delivery, tips) never earn points themselves
+    const l=fresh.filter(x=>x.pi===j&&x.k!=='final'&&x.k!=='morning'&&x.k!=='tip').pop();
     if(l){l.dv=d; l.tot=c.total-(fin?fin.dv:0); l.why=parts.join(', ');}
-    else {const e=fresh.filter(x=>x.pi<0).pop()||fresh[fresh.length-1]; if(e) (e.dvs=e.dvs||[]).push({pi:j,d,tot:c.total,why:parts.join(', ')});}
+    else {const e=fresh.filter(x=>x.k==='event').pop()||fresh.filter(x=>x.pi<0).pop()||fresh[fresh.length-1]; if(e) (e.dvs=e.dvs||[]).push({pi:j,d,tot:c.total,why:parts.join(', ')});}
   });
   fresh.forEach(l=>{
     if(l.k==='serve') sfx('serve');
