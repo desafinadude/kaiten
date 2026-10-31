@@ -251,14 +251,42 @@ body.dragging .board:not(.can){opacity:.45}
 .sfx-card p{margin:0;font-weight:700;color:#ffe9c4;text-shadow:0 2px 4px rgba(0,0,0,.6)}
 .sfx-vp{font-family:var(--disp);font-size:40px;line-height:1;color:#fff;background:var(--lac);border-radius:14px;padding:6px 16px 8px;box-shadow:0 5px 0 var(--lac-2),0 12px 30px rgba(0,0,0,.4);animation:stamp .5s .35s cubic-bezier(.2,1.6,.4,1) both}
 .sfx-vp small{font-size:14px;margin-left:4px}
-.carw{display:flex;align-items:center;gap:6px}
 .car{flex:1;min-width:0;display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}
 .car::-webkit-scrollbar{display:none}
 .cslide{flex:0 0 100%;scroll-snap-align:center;display:flex;justify-content:center;padding:4px 2px}
-.carr{flex:none;width:40px;height:40px;border:0;border-radius:50%;background:var(--indigo);color:#fff;font-size:24px;line-height:1;cursor:pointer;box-shadow:0 3px 0 var(--indigo-2)}
-.dots{display:flex;justify-content:center;gap:6px;padding:8px 0 2px}
-.cdot{width:8px;height:8px;border-radius:50%;background:var(--paper-2);box-shadow:inset 0 0 0 1px #b9a98a}
-.cdot.on{background:var(--lac);box-shadow:none}
+.carr{position:absolute;top:50%;margin-top:-18px;width:36px;height:36px;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:rgba(255,255,255,.8);font-size:22px;line-height:1;cursor:pointer;z-index:2;backdrop-filter:blur(2px)}
+.carr:hover{background:rgba(255,255,255,.28);color:#fff}
+.carr.prev{left:4px}.carr.next{right:4px}
+@media (hover:none){.carr{display:none}}
+.dots{display:flex;justify-content:center;gap:5px;padding:10px 0 0}
+.cdot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.3)}
+.cdot.on{background:rgba(255,255,255,.85)}
+.cveil{padding:0}
+.deck{position:relative;width:100%;max-width:760px;display:flex;flex-direction:column;align-items:stretch}
+.deck .car{width:100%}
+.deck .cslide{padding:8px 0;align-items:center}
+.pcard2{text-align:left}
+.seatcard .pcb,.pcard2.wide .pcb{align-items:stretch}
+.pcard2{width:min(440px,calc(100vw - 48px));max-height:calc(100dvh - 90px);display:flex;flex-direction:column;background:url(art/tex-paper.webp) 0 0/320px,var(--paper);color:var(--ink);border-radius:14px;border-top:6px solid var(--pc,var(--cat,var(--lac)));box-shadow:0 6px 0 var(--paper-2),0 20px 50px rgba(0,0,0,.5);overflow:hidden}
+.pcard2.wide{width:min(560px,calc(100vw - 48px))}
+.pch{display:flex;align-items:center;justify-content:space-between;padding:8px 8px 0 14px;flex:none}
+.pck{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.pcx{border:0;background:transparent;color:var(--ink-2);font-size:24px;line-height:1;width:36px;height:36px;border-radius:50%;cursor:pointer}
+.pcx:hover{background:var(--paper-2)}
+.pcb{flex:1;min-height:0;overflow-y:auto;scrollbar-width:none;padding:4px 16px 16px;display:flex;flex-direction:column;align-items:center}
+.pcb::-webkit-scrollbar{display:none}
+.pcb>.ccard{max-width:none}
+.schead{display:flex;align-items:center;gap:12px;width:100%;margin-bottom:8px}
+.schead .face{width:64px;height:64px;box-shadow:0 0 0 3px var(--pc),0 3px 8px rgba(0,0,0,.25)}
+.schead>div{flex:1;min-width:0}
+.schead h3{margin:0;font-family:var(--disp);font-weight:400;font-size:20px}
+.sgrid{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;width:100%;font-size:12.5px;align-items:center;margin-bottom:6px}
+.sl{font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-2)}
+.seatcard .res{display:flex;flex-wrap:wrap;gap:8px}
+.seatcard .echips{justify-content:flex-start}
+.seatcard .sorders,.seatcard .dlist{width:100%}
+.seatcard .dlist .sol{display:block;margin:6px 0 2px}
+.sbreak{width:100%;border-top:1px dashed var(--paper-2);padding-top:6px;margin-top:6px}
 .ccard{width:100%;max-width:400px;display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
 .ccard h3{margin:0;font-family:var(--disp);font-weight:400;font-size:20px}
 .cdish .plate{width:128px;height:128px}
@@ -1268,7 +1296,7 @@ function render(){
 
   const mates=S.players.filter(p=>p.bot).map(p=>{
     const s2=score(p), c=catCounts(p.tableau);
-    return '<button type="button" class="mate'+(!S.over&&S.turn===p.color?' on':'')+'" data-open="seats" aria-label="'+esc(p.name+': '+s2.total+' VP, '+p.tableau.length+' plates served, '+p.regulars.length+' regulars. Open details.')+'">'+
+    return '<button type="button" class="mate'+(!S.over&&S.turn===p.color?' on':'')+'" data-open="seats" data-seat="'+p.color+'" aria-label="'+esc(p.name+': '+s2.total+' VP, '+p.tableau.length+' plates served, '+p.regulars.length+' regulars. Open details.')+'">'+
       '<img class="face" src="'+chefArt(p.chef)+'" alt=""><span class="mid"><span class="top"><b class="nm">'+esc(p.name)+'</b><span class="vp num">'+s2.total+'</span></span><span class="pips">'+
       CATS.map(k=>'<span class="pip c-'+k+'" title="'+c[k]+' '+CAT_NAME[k]+'"><span class="pd"></span>'+c[k]+'</span>').join('')+
       '<span class="pip" title="Tasting sets"><span class="setb">SET</span>'+Math.min(c.nigiri,c.maki,c.sashimi)+'</span>'+
@@ -1402,9 +1430,14 @@ function maxPick(){
   if(s==='head') return 2;
   return 1;
 }
-function carouselHTML(cards){
-  return '<div class="carw"><button type="button" class="carr" data-car="-1" aria-label="Previous">‹</button><div class="car" data-sk="car">'+cards.map(c=>'<div class="cslide">'+c+'</div>').join('')+'</div>'+
-    '<button type="button" class="carr" data-car="1" aria-label="Next">›</button></div><div class="dots" aria-hidden="true">'+cards.map((_,i)=>'<span class="cdot'+(i===0?' on':'')+'"></span>').join('')+'</div>';
+// a deck of whole paper cards that slide past; each card scrolls on its own if it is tall
+function cardDeck(title,cards){
+  const n=cards.length;
+  return '<div class="veil cveil" data-act="veil"><div class="deck" role="dialog" aria-modal="true" aria-label="'+esc(title)+'"><div class="car" data-sk="car">'+
+    cards.map((c,i)=>'<div class="cslide" data-act="veil"><article class="pcard2'+(c.cls?' '+c.cls:'')+'"><header class="pch"><span class="pck">'+esc(title)+(n>1?' · '+(i+1)+'/'+n:'')+'</span>'+
+      '<button type="button" class="pcx" data-act="cancel" aria-label="Close">×</button></header><div class="pcb">'+c.html+'</div></article></div>').join('')+'</div>'+
+    (n>1?'<button type="button" class="carr prev" data-car="-1" aria-label="Previous">‹</button><button type="button" class="carr next" data-car="1" aria-label="Next">›</button>'+
+      '<div class="dots" aria-hidden="true">'+cards.map((_,i)=>'<span class="cdot'+(i===0?' on':'')+'"></span>').join('')+'</div>':'')+'</div></div>';
 }
 // how far a chef is towards a regular: one row per thing they want
 function regProgress(r,tab){
@@ -1551,17 +1584,21 @@ function engineTable(){
 }
 const dvHTML=l=>(l.dv?'<span class="dv'+(l.dv<0?' neg':'')+'"'+(l.why?' title="'+esc(l.why)+'"':'')+'><b class="num">'+(l.dv>0?'+':'')+l.dv+'</b><small class="num">'+l.tot+' VP</small>'+(l.why?'<small class="why2">'+esc(l.why)+'</small>':'')+'</span>':'')+
   (l.dvs?'<span class="dvs">'+l.dvs.map(x=>'<span class="dvx" title="'+esc(x.why)+'"><span class="ld pc'+S.players[x.pi].color+'"></span>'+esc(S.players[x.pi].name)+' <b class="num">'+(x.d>0?'+':'')+x.d+'</b></span>').join('')+'</span>':'');
-function seatsHTML(){
+function seatCards(){
   return S.players.map((p,i)=>{
-    const s2=score(p);
-    return '<div class="seat"><div class="seat-h"><img class="face" src="'+chefArt(p.chef)+'" alt=""><b>'+esc(p.name)+'</b>'+(S.first===i?'<span class="firstmark">FIRST</span>':'')+'<span class="sc num">'+s2.total+'</span></div>'+
-      '<div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
-      '<div class="meta"><b>'+esc(CHAR[p.char].name+', '+CHAR[p.char].title.toLowerCase())+':</b> '+esc(CHAR[p.char].text)+'</div>'+
-      '<div class="meta">'+(S.over?0:chefsLeft(p))+'/'+chefsOf(p)+' chefs'+(p.hired&&!p.apprentice?' (+1 next round)':'')+' · '+p.orders.length+' orders · '+p.regulars.length+' regulars'+(p.regulars.length?' ('+p.regulars.map(r=>REG[r].name).join(', ')+')':'')+'</div>'+
+    const s2=score(p), cc=catCounts(p.tableau);
+    const html='<div class="schead pc'+p.color+'"><img class="face" src="'+chefArt(p.chef)+'" alt=""><div><h3>'+esc(p.name)+(S.first===i?' <span class="firstmark">FIRST</span>':'')+'</h3>'+
+        '<span class="cwant">'+esc(CHAR[p.char].name+', '+CHAR[p.char].title.toLowerCase())+(chefOn(p)?': '+esc(CHAR[p.char].text):'')+'</span></div><span class="cvp num">'+s2.total+'<small>VP</small></span></div>'+
+      '<div class="sgrid"><span class="sl">Pantry</span><div class="res">'+ING_KEYS.map(k=>'<span class="'+(p.hand[k]?'':'z')+'"><img class="ic sm" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">'+p.hand[k]+'</span>').join('')+'<span><img class="ic sm" src="'+ingArt('W')+'" alt="Wasabi">'+p.wasabi+'</span></div>'+
+      '<span class="sl">Chefs</span><span>'+(S.over?0:chefsLeft(p))+' of '+chefsOf(p)+' left this round'+(p.hired&&!p.apprentice?' (+1 next round)':'')+'</span>'+
+      '<span class="sl">Engine</span><span class="echips">'+(engineChips(p)||'<span class="ez">nothing yet</span>')+'</span>'+
+      '<span class="sl">Plates</span><span>'+CATS.map(k=>cc[k]+' '+CAT_NAME[k]).join(' · ')+'</span>'+
+      '<span class="sl">Regulars</span><span>'+(p.regulars.map(r=>REG[r].name).join(', ')||'none yet')+'</span></div>'+
       (p.orders.length?'<div class="sorders"><span class="sol">Orders</span>'+p.orders.map(id=>{const d=DISH[id], ok=canCook(p,d); return '<span class="sord c-'+d.cat+(ok?' ok':'')+'" title="'+esc(d.name+(ok?': ready to cook':''))+'"><img src="'+dishArt(id)+'" alt=""><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(ok?' · ready':'')+'<span class="cost">'+[...d.cost].map(k=>ic(k,'sm')).join('')+'</span></span></span>';}).join('')+'</div>':'')+
-      '<div class="dlist">'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(d.ab?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>'+
-      '<div class="meta">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+(s2.ev?' · events '+s2.ev:'')+(s2.left?' · leftovers '+s2.left:'')+(s2.unserved?' · unserved '+s2.unserved:'')+'</div></div>';
-  }).join('');
+      (p.tableau.length?'<div class="dlist"><span class="sol">Served</span>'+p.tableau.map(id=>{const d=DISH[id]; return '<div class="drow c-'+d.cat+'"><span class="dot"></span><span><b>'+esc(d.name)+'</b> '+d.vp+' VP'+(abText(d.ab)?' · <span class="e">'+abText(d.ab)+'</span>':'')+'</span></div>';}).join('')+'</div>':'')+
+      '<div class="meta sbreak">Plates '+s2.dishes+' · bonuses '+s2.bonus+' · sets '+s2.sets+' · regulars '+s2.regs+' · end '+s2.end+(s2.ev?' · events '+s2.ev:'')+(s2.left?' · leftovers '+s2.left:'')+(s2.unserved?' · unserved '+s2.unserved:'')+'</div>';
+    return {html,cls:'pc'+p.color+' seatcard'};
+  });
 }
 const RULES_HTML='<div class="rules"><p>Run the best stall at the sushi bar over 7 rounds. Send chefs to stations, gather fish and staples, take orders off the belt, and serve dishes. Served plates stay with you, score, and often keep working for you.</p>'+
   '<h3>Your chef</h3><p>Each chef has one edge. Sora (fishmonger) takes 1 extra fish at the Fish Market. Hana (hostess) gains 1 extra wasabi at the Front Door. Ren (rice master) gains 1 wasabi at the Pantry. Ito (old master) scores 1 extra VP for the first dish served each round.</p>'+
@@ -1578,6 +1615,9 @@ function sheetHTML(me){
       '<div class="sheet-f"><button type="button" class="gbtn wood" data-act="copylog">Copy log</button><button type="button" class="gbtn wood" data-act="closeend">See the table</button><button type="button" class="gbtn" data-start="go">Play again</button></div></div></div>';
   }
   const sh=ui.sheet; if(!sh) return '';
+  if(sh==='reg') return cardDeck('Regulars waiting',S.regulars.filter(Boolean).map(r=>({html:regCard(r,me)})));
+  if(sh==='dish') return cardDeck('On the belt',S.belt.map((b,i)=>b?{html:dishCard(b,i,me),cls:'c-'+DISH[b.id].cat}:null).filter(Boolean));
+  if(sh==='seats') return cardDeck('The chefs',[{html:'<h3 class="eh">Kitchen engines</h3><p class="cnote">Who is building what. Dots show the size of each bonus; the leader on each row is highlighted.</p>'+engineTable(),cls:'wide'}].concat(seatCards()));
   let title='', help='', body='', ok=false, label='Place chef', confirm=true, extra='';
   if(sh==='market'){
     const k=maxPick(); title='Fish Market'; help='Pick '+k+' fish off the ice.'; label='Buy fish';
@@ -1609,14 +1649,6 @@ function sheetHTML(me){
     title=L.name; help=stationText(L,me); label='Place chef here'; ok=my&&!why;
     body='<div class="stinfo"><img class="stbig" src="'+A('st-'+L.id)+'" alt=""><div><span class="holes">'+holesHTML(L,taken,cap)+'</span>'+
       '<p>'+(cap>20?'Any number of chefs can work here.':(cap-taken.length)+' of '+cap+' spots free this round.')+'</p></div></div>'+(why&&why!=='Taken'?'<p class="why">'+esc(why)+'</p>':why==='Taken'?'<p class="why">Every spot here is taken this round.</p>':'');
-  } else if(sh==='reg'){
-    title='Regulars waiting'; help='Swipe to see them all. Each joins the first chef whose served plates match.'; confirm=false;
-    body=carouselHTML(S.regulars.filter(Boolean).map(r=>regCard(r,me)));
-  } else if(sh==='dish'){
-    title='On the belt'; help='Swipe through the dishes. Take one to send a chef to the Kaiten Belt.'; confirm=false;
-    body=carouselHTML(S.belt.map((b,i)=>b?dishCard(b,i,me):'').filter(Boolean));
-  } else if(sh==='seats'){
-    title='The chefs'; help='Everyone’s engine, pantry, served plates and score so far.'; body='<h3 class="eh">Kitchen engines</h3>'+engineTable()+seatsHTML(); confirm=false;
   } else if(sh==='log'){
     title='Service log'; help='Everything that happened, newest first. Score changes are on the right.'; confirm=false; extra='<button type="button" class="gbtn" data-act="copylog">Copy log</button>';
     const f=ui.logF;
@@ -1853,7 +1885,7 @@ app.addEventListener('click',e=>{
   if(!t) return;
   const d=t.dataset;
   if(d.loc) return pickLoc(d.loc);
-  if(d.open){ui.menu=false; ui.sheet=d.open; ui.sel=[]; return render();}
+  if(d.open){ui.menu=false; ui.sheet=d.open; ui.sel=[]; if(d.open==='seats') ui.carJump=d.seat!=null?+d.seat+1:0; return render();}
   if(d.reg!=null){ui.sheet='reg'; ui.carJump=S.regulars.slice(0,+d.reg).filter(Boolean).length; return render();}
   if(d.dish!=null){ui.sheet='dish'; ui.carJump=S.belt.slice(0,+d.dish).filter(Boolean).length; sfx('pick'); return render();}
   if(d.take!=null){if(t.disabled||S.turn!==0||!legal(S,0,'belt')) return; ui.sheet=null; return humanAct('belt',{slots:[+d.take]});}
@@ -1888,7 +1920,7 @@ app.addEventListener('click',e=>{
 });
 function carDots(c){
   const i=Math.round(c.scrollLeft/Math.max(1,c.clientWidth));
-  c.closest('.sheet-b')?.querySelectorAll('.cdot').forEach((d,k)=>d.classList.toggle('on',k===i));
+  c.closest('.deck')?.querySelectorAll('.cdot').forEach((d,k)=>d.classList.toggle('on',k===i));
 }
 app.addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('car')) carDots(e.target);},true);
 app.addEventListener('keydown',e=>{if((e.key==='Enter'||e.key===' ')&&e.target.dataset&&e.target.dataset.dish!=null){e.preventDefault(); e.target.click();}});
