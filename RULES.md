@@ -84,6 +84,38 @@ Each player picks one of four chefs. Each has a single edge:
 In 1,500 simulated games per player count, each chef's win rate is within
 about 5 points of an even share.
 
+## Keeping track on the table
+
+Everything the app tracks can be tracked with cards and tokens:
+
+- **Served dishes** are tucked under the top edge of your player mat in four
+  columns (Nigiri, Maki, Sashimi, Special), so only each card's bottom strip
+  shows. The strip carries the dish's bonus icon, so your mat reads as your
+  engine: round-start income, station boosts, serving combos and closing
+  bonuses. Count a column to check sets and regulars.
+- **One-off bonuses** ("When served: +2 wasabi") are taken immediately; tuck the
+  card face-down-strip so it isn't paid twice.
+- **Morning delivery:** at the start of each round, every player reads the
+  round-start icons on their mat and takes those ingredients from the supply.
+- **Score track** around the board for VP; the closing bonuses are added at
+  the end.
+
+## Variants for newcomers
+
+Any of these groups of bonuses can be switched off before a game (the app has
+toggles on the start screen). Switched-off bonuses are simply ignored:
+
+- **Dish bonuses:** serving combos (+2 VP per later Nigiri/Maki/Sashimi),
+  closing bonuses (+1 VP per Nigiri/Maki/Sashimi, +2 VP per regular) and
+  "When served: +2 wasabi".
+- **Station bonuses:** dishes that give an extra fish at the Market, an extra
+  staple at the Pantry or a wasabi at the Kaiten Belt.
+- **Round-start bonuses:** dishes that pay out at the start of each round.
+- **Chef abilities:** Sora, Hana, Ren and Ito play without their edge.
+
+A first game with all four off is a gentle introduction: about 37 VP per
+player instead of 56, and seats stay even.
+
 ## Rival difficulty
 
 The app's rival chefs come in three strengths. Easy rivals often take a weaker

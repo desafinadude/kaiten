@@ -456,11 +456,23 @@ body.dragging .board:not(.can){opacity:.45}
 .pip .mf{width:15px;height:15px;box-shadow:none}
 .engb{font-size:8.5px;font-weight:900;letter-spacing:.06em;background:#6d9a4a;color:#fff;border-radius:3px;padding:0 3px}
 .myeng{display:flex;flex-direction:column;gap:4px;cursor:pointer;max-width:230px}
+
 .echips{display:flex;flex-wrap:wrap;gap:4px}
 .echip{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:900;color:#fff;border-radius:999px;padding:1px 7px 1px 2px;line-height:1.5;font-variant-numeric:tabular-nums;box-shadow:0 1px 0 rgba(0,0,0,.3)}
 .echip img{width:18px;height:18px;object-fit:contain}
 .echip .pdot,.echip .regb{width:12px;height:12px;margin:0 2px 0 3px}
 .echip .pdot{box-shadow:0 0 0 2px #fff}
+.sbadges{display:flex;justify-content:center;gap:2px;margin-top:3px}
+.sbadge{display:inline-flex;align-items:center;gap:1px;font-size:9.5px;font-weight:900;color:#fff;border-radius:999px;padding:0 5px;line-height:1.45;box-shadow:0 1px 0 rgba(0,0,0,.3);white-space:nowrap}
+.sbadge img{width:12px;height:12px;object-fit:contain}
+.sbadge .pdot{width:9px;height:9px;margin:0 1px 0 3px;box-shadow:0 0 0 1.5px #fff}
+.sbadge .regb{width:9px;height:9px;margin:0 1px 0 3px;border-width:1.5px}
+.wrules{display:flex;align-items:flex-start;gap:10px}
+.wtog{flex:1;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.tog{display:flex;align-items:center;gap:6px;border:2px solid rgba(255,210,122,.35);background:rgba(255,255,255,.05);color:#fff;border-radius:10px;padding:6px 8px;min-height:40px;font-weight:900;font-size:12px;text-align:left;cursor:pointer}
+.tog.on{background:rgba(47,125,74,.55);border-color:#6d9a4a}
+.tog .tk{flex:none;width:18px;height:18px;border-radius:5px;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;font-size:12px}
+.tog.on .tk{background:#fff;color:#2f7d4a}
 .g-round{background:#2f7d4a}.g-st{background:#7a532b}.g-vp{background:var(--lac)}.g-end{background:var(--indigo)}
 .echips:empty::after{content:"Serve dishes with effects to build it";font-size:11px;color:#f3dcb5;font-weight:700}
 .eh{margin:4px 0 6px;font-family:var(--disp);font-weight:400;font-size:16px}
@@ -838,15 +850,15 @@ function drawDish(s){
 function refillMarket(s){while(s.market.length<5){const f=drawFish(s); if(!f) break; s.market.push(f);}}
 
 function newGame(opts){
-  const o=Object.assign({nBots:2,seed:(Math.random()*1e9)|0,allBots:false,level:'normal',levels:null,catchup:true,you:null,chars:null},opts||{});
+  const o=Object.assign({nBots:2,seed:(Math.random()*1e9)|0,allBots:false,level:'normal',levels:null,catchup:true,you:null,chars:null,rules:null},opts||{});
   const n=o.nBots+1;
-  const s={rng:o.seed|0,seed:o.seed|0,round:1,maxRounds:ROUNDS,log:[],over:false,doorTaker:null,level:o.level,catchup:o.catchup};
+  const s={rng:o.seed|0,seed:o.seed|0,round:1,maxRounds:ROUNDS,log:[],over:false,doorTaker:null,level:o.level,catchup:o.catchup,rules:Object.assign({},RULES_ALL,o.rules||{})};
   s.players=[];
   // you get the chef you chose; the rivals are dealt the others
   const chars=o.chars||(o.you?[o.you]:[]).concat(shuffle(s,CHARS.map(c=>c.id).filter(c=>c!==o.you))).slice(0,n);
   for(let i=0;i<n;i++){
     const ch=CHAR[chars[i]];
-    s.players.push({name:o.allBots?ch.name+' '+(i+1):i===0?'You':ch.name,bot:o.allBots||i>0,color:i,char:ch.id,chef:ch.art,firstR:0,
+    s.players.push({name:o.allBots?ch.name+' '+(i+1):i===0?'You':ch.name,bot:o.allBots||i>0,color:i,char:ch.id,chef:ch.art,firstR:0,rules:s.rules,
       level:o.levels?o.levels[i]:o.level,
       hand:{R:2,N:1,T:0,S:0,U:0,E:0},wasabi:1+((o.allBots||i>0)?(LEVELS[o.levels?o.levels[i]:o.level]||LEVELS.normal).head:0),orders:[],tableau:[],bonus:0,ev:0,regulars:[],hired:false,apprentice:false,placed:0});
   }
@@ -883,7 +895,13 @@ function regMet(r,tab){
   if(q.allFish) return FISH.every(f=>tab.some(id=>DISH[id].cost.includes(f)));
   return false;
 }
-const abCount=(p,t)=>p.tableau.filter(id=>DISH[id].ab&&DISH[id].ab.t===t).length+(p.char&&CHAR[p.char].t===t?CHAR[p.char].n||1:0);
+// house rules: whole groups of bonuses can be switched off for newcomers. They live on each player too, so score(p) can see them.
+const RULE_OF={start:'start',market:'station',pantry:'station',belt:'station',cook:'dish',end:'dish',now:'dish',regular:'dish'};
+const RULES_ALL={dish:true,station:true,start:true,chefs:true};
+const abOn=(p,a)=>!!a&&(!p.rules||p.rules[RULE_OF[a.t]]!==false);
+const abOf=(p,id)=>abOn(p,DISH[id].ab)?DISH[id].ab:null;
+const chefOn=p=>!!(p.char&&(!p.rules||p.rules.chefs!==false));
+const abCount=(p,t)=>p.tableau.filter(id=>{const a=abOf(p,id); return a&&a.t===t;}).length+(chefOn(p)&&CHAR[p.char].t===t?CHAR[p.char].n||1:0);
 
 // a power cut halves the belt: one chef can work it by hand
 const locCap=(s,loc)=>loc==='belt'&&s.event==='powercut'?1:LOC[loc].cap(s.players.length);
@@ -909,10 +927,10 @@ function cook(s,pi,id){
   const p=s.players[pi], d=DISH[id], n=countCost(d.cost);
   for(const k in n){const u=Math.min(n[k],p.hand[k]); p.hand[k]-=u; if(FISH.includes(k)) for(let i=0;i<u;i++) s.fishDiscard.push(k); p.wasabi-=n[k]-u;}
   p.orders.splice(p.orders.indexOf(id),1);
-  const trig=p.tableau.filter(t=>DISH[t].ab&&DISH[t].ab.t==='cook'&&DISH[t].ab.c===d.cat).length;
+  const trig=p.tableau.filter(t=>{const a=abOf(p,t); return a&&a.t==='cook'&&a.c===d.cat;}).length;
   p.bonus+=2*trig; p.tableau.push(id);
-  if(d.ab&&d.ab.t==='now') p.wasabi+=d.ab.w;
-  let first=0; if(p.char&&CHAR[p.char].t==='first'&&p.firstR!==s.round){p.firstR=s.round; first=1; p.bonus+=1;}
+  if(abOn(p,d.ab)&&d.ab.t==='now') p.wasabi+=d.ab.w;
+  let first=0; if(chefOn(p)&&CHAR[p.char].t==='first'&&p.firstR!==s.round){p.firstR=s.round; first=1; p.bonus+=1;}
   let ev=0;
   if(s.event==='blogger') ev+=1;
   if(s.event==='celebrity'&&d.cat==='special'&&!s.celebDone){s.celebDone=true; ev+=3;}
@@ -939,7 +957,7 @@ function act(s,pi,loc,args){
     case 'pantry':{
       const k=pantryCount(s,p); const r=Math.max(0,Math.min(k,args.rice==null?k:args.rice));
       p.hand.R+=r; p.hand.N+=k-r;
-      const rw=p.char&&CHAR[p.char].t==='pantryw'?1:0; p.wasabi+=rw;
+      const rw=chefOn(p)&&CHAR[p.char].t==='pantryw'?1:0; p.wasabi+=rw;
       log(s,p.name+' took '+[r?r+' Rice':'',k-r?(k-r)+' Nori':''].filter(Boolean).join(' and ')+' from the pantry'+(rw?' and 1 wasabi':'')+'.',pi);
       break;}
     case 'belt':{
@@ -1037,7 +1055,7 @@ function endRound(s){
   s.players.forEach((p,i)=>{
     const g=s.morning.gains[i];
     p.tableau.forEach(id=>{
-      const a=DISH[id].ab; if(!a||a.t!=='start') return;
+      const a=abOf(p,id); if(!a||a.t!=='start') return;
       if(a.g==='W'){p.wasabi++; g.W++;} else if(a.g==='F'){const f=drawFish(s); if(f){p.hand[f]++; g.F.push(f);}} else {p.hand[a.g]++; g[a.g]++;}
     });
     const parts=[g.R?g.R+' Rice':'',g.N?g.N+' Nori':'',g.W?g.W+' wasabi':'',...g.F.map(f=>'a '+ING_NAME[f])].filter(Boolean);
@@ -1048,10 +1066,10 @@ function endRound(s){
 // everything a chef's counter does for them, from served dishes and their chef: the engine
 function engineOf(p){
   const e={R:0,N:0,W:0,F:0,market:0,pantry:0,belt:0,door:0,pantryw:0,first:0,cook:{nigiri:0,maki:0,sashimi:0},end:{nigiri:0,maki:0,sashimi:0},reg:0};
-  p.tableau.forEach(id=>{const a=DISH[id].ab; if(!a) return;
+  p.tableau.forEach(id=>{const a=abOf(p,id); if(!a) return;
     if(a.t==='start') e[a.g]++; else if(a.t==='market'||a.t==='pantry'||a.t==='belt') e[a.t]++;
     else if(a.t==='cook') e.cook[a.c]+=2; else if(a.t==='end') e.end[a.c]++; else if(a.t==='regular') e.reg+=2;});
-  const c=p.char&&CHAR[p.char];
+  const c=chefOn(p)&&CHAR[p.char];
   if(c){if(c.t==='market'||c.t==='pantry'||c.t==='belt'||c.t==='door') e[c.t]+=c.n||1; if(c.t==='pantryw') e.pantryw++; if(c.t==='first') e.first++;}
   return e;
 }
@@ -1072,7 +1090,7 @@ function score(p){
   const dishes=p.tableau.reduce((a,id)=>a+DISH[id].vp,0);
   const sets=Math.min(c.nigiri,c.maki,c.sashimi)*SET_VP;
   const regs=p.regulars.reduce((a,id)=>a+REG[id].vp,0);
-  let end=0; p.tableau.forEach(id=>{const a=DISH[id].ab; if(!a) return; if(a.t==='end') end+=c[a.c]; if(a.t==='regular') end+=2*p.regulars.length;});
+  let end=0; p.tableau.forEach(id=>{const a=abOf(p,id); if(!a) return; if(a.t==='end') end+=c[a.c]; if(a.t==='regular') end+=2*p.regulars.length;});
   const ev=p.ev||0;
   // closing time only (p.fin is set when the game ends): leftovers score, unserved orders cost
   const left=p.fin?p.fin.left:0, unserved=p.fin?-p.fin.orders:0;
@@ -1086,7 +1104,7 @@ function ranking(s){
 /* ---------- bot ---------- */
 function dishValue(s,p,d){
   const left=s.maxRounds-s.round, tab=p.tableau;
-  let v=d.vp; const a=d.ab;
+  let v=d.vp; const a=abOn(p,d.ab)?d.ab:null;
   if(a){switch(a.t){
     case 'start': v+=left*(a.g==='W'||a.g==='F'?0.9:0.6); break;
     case 'market': case 'pantry': v+=left*0.55; break;
@@ -1096,7 +1114,7 @@ function dishValue(s,p,d){
     case 'now': v+=a.w*0.7; break;
     case 'regular': v+=2*p.regulars.length+left*0.3; break;
   }}
-  v+=2*tab.filter(t=>DISH[t].ab&&DISH[t].ab.t==='cook'&&DISH[t].ab.c===d.cat).length;
+  v+=2*tab.filter(t=>{const x=abOf(p,t); return x&&x.t==='cook'&&x.c===d.cat;}).length;
   if(d.cat!=='special'){const c=catCounts(tab); const m=Math.min(c.nigiri,c.maki,c.sashimi); if(c[d.cat]===m) v+=1.6;}
   const after=tab.concat([d.id]);
   for(const r of s.regulars) if(r&&!regMet(REG[r],tab)&&regMet(REG[r],after)) v+=REG[r].vp*0.9;
@@ -1151,7 +1169,7 @@ function botMove(s,pi){
       case 'pantry':{
         const k=pantryCount(s,p); const dem=demand(s,p); let r=0,v=0;
         for(let t=0;t<k;t++){ if(dem.R>=dem.N&&dem.R>0){r++;dem.R--;v+=1.2;} else if(dem.N>0){dem.N--;v+=1.2;} else {r++; v+=0.35;} }
-        sc=(last?pantryCount(s,p)/LEFTOVER_PER_VP+v*0.3:v*0.95)+(p.char&&CHAR[p.char].t==='pantryw'?0.9:0); args={rice:r};
+        sc=(last?pantryCount(s,p)/LEFTOVER_PER_VP+v*0.3:v*0.95)+(chefOn(p)&&CHAR[p.char].t==='pantryw'?0.9:0); args={rice:r};
         break;}
       case 'door': sc=(last?0.7:1.6+(p.orders.length<ORDER_LIMIT?0.6:0))+abCount(p,'door')*0.7; break;
       case 'staff': sc=left>=2?1.1*left:-1; break;
@@ -1176,6 +1194,9 @@ const DISH_ART={
 };
 // 'svg' = drawn placeholders; switch to 'webp' once tools/slice_sheets.py has cut the painted sheets
 const ART_EXT='webp';
+// a bonus switched off by the house rules isn't printed on the cards
+const abTextAll=abText;
+abText=a=>a&&S&&S.rules&&S.rules[RULE_OF[a.t]]===false?'':abTextAll(a);
 const A=k=>'art/'+k+'.'+ART_EXT;
 const dishArt=id=>A('dish-'+DISH_ART[id]);
 const chefArt=c=>A('chef-'+c);
@@ -1183,7 +1204,7 @@ const ingArt=k=>A('ing-'+k);
 const esc=t=>String(t).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 let S=null;
-const ui={welcome:true,live:false,level:'normal',char:'sora',vpShown:null,catShown:null,catBump:{},fx:null,carJump:null,menu:false,sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0,queue:[],spot:null,markId:0};
+const ui={rules:{...RULES_ALL},welcome:true,live:false,level:'normal',char:'sora',vpShown:null,catShown:null,catBump:{},fx:null,carJump:null,menu:false,sheet:null,sel:[],rice:0,toast:'',toastT:0,endOpen:true,nBots:2,botT:0,queue:[],spot:null,markId:0};
 const app=document.getElementById('app');
 
 const ic=(k,cls)=>'<img class="ic'+(cls?' '+cls:'')+'" src="'+ingArt(k)+'" alt="'+ING_NAME[k]+'">';
@@ -1269,7 +1290,7 @@ function render(){
   const cc=catCounts(me.tableau);
   if(!ui.catShown) ui.catShown={...cc};
   const now=Date.now(); CATS.forEach(k=>{if(cc[k]>ui.catShown[k]) ui.catBump[k]={until:now+1500,n:cc[k]-ui.catShown[k]};}); ui.catShown={...cc};
-  const stacks=CATS.map(k=>'<div class="stack c-'+k+(ui.catBump[k]&&ui.catBump[k].until>now?' bump':'')+'" role="img" aria-label="'+cc[k]+' '+CAT_NAME[k]+' served">'+(ui.catBump[k]&&ui.catBump[k].until>now?'<span class="plus">+'+ui.catBump[k].n+'</span>':'')+'<span class="lb">'+CAT_NAME[k]+'</span><span class="cnt num">'+cc[k]+'</span>'+
+  const stacks=CATS.map(k=>'<div class="stack c-'+k+(ui.catBump[k]&&ui.catBump[k].until>now?' bump':'')+'" role="img" aria-label="'+cc[k]+' '+CAT_NAME[k]+' served">'+(ui.catBump[k]&&ui.catBump[k].until>now?'<span class="plus">+'+ui.catBump[k].n+'</span>':'')+stackBadges(me,k)+'<span class="lb">'+CAT_NAME[k]+'</span><span class="cnt num">'+cc[k]+'</span>'+
     (cc[k]?Array.from({length:Math.min(cc[k],7)},()=>'<span class="pl"></span>').join(''):'<span class="none"></span>')+'</div>').join('');
 
   app.innerHTML=
@@ -1305,7 +1326,7 @@ function render(){
     '<div class="tcol t-regs"><span class="tlabel">Regulars</span><div class="rtix">'+regIcons+'</div></div>'+
     '<div class="tcol t-plates"><span class="tlabel">Served plates</span><div class="stacks">'+stacks+'</div><span class="sets">Tasting sets <b class="num">'+Math.min(cc.nigiri,cc.maki,cc.sashimi)+'</b> · 4 VP each</span></div>'+
     '<div class="tcol t-me"><div class="chefs'+(my?' ready':'')+'" aria-label="'+left+(left===1?' chef':' chefs')+' left. Drag one onto a station, or tap a station.">'+Array.from({length:left},()=>'<img class="face" src="'+chefArt(me.chef)+'" alt=""'+(my?' data-drag="1" draggable="false"':'')+'>').join('')+'</div>'+
-      '<div class="myeng" data-open="seats" role="button" tabindex="0" aria-label="Your kitchen engine. Open the comparison."><span class="tlabel">Your engine</span><span class="echips">'+engineChips(me)+'</span></div></div>'+
+      '<div class="myeng" data-open="seats" role="button" tabindex="0" aria-label="Your kitchen engine. Open the comparison."><span class="tlabel">Your engine</span><span class="echips">'+engineChips(me,true)+'</span></div></div>'+
   '</div></section>'+
   (ui.welcome?welcomeHTML():'')+sheetHTML(me)+(ui.fx?serveFxHTML():overlayHTML())+
   (ui.toast?'<div class="toast" role="status">'+esc(ui.toast)+'</div>':'');
@@ -1344,6 +1365,7 @@ function saveGame(){
   if(!ui.live) return;
   try{if(S.over) localStorage.removeItem('kaiten-save'); else localStorage.setItem('kaiten-save',JSON.stringify({state:S,nBots:ui.nBots}));}catch(e){}
 }
+const RULE_TOGGLES=[['dish','Dish bonuses','Serving combos, closing bonuses and one-off wasabi printed on dishes'],['station','Station bonuses','Dishes that boost the Fish Market, Pantry or Kaiten Belt'],['start','Round-start bonuses','Dishes that pay out at the start of each round'],['chefs','Chef abilities','Sora, Hana, Ren and Ito’s special edges']];
 function welcomeHTML(){
   const cont=ui.live&&!S.over, n=S.players.length-1;
   return '<div class="welcome" role="dialog" aria-modal="true" aria-label="Kaiten"><div class="wcard" data-sk="welcome">'+
@@ -1352,10 +1374,12 @@ function welcomeHTML(){
     (cont?'<button type="button" class="gbtn wbig" data-act="continue">Continue<small>Round '+S.round+' of '+S.maxRounds+' · '+score(S.players[0]).total+' VP · '+n+' '+(n>1?'rivals':'rival')+', '+LEVEL_INFO[S.level||'normal'][0]+'</small></button>':'')+
     '<div class="wnew"><h2>'+(cont?'Or start a new game':'New game')+'</h2>'+
       '<div class="wchefs" role="group" aria-label="Choose your chef">'+CHARS.map(c=>'<button type="button" class="wchef'+(c.id===ui.char?' on':'')+'" aria-pressed="'+(c.id===ui.char)+'" data-wc="'+c.id+'"><img class="face" src="'+chefArt(c.art)+'" alt=""><span>'+c.name+'</span></button>').join('')+'</div>'+
-      '<p class="wdesc wab"><b>'+CHAR[ui.char].name+', '+CHAR[ui.char].title.toLowerCase()+'.</b> '+esc(CHAR[ui.char].text)+'</p>'+
+      '<p class="wdesc wab"><b>'+CHAR[ui.char].name+', '+CHAR[ui.char].title.toLowerCase()+'.</b> '+(ui.rules.chefs?esc(CHAR[ui.char].text):'Chef abilities are switched off.')+'</p>'+
       '<div class="wrow"><span class="wl">Rivals</span><div class="seg">'+[1,2,3].map(k=>'<button type="button" class="gbtn'+(k===ui.nBots?' on':' wood')+'" aria-pressed="'+(k===ui.nBots)+'" data-wr="'+k+'">'+k+'</button>').join('')+'</div></div>'+
       '<div class="wrow"><span class="wl">Difficulty</span><div class="seg">'+Object.keys(LEVEL_INFO).map(k=>'<button type="button" class="gbtn'+(k===ui.level?' on':' wood')+'" aria-pressed="'+(k===ui.level)+'" data-wl="'+k+'">'+LEVEL_INFO[k][0]+'</button>').join('')+'</div></div>'+
       '<p class="wdesc">'+esc(LEVEL_INFO[ui.level][1])+'</p>'+
+      '<div class="wrules"><span class="wl">Bonuses</span><div class="wtog">'+RULE_TOGGLES.map(([k,n,t])=>'<button type="button" class="tog'+(ui.rules[k]?' on':'')+'" aria-pressed="'+ui.rules[k]+'" data-rule="'+k+'" title="'+esc(t)+'"><span class="tk" aria-hidden="true">'+(ui.rules[k]?'✓':'')+'</span>'+n+'</button>').join('')+'</div></div>'+
+      (Object.values(ui.rules).some(v=>!v)?'<p class="wdesc">Newcomer rules: switched-off bonuses don’t apply and are hidden on the cards.</p>':'')+
       '<button type="button" class="gbtn wbig'+(cont?' wood':'')+'" data-start="go">'+(cont?'Start new game':'Start cooking')+'</button>'+
     '</div>'+
     '<button type="button" class="wlink" data-open="rules">How to play</button>'+
@@ -1463,7 +1487,7 @@ function dishCard(b,i,me){
 }
 // the whole game as plain text, oldest first, for pasting into a chat
 function logText(){
-  const lines=['KAITEN · '+(S.over?'final':'round '+S.round+' of '+S.maxRounds)+' · rivals: '+(S.level||'normal')+(S.catchup?' · catch-up on':'')];
+  const lines=['KAITEN · '+(S.over?'final':'round '+S.round+' of '+S.maxRounds)+' · rivals: '+(S.level||'normal')+(S.catchup?' · catch-up on':'')+(S.rules&&Object.values(S.rules).some(v=>!v)?' · off: '+RULE_TOGGLES.filter(([k])=>!S.rules[k]).map(r=>r[1].toLowerCase()).join(', '):'')];
   S.players.forEach(p=>{const c=score(p); lines.push(p.name+' ('+CHAR[p.char].name+', '+CHAR[p.char].title+'): '+c.total+' VP = plates '+c.dishes+', bonuses '+c.bonus+', sets '+c.sets+', regulars '+c.regs+', end '+c.end+(c.ev?', events '+c.ev:'')+(c.left?', leftovers '+c.left:'')+(c.unserved?', unserved orders '+c.unserved:'')+
     ' | served '+p.tableau.length+', regulars '+(p.regulars.map(r=>REG[r].name).join(', ')||'none')+', orders '+(p.orders.map(id=>DISH[id].name).join(', ')||'none')+', wasabi '+p.wasabi);});
   lines.push('');
@@ -1500,9 +1524,17 @@ const ENGINE_ROWS=[
   ['Closing','reg','Closing: VP per regular',e=>e.reg,null,n=>'+'+n,'reg'],
 ];
 const GROUP_CLS={'Each round':'g-round',Stations:'g-st',Serving:'g-vp',Closing:'g-end'};
-function engineChips(p){
+// each plate stack sums its bonuses: red = VP per later serve of that type, blue = closing VP per plate of that type
+function stackBadges(p,k){
+  const e=engineOf(p), serve=e.cook[k]||0, end=k==='special'?e.reg:(e.end[k]||0);
+  const b=[];
+  if(serve) b.push('<span class="sbadge g-vp" title="Each '+CAT_NAME[k]+' you serve scores '+serve+' extra VP">+'+serve+'</span>');
+  if(end) b.push('<span class="sbadge g-end" title="'+(k==='special'?'Closing: +'+end+' VP per regular won':'Closing: +'+end+' VP per '+CAT_NAME[k]+' served')+'">'+(k==='special'?'+'+end+'/reg':'×'+end)+'</span>');
+  return b.length?'<span class="sbadges">'+b.join('')+'</span>':'';
+}
+function engineChips(p,noCats){
   const e=engineOf(p);
-  return ENGINE_ROWS.filter(r=>r[3](e)).map(r=>{const n=r[3](e);
+  return ENGINE_ROWS.filter(r=>r[3](e)&&!(noCats&&r[6])).map(r=>{const n=r[3](e);
     return '<span class="echip '+GROUP_CLS[r[0]]+'" title="'+esc(r[0]+': '+r[2]+' '+r[5](n))+'">'+(r[4]?'<img src="'+r[4]()+'" alt="">':r[6]==='reg'?'<span class="regb"></span>':'<span class="pdot c-'+r[6]+'"></span>')+r[5](n)+'</span>';}).join('');
 }
 const engineSize=p=>{const e=engineOf(p); return ENGINE_ROWS.reduce((a,r)=>a+(r[1][0]==='c'&&r[1].length===2?r[3](e)/2:r[3](e)),0);};
@@ -1720,8 +1752,8 @@ function schedule(){
 }
 function startNew(){
   clearTimeout(ui.botT);
-  try{localStorage.setItem('kaiten-bots',String(ui.nBots)); localStorage.setItem('kaiten-level',ui.level); localStorage.setItem('kaiten-char',ui.char);}catch(e){}
-  S=newGame({nBots:ui.nBots,level:ui.level,you:ui.char}); Object.assign(ui,{vpShown:null,catShown:null,catBump:{},fx:null,welcome:false,live:true,sheet:null,sel:[],endOpen:true,menu:false,queue:[],spot:null,markId:S.logN});
+  try{localStorage.setItem('kaiten-bots',String(ui.nBots)); localStorage.setItem('kaiten-level',ui.level); localStorage.setItem('kaiten-char',ui.char); localStorage.setItem('kaiten-rules',JSON.stringify(ui.rules));}catch(e){}
+  S=newGame({nBots:ui.nBots,level:ui.level,you:ui.char,rules:ui.rules}); Object.assign(ui,{vpShown:null,catShown:null,catBump:{},fx:null,welcome:false,live:true,sheet:null,sel:[],endOpen:true,menu:false,queue:[],spot:null,markId:S.logN});
   render(); schedule();
 }
 function defaultRice(){
@@ -1817,7 +1849,7 @@ function actbarHTML(){
 
 app.addEventListener('pointerdown',audioInit);
 app.addEventListener('click',e=>{
-  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-wr],[data-wl],[data-wc],[data-dish],[data-take],[data-car],[data-logf],[data-act]');
+  const t=e.target.closest('[data-loc],[data-pick],[data-open],[data-reg],[data-rice],[data-start],[data-toggle],[data-wr],[data-wl],[data-wc],[data-rule],[data-dish],[data-take],[data-car],[data-logf],[data-act]');
   if(!t) return;
   const d=t.dataset;
   if(d.loc) return pickLoc(d.loc);
@@ -1827,6 +1859,7 @@ app.addEventListener('click',e=>{
   if(d.take!=null){if(t.disabled||S.turn!==0||!legal(S,0,'belt')) return; ui.sheet=null; return humanAct('belt',{slots:[+d.take]});}
   if(d.car){const c=app.querySelector('.car'); if(c) c.scrollBy({left:(+d.car)*c.clientWidth,behavior:'smooth'}); return;}
   if(d.wc){ui.char=d.wc; sfx('pick'); return render();}
+  if(d.rule){ui.rules[d.rule]=!ui.rules[d.rule]; sfx('pick'); return render();}
   if(d.logf){ui.logF=d.logf==='all'?null:+d.logf; return render();}
   if(d.start) return startNew();
   if(d.wr){ui.nBots=+d.wr; sfx('pick'); return render();}
@@ -1898,11 +1931,11 @@ app.addEventListener('wheel',e=>{
 },{passive:false});
 
 function start(data){
-  try{const k=+localStorage.getItem('kaiten-bots'); if(k>=1&&k<=3) ui.nBots=k; const l=localStorage.getItem('kaiten-level'); if(LEVEL_INFO[l]) ui.level=l; const c=localStorage.getItem('kaiten-char'); if(CHAR[c]) ui.char=c;}catch(e){}
+  try{const k=+localStorage.getItem('kaiten-bots'); if(k>=1&&k<=3) ui.nBots=k; const l=localStorage.getItem('kaiten-level'); if(LEVEL_INFO[l]) ui.level=l; const c=localStorage.getItem('kaiten-char'); if(CHAR[c]) ui.char=c; Object.assign(ui.rules,JSON.parse(localStorage.getItem('kaiten-rules')||'{}'));}catch(e){}
   let saved=null; try{saved=JSON.parse(localStorage.getItem('kaiten-save')||'null');}catch(e){}
   if(data&&data.state){S=data.state; Object.assign(ui,data.ui||{},{welcome:false,live:true});}
   else if(saved&&saved.state&&!saved.state.over){S=saved.state; ui.live=true;}
-  else S=newGame({nBots:ui.nBots,level:ui.level,you:ui.char});
+  else S=newGame({nBots:ui.nBots,level:ui.level,you:ui.char,rules:ui.rules});
   S.players.forEach(p=>{if(p.chef==null){p.chef=p.color; p.char=CHARS[p.color].id;}});
   ui.markId=S.logN||0;
   render(); schedule();
