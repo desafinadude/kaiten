@@ -265,8 +265,8 @@ img{display:block}
 .catdot.big{width:4.4mm;height:4.4mm}
 .regdot{display:inline-block;width:3.6mm;height:3.6mm;border-radius:50%;border:.7mm solid #ff8a6e;background:#fff}
 
-.dish .plate{position:absolute;left:50%;top:24mm;width:37mm;height:37mm;margin-left:-18.5mm;border-radius:50%;background:radial-gradient(circle,#fff 0 60%,#f2ece0 61%);box-shadow:0 0 0 1.6mm var(--cat),0 0 0 2.3mm #fff,0 1.2mm 2.4mm rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center}
-.dish .plate img{width:32mm;height:32mm;object-fit:contain}
+.dish .plate{position:absolute;left:50%;top:24mm;width:37mm;height:37mm;margin-left:-18.5mm;border-radius:50%;background:radial-gradient(circle,#fff 0 68%,#f2ece0 69%);box-shadow:0 0 0 1.6mm var(--cat),0 0 0 2.3mm #fff,0 1.2mm 2.4mm rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center}
+.dish .plate img{width:27mm;height:27mm;object-fit:contain}
 .dish .cost{position:absolute;left:0;right:0;top:64mm;display:flex;justify-content:center;gap:1mm}
 .strip{position:absolute;left:-${CARD.bleed}mm;right:-${CARD.bleed}mm;bottom:-${CARD.bleed}mm;height:${15 + CARD.bleed}mm;padding:0 ${CARD.bleed + 3}mm ${CARD.bleed}mm ${CARD.bleed}mm;display:flex;align-items:center;gap:2mm;color:#fff}
 .strip .tab{align-self:stretch;width:14mm;margin-left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--cat);padding-left:${CARD.bleed}mm;box-sizing:content-box;margin-left:-${CARD.bleed}mm}
