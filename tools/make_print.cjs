@@ -76,7 +76,7 @@ function guestFront(r){
     '<div class="hd"><span class="kind">Regular · 常連</span><span class="nm">'+esc(r.name)+'</span></div>'+
     '<div class="vp"><b>'+r.vp+'</b><small>VP</small></div>'+
     '<div class="portrait"><img src="'+A('reg-'+r.id)+'" alt=""></div>'+
-    '<div class="wants"><small>Joins the first chef who has served</small>'+reqHTML(r.req)+'</div>');
+    '<div class="wants"><small>Wants on your counter</small><div class="wlist'+(r.req.cat&&Object.keys(r.req.cat).length>2?' many':'')+'">'+reqHTML(r.req)+'</div></div>');
 }
 function guestBack(){return frame('back guestback','<div class="disc"><span class="jp">常連</span><span class="en">REGULAR</span></div>');}
 
@@ -148,7 +148,7 @@ img{display:block}
 .hd{position:absolute;left:-${CARD.bleed}mm;right:-${CARD.bleed}mm;top:-${CARD.bleed}mm;height:${20 + CARD.bleed}mm;padding:${CARD.bleed + 1.6}mm ${CARD.bleed + 16}mm 1.6mm ${CARD.bleed + 4}mm;justify-content:center;background:linear-gradient(rgba(255,255,255,.12),rgba(0,0,0,.12)),var(--cat,var(--indigo));color:#fff;display:flex;flex-direction:column;gap:.6mm}
 .hd .kind{font-size:2.3mm;font-weight:900;letter-spacing:.14em;text-transform:uppercase;opacity:.9}
 .hd .nm{font-family:var(--disp);font-size:4.6mm;line-height:1.18}
-.vp{position:absolute;right:2.5mm;top:9.5mm;width:14mm;height:14mm;border-radius:50%;background:var(--lac);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:inset 0 0 0 .7mm rgba(255,255,255,.4),0 .6mm 0 var(--lac-2);font-family:var(--disp);line-height:1}
+.vp{position:absolute;right:2.5mm;top:3mm;width:14mm;height:14mm;border-radius:50%;background:var(--lac);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:inset 0 0 0 .7mm rgba(255,255,255,.4),0 .6mm 0 var(--lac-2);font-family:var(--disp);line-height:1}
 .vp b{font-size:6mm;font-weight:400}.vp small{font-size:1.9mm;letter-spacing:.1em}
 .ing{width:7.5mm;height:7.5mm;border-radius:50%;background:#fffdf8;box-shadow:0 0 0 .35mm var(--paper-2),0 .4mm .8mm rgba(0,0,0,.15);display:inline-flex;align-items:center;justify-content:center;flex:none}
 .ing img{width:6mm;height:6mm;object-fit:contain}
@@ -173,12 +173,14 @@ img{display:block}
 
 .portrait{position:absolute;left:50%;top:23.5mm;width:36mm;height:36mm;margin-left:-18mm;border-radius:50%;overflow:hidden;box-shadow:0 0 0 1.4mm var(--pc,var(--indigo)),0 0 0 2.1mm #fff,0 1.2mm 2.4mm rgba(0,0,0,.25);background:#f6ecd8}
 .portrait img{width:100%;height:100%;object-fit:cover}
-.guest .wants{position:absolute;left:4mm;right:4mm;top:63mm;bottom:4mm;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.2mm;border-top:.3mm dashed #c9b894;padding-top:1.5mm}
-.guest .wants small{font-size:2.2mm;color:var(--ink-2);letter-spacing:.04em}
-.want{display:inline-flex;align-items:center;gap:1.2mm;font-size:3.3mm;font-weight:900}
-.want b{font-family:var(--disp);font-weight:400;font-size:3.8mm}
+.guest .wants{position:absolute;left:5mm;right:5mm;top:63mm;bottom:4.5mm;display:flex;flex-direction:column;align-items:center;gap:1.4mm;border-radius:2.4mm;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 .45mm var(--indigo);padding:1.8mm 2mm}
+.guest .wants small{font-size:2mm;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:var(--indigo)}
+.wlist{flex:1;display:flex;flex-wrap:wrap;align-content:center;justify-content:center;gap:1.2mm 3mm}
+.want{display:inline-flex;align-items:center;gap:1.2mm;font-size:3.6mm;font-weight:900}
+.want b{font-family:var(--disp);font-weight:400;font-size:4.4mm}
 .fishrow{gap:.8mm}
-.guest .wants{flex-wrap:wrap}
+.wlist.many{display:grid;grid-template-columns:auto auto;gap:.8mm 4mm;align-content:center}
+.wlist.many .want{font-size:3.1mm}.wlist.many .want b{font-size:3.6mm}.wlist.many .catdot.big{width:3.6mm;height:3.6mm}
 
 .chef .title{position:absolute;left:0;right:0;top:62.5mm;text-align:center;font-family:var(--disp);font-size:4mm;color:var(--pc)}
 .chef .ability{position:absolute;left:5mm;right:5mm;top:69mm;bottom:5mm;border-radius:2mm;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 .4mm var(--pc);padding:1.6mm 2.4mm;font-size:3mm;font-weight:700;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:.5mm}
