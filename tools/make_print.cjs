@@ -83,7 +83,16 @@ function guestBack(){return frame('back guestback','<div class="disc"><span clas
 function chefFront(c,i){
   return frame('chef','<div class="hd" style="background:'+PCOL[i]+'"><span class="kind">Chef · '+['Blue','Red','Yellow','Teal'][i]+'</span><span class="nm">'+esc(c.name)+'</span></div>'+
     '<div class="portrait" style="--pc:'+PCOL[i]+'"><img src="'+A('chef-'+c.art)+'" alt=""></div>'+
-    '<div class="title">'+esc(c.title)+'</div><div class="ability"><small>Ability</small>'+esc(c.text)+'</div>',' style="--pc:'+PCOL[i]+'"');
+    '<div class="title">'+esc(c.title)+'</div>'+chefAbility(c),' style="--pc:'+PCOL[i]+'"');
+}
+// a chef's edge as icons: where it applies (icon and name in bold), then what it gives
+function chefAbility(c){
+  const im=k=>'<img src="'+A(k)+'" alt="">';
+  const ab={market:[im('st-market'),'Fish Market','+1',im('ing-T'),'fish'],
+    door:[im('st-door'),'Front Door','+1',im('ing-W'),'wasabi'],
+    pantryw:[im('st-pantry'),'Pantry','+1',im('ing-W'),'wasabi'],
+    first:[im('st-head'),'First dish each round','+1','<b class="vpi">VP</b>','']}[c.t];
+  return '<div class="ability"><div class="abw">'+ab[0]+'<b>'+ab[1]+'</b></div><div class="abg"><span class="abn">'+ab[2]+'</span>'+ab[3]+(ab[4]?'<small>'+ab[4]+'</small>':'')+'</div></div>';
 }
 function chefBack(i){
   // the player aid: one short line per step, each with an icon
@@ -239,7 +248,15 @@ img{display:block}
 
 .chef .title{position:absolute;left:0;right:0;top:62.5mm;text-align:center;font-family:var(--disp);font-size:4mm;color:var(--pc)}
 .chef .ability{position:absolute;left:5mm;right:5mm;top:69mm;bottom:5mm;border-radius:2mm;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 .4mm var(--pc);padding:1.6mm 2.4mm;font-size:3mm;font-weight:700;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:.5mm}
-.chef .ability small{font-size:1.9mm;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2)}
+.chef .ability{align-items:center;gap:1.2mm}
+.abw{display:flex;align-items:center;gap:1.4mm}
+.abw img{width:6mm;height:6mm;object-fit:contain}
+.abw b{font-size:3mm;font-weight:900;letter-spacing:.08em;text-transform:uppercase}
+.abg{display:flex;align-items:center;gap:1mm}
+.abg img{width:6.5mm;height:6.5mm;object-fit:contain}
+.abn{font-family:var(--disp);font-size:5.2mm;color:var(--pc);line-height:1}
+.abg small{font-size:2.6mm;font-weight:900;color:var(--ink-2);margin-left:.5mm}
+.vpi{font-family:var(--disp);font-weight:400;font-size:3mm;color:#fff;background:var(--lac);border-radius:50%;width:7mm;height:7mm;display:flex;align-items:center;justify-content:center}
 
 .guest .hd{background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.1)),url(art/tex-noren.webp) 0 0/60mm,var(--indigo)}
 .event .hd{background:linear-gradient(rgba(255,255,255,.1),rgba(0,0,0,.15)),#8f1f17}
@@ -350,9 +367,13 @@ img{display:block}
 .roundline{display:flex;align-items:center;gap:3mm}
 .roundline>b{font-family:var(--disp);font-weight:400;font-size:4.4mm}
 .lanterns{display:flex;gap:2mm}
-.lan{width:13mm;height:11mm;border-radius:6.5mm/5.5mm;background:#3a4d6e;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);line-height:1}
+.lanterns{position:relative;padding-top:2.4mm;gap:3mm!important;width:max-content}
+.lanterns::before{content:"";position:absolute;left:-2mm;right:-2mm;top:.6mm;height:.4mm;background:#3a2a1c;border-radius:.2mm}
+.lan{position:relative;width:11mm;height:14mm;border-radius:5.5mm/7mm;background:radial-gradient(circle at 50% 40%,#5a6f94,#2c3d5c 75%);box-shadow:inset 0 0 0 .3mm rgba(255,255,255,.15);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);line-height:1}
 .lan b{font-size:4.6mm;font-weight:400}.lan small{font-family:"Zen Kaku Gothic New";font-size:1.9mm;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
-.lan.ev{background:#ff6a3d}
+.lan::before,.lan::after{content:"";position:absolute;left:2.2mm;right:2.2mm;height:1.2mm;background:#1b140e;border-radius:.4mm}
+.lan::before{top:-.6mm}.lan::after{bottom:-.6mm}
+.lan.ev{background:radial-gradient(circle at 50% 40%,#ffd27a,#ff6a3d 55%,#c2342a);box-shadow:0 0 3mm 1mm rgba(255,120,60,.55)}
 .foot .rules{flex:1;display:flex;flex-direction:column;gap:1mm;align-items:flex-end;text-align:right}
 .board>.foot{display:flex;align-items:center;gap:8mm;font-size:3mm;color:var(--ink);background:rgba(252,247,236,.75);border-radius:2mm;padding:2mm 4mm}
 
