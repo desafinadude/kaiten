@@ -236,6 +236,29 @@ function stationBack(){return frame('back stnback','<div class="disc"><span clas
 const travelFronts=()=>[iceCard(),...LOCS.map(stationCard),roundsCard()];
 
 // both boards on one A3 sheet, with a cut line between them
+// print-ready boards: each board on its own A3 page, art carried 3 mm past the trim, crop marks outside the bleed
+function boardPrint(){
+  const b=board(), B=3;
+  const page=(html,cls,w,h)=>{
+    const L=(420-w)/2, T=(297-h)/2; let m='';
+    [L,L+w].forEach(x=>{m+='<div class="cut" style="left:'+x+'mm;top:'+(T-B-7)+'mm;width:.2mm;height:6mm"></div><div class="cut" style="left:'+x+'mm;top:'+(T+h+B+1)+'mm;width:.2mm;height:6mm"></div>';});
+    [T,T+h].forEach(y=>{m+='<div class="cut" style="top:'+y+'mm;left:'+(L-B-7)+'mm;height:.2mm;width:6mm"></div><div class="cut" style="top:'+y+'mm;left:'+(L+w+B+1)+'mm;height:.2mm;width:6mm"></div>';});
+    return '<div class="boardpage a3"><div class="bbleed '+cls+'" style="left:'+(L-B)+'mm;top:'+(T-B)+'mm;width:'+(w+2*B)+'mm;height:'+(h+2*B)+'mm"><div class="btrim" style="width:'+w+'mm;height:'+h+'mm">'+html+'</div></div>'+m+
+      '<div class="label">Kaiten · '+(cls==='belt'?'belt board':'kitchen board')+' · '+w+' × '+h+' mm · 3 mm bleed · cut on the crop marks</div></div>';};
+  return page(b.belt,'belt',400,116)+page(b.kitchen,'kitchen',400,168);
+}
+// the same boards for an A4 printer: each board cut into a left and right half, one per A4 landscape page,
+// every half with full bleed and crop marks (the bleed on the join side carries on into the other half)
+function boardHalves(){
+  const b=board(), B=3, W=200;
+  const page=(html,cls,h,half,name)=>{
+    const L=(297-W)/2, T=(210-h)/2; let m='';
+    [L,L+W].forEach(x=>{m+='<div class="cut" style="left:'+x+'mm;top:'+(T-B-7)+'mm;width:.2mm;height:6mm"></div><div class="cut" style="left:'+x+'mm;top:'+(T+h+B+1)+'mm;width:.2mm;height:6mm"></div>';});
+    [T,T+h].forEach(y=>{m+='<div class="cut" style="top:'+y+'mm;left:'+(L-B-7)+'mm;height:.2mm;width:6mm"></div><div class="cut" style="top:'+y+'mm;left:'+(L+W+B+1)+'mm;height:.2mm;width:6mm"></div>';});
+    return '<div class="boardpage a4l"><div class="bbleed '+cls+'" style="left:'+(L-B)+'mm;top:'+(T-B)+'mm;width:'+(W+2*B)+'mm;height:'+(h+2*B)+'mm"><div class="btrim" style="left:'+(B-W*half)+'mm;width:400mm;height:'+h+'mm">'+html+'</div></div>'+m+
+      '<div class="label">Kaiten · '+name+' · '+(half?'right':'left')+' half · cut on the crop marks, then butt the two halves together and tape the back</div></div>';};
+  return page(b.belt,'belt',116,0,'belt board')+page(b.belt,'belt',116,1,'belt board')+page(b.kitchen,'kitchen',168,0,'kitchen board')+page(b.kitchen,'kitchen',168,1,'kitchen board');
+}
 const boardSheet=()=>{const b=board(); return '<div class="boardpage"><div class="bwrap belt">'+b.belt+'</div><div class="bwrap kitchen">'+b.kitchen+'</div></div>';};
 `;
 
@@ -380,6 +403,12 @@ img{display:block}
 .bwrap{position:absolute;left:10mm;width:400mm;overflow:hidden;outline:.25mm dashed #999;outline-offset:1.5mm}
 .bwrap.belt{top:4mm;height:116mm}
 .bwrap.kitchen{top:125mm;height:168mm}
+.boardpage.a4l{width:297mm;height:210mm;page-break-after:always;break-after:page}
+.boardpage.a3{page-break-after:always;break-after:page}
+.bbleed{position:absolute;overflow:hidden}
+.bbleed.belt{background:linear-gradient(rgba(255,255,255,.06),rgba(0,0,0,.08)),url(art/tex-belt.webp) 0 0/60mm 100%,#8d989b}
+.bbleed.kitchen{background:url(art/tex-ash.webp) 0 0/300mm auto,#e6cd9f}
+.btrim{position:absolute;left:3mm;top:3mm}
 .board{position:absolute;inset:0;padding:6mm 7mm 5mm;background:url(art/tex-ash.webp) 0 0/300mm auto,#e6cd9f;display:flex;flex-direction:column;gap:4mm}
 .brand{display:flex;flex-direction:column;align-items:flex-start;color:var(--indigo);flex:none}
 .brand .jp{font-family:var(--disp);font-size:8mm;line-height:1}.brand .en{font-family:var(--disp);font-size:3.4mm;letter-spacing:.5em;margin-right:-.5em;color:var(--lac)}
@@ -513,13 +542,15 @@ async function ready(page) {
 
   /* 3. board: A3 landscape, plus the same board split over two A4 portrait pages */
   {
+    const pp = await open(`()=>boardPrint()`, { width: 1588, height: 1123 });
+    await pp.pdf({ path: path.join(OUT, 'kaiten-board-A3.pdf'), width: '420mm', height: '297mm', printBackground: true });
+    await pp.close();
     const page = await open(`()=>boardSheet()`, { width: 1588, height: 1123 });
-    await page.pdf({ path: path.join(OUT, 'kaiten-board-A3.pdf'), width: '420mm', height: '297mm', printBackground: true });
     await page.screenshot({ path: path.join(OUT, 'contact-board.jpg'), type: 'jpeg', quality: 82, clip: { x: 0, y: 0, width: 1588, height: 1123 }, scale: 'css' });
     for (const k of ['belt', 'kitchen']) await (await page.$('.bwrap.' + k)).screenshot({ path: path.join(OUT, 'contact-board-' + k + '.jpg'), type: 'jpeg', quality: 84 });
     await page.close();
-    const tiles = await open(`()=>[0,1].map(i=>'<div class="sheet"><div style="position:absolute;left:'+(-210*i)+'mm;top:0">'+boardSheet()+'</div><div class="label" style="color:#fff;mix-blend-mode:difference">Board '+(i+1)+'/2 · '+(i?'right':'left')+' half</div></div>').join('')`, { width: 794, height: 1123 });
-    await tiles.pdf({ path: path.join(OUT, 'kaiten-board-2xA4.pdf'), width: '210mm', height: '297mm', printBackground: true });
+    const tiles = await open(`()=>boardHalves()`, { width: 1123, height: 794 });
+    await tiles.pdf({ path: path.join(OUT, 'kaiten-board-4xA4.pdf'), width: '297mm', height: '210mm', printBackground: true });
     await tiles.close();
   }
 
