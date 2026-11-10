@@ -121,13 +121,15 @@ function board(){
   // the round track is a single line under the stations
   const rounds='<div class="roundline"><b>Rounds</b><div class="lanterns">'+
     Array.from({length:ROUNDS},(_,i)=>'<span class="lan'+(EVENT_ROUNDS.includes(i+1)?' ev':'')+'"><b>'+(i+1)+'</b>'+(EVENT_ROUNDS.includes(i+1)?'<small>event</small>':'')+'</span>').join('')+'</div></div>';
-  return '<div class="board"><div class="brand"><span class="jp">回転寿司</span><span class="en">KAITEN</span></div>'+
-    '<div class="beltband"><div class="dir">The belt turns this way at the end of each round →</div><div class="slots">'+[0,1,2,3,4].map(slot).join('')+'</div></div>'+
-    '<div class="mid"><div class="stations"><div class="station ice"><div class="sh"><b>Fish on the ice</b><span class="skj">氷</span></div><p>Lay 5 fish here. Refill to 5 from the fish bag after each visit.</p></div>'+
+  const belt='<div class="beltboard"><div class="dir">The belt turns this way at the end of each round →</div><div class="slots">'+[0,1,2,3,4].map(slot).join('')+'</div></div>';
+  const kitchen='<div class="board"><div class="mid"><div class="stations"><div class="station ice"><div class="sh"><b>Fish on the ice</b><span class="skj">氷</span></div><p>Lay 5 fish here. Refill to 5 from the fish bag after each visit.</p></div>'+
     LOCS.map(st).join('')+'</div></div>'+
-    '<div class="foot">'+rounds+'<div class="rules"><span><b>Closing:</b> plates · 4 VP per Nigiri + Maki + Sashimi set · regulars · closing bonuses · 1 VP per 3 leftover ingredients · −1 VP per unserved order</span>'+
+    '<div class="foot"><div class="brand"><span class="jp">回転寿司</span><span class="en">KAITEN</span></div>'+rounds+'<div class="rules"><span><b>Closing:</b> plates · 4 VP per Nigiri + Maki + Sashimi set · regulars · closing bonuses · 1 VP per 3 leftover ingredients · −1 VP per unserved order</span>'+
     '<span><b>Catch-up:</b> 6+ VP behind → +1 wasabi · 15+ → +2</span></div></div></div>';
+  return {belt,kitchen};
 }
+// both boards on one A3 sheet, with a cut line between them
+const boardSheet=()=>{const b=board(); return '<div class="boardpage"><div class="bwrap belt">'+b.belt+'</div><div class="bwrap kitchen">'+b.kitchen+'</div></div>';};
 `;
 
 const CSS = String.raw`
@@ -229,10 +231,15 @@ img{display:block}
 
 /* ---------- board (A3 landscape) ---------- */
 .boardpage{width:420mm;height:297mm;position:relative;overflow:hidden}
-.board{position:absolute;inset:0;padding:7mm 8mm 6mm;background:url(art/tex-ash.webp) 0 0/300mm auto,#e6cd9f;display:flex;flex-direction:column;gap:4mm}
-.brand{position:absolute;right:9mm;top:6mm;display:flex;flex-direction:column;align-items:flex-end;color:var(--indigo)}
-.brand .jp{font-family:var(--disp);font-size:10mm;line-height:1}.brand .en{font-family:var(--disp);font-size:3.4mm;letter-spacing:.5em;margin-right:-.5em;color:var(--lac)}
-.beltband{border-radius:6mm;padding:3mm 5mm 4mm;background:url(art/tex-belt.webp) 0 0/60mm 100%,#8d989b;box-shadow:inset 0 2.4mm 0 #b9c2c4,inset 0 -2.4mm 0 #4d5658,0 2mm 4mm rgba(0,0,0,.35);width:${5 * (CARD.w + 3) + 4 * 5 + 10}mm}
+.bwrap{position:absolute;left:10mm;width:400mm;overflow:hidden;outline:.25mm dashed #999;outline-offset:1.5mm}
+.bwrap.belt{top:4mm;height:116mm}
+.bwrap.kitchen{top:125mm;height:168mm}
+.board{position:absolute;inset:0;padding:6mm 7mm 5mm;background:url(art/tex-ash.webp) 0 0/300mm auto,#e6cd9f;display:flex;flex-direction:column;gap:4mm}
+.brand{display:flex;flex-direction:column;align-items:flex-start;color:var(--indigo);flex:none}
+.brand .jp{font-family:var(--disp);font-size:8mm;line-height:1}.brand .en{font-family:var(--disp);font-size:3.4mm;letter-spacing:.5em;margin-right:-.5em;color:var(--lac)}
+.beltboard{position:absolute;inset:0;padding:6mm 0 0;background:linear-gradient(rgba(255,255,255,.06),rgba(0,0,0,.08)),url(art/tex-belt.webp) 0 0/60mm 100%,#8d989b;display:flex;flex-direction:column;align-items:center}
+.beltboard .dir{align-self:stretch;padding-left:${(400 - 5 * (CARD.w + 3) - 4 * 6) / 2}mm}
+.beltboard .slots{gap:6mm}
 .dir{color:#fff;font-weight:900;font-size:3.2mm;letter-spacing:.06em;margin:0 0 2mm 1mm;text-shadow:0 .4mm 0 rgba(0,0,0,.4)}
 .slots{display:flex;gap:5mm}
 .bslot{position:relative;width:${CARD.w + 3}mm;height:${CARD.h + 3}mm;border-radius:3mm;border:.8mm dashed rgba(255,255,255,.75);background:rgba(255,255,255,.12)}
@@ -355,11 +362,12 @@ async function ready(page) {
 
   /* 3. board: A3 landscape, plus the same board split over two A4 portrait pages */
   {
-    const page = await open(`()=>'<div class="boardpage">'+board()+'</div>'`, { width: 1588, height: 1123 });
+    const page = await open(`()=>boardSheet()`, { width: 1588, height: 1123 });
     await page.pdf({ path: path.join(OUT, 'kaiten-board-A3.pdf'), width: '420mm', height: '297mm', printBackground: true });
     await page.screenshot({ path: path.join(OUT, 'contact-board.jpg'), type: 'jpeg', quality: 82, clip: { x: 0, y: 0, width: 1588, height: 1123 }, scale: 'css' });
+    for (const k of ['belt', 'kitchen']) await (await page.$('.bwrap.' + k)).screenshot({ path: path.join(OUT, 'contact-board-' + k + '.jpg'), type: 'jpeg', quality: 84 });
     await page.close();
-    const tiles = await open(`()=>[0,1].map(i=>'<div class="sheet"><div style="position:absolute;left:'+(-210*i)+'mm;top:0"><div class="boardpage">'+board()+'</div></div><div class="label" style="color:#fff;mix-blend-mode:difference">Board '+(i+1)+'/2 · '+(i?'right':'left')+' half</div></div>').join('')`, { width: 794, height: 1123 });
+    const tiles = await open(`()=>[0,1].map(i=>'<div class="sheet"><div style="position:absolute;left:'+(-210*i)+'mm;top:0">'+boardSheet()+'</div><div class="label" style="color:#fff;mix-blend-mode:difference">Board '+(i+1)+'/2 · '+(i?'right':'left')+' half</div></div>').join('')`, { width: 794, height: 1123 });
     await tiles.pdf({ path: path.join(OUT, 'kaiten-board-2xA4.pdf'), width: '210mm', height: '297mm', printBackground: true });
     await tiles.close();
   }
