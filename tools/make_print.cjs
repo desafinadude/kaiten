@@ -225,8 +225,7 @@ function stationCard(L){
 }
 function iceCard(){
   return frame('stn icec','<div class="hd"><span class="kind">Supply · 氷</span>'+nmHTML('Fish on the ice')+'</div>'+
-    '<div class="stxt">Lay 5 fish beside this card. Refill to 5 from the bag after each visit to the Fish Market.</div>'+
-    '<div class="fishrow">'+['T','S','U','E','T'].map(k=>'<img src="'+A('ing-'+k)+'" alt="">').join('')+'</div>');
+    '<div class="stxt">Keep 5 fish tokens on the ice. Refill to 5 from the bag after each visit to the Fish Market.</div>');
 }
 function roundsCard(){
   const lan=i=>'<span class="lan'+(EVENT_ROUNDS.includes(i)?' ev':'')+'"><b>'+i+'</b>'+(EVENT_ROUNDS.includes(i)?'<small>event</small>':'')+'</span>';
@@ -439,8 +438,6 @@ img{display:block}
 .snote{position:absolute;left:4mm;right:4mm;bottom:3.5mm;text-align:center;font-size:2.4mm;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--wood-dk)}
 .icec{background:linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),url(art/tex-ice-cover.webp) center/cover}
 .icec .hd{--cat:#4f6f7a}.icec .stxt{color:#2c3c42}
-.fishrow{position:absolute;left:3mm;right:3mm;bottom:12mm;display:flex;flex-wrap:wrap;justify-content:center;gap:1mm}
-.fishrow img{width:17mm;height:17mm;object-fit:contain;filter:drop-shadow(0 .6mm .6mm rgba(0,0,0,.25))}
 .roundc .hd{--cat:var(--lac-2)}
 .lrow{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:1.6mm}
 .lrow:nth-of-type(2){top:23mm}.lrow:nth-of-type(3){top:41mm}
