@@ -195,6 +195,39 @@ Grid **2 × 1**, 2048 × 1024.
 
 ---
 
+## Sheet 9: Event scenes
+
+These are one image per event, not a contact sheet. They print as the top panel of each event card,
+69 × 41 mm with bleed, so each picture needs the full resolution of a wide frame. To keep the seven
+consistent, make them all in **one ChatGPT chat**: paste the style brief, then the shared frame
+below, then one scene per message.
+
+> **Shared frame.** Using the style brief, make ONE wide illustration, 1792 × 1024, filling the
+> whole frame edge to edge with no border, background colour or gutter. It is the top panel of an
+> event card for the same little sushi bar, seen at night from the street. Every scene has the same
+> composition: a large oval red-orange paper chōchin lantern with ribbed paper and a black lacquered
+> cap and base hangs in the centre. Its top sits at about 25% of the frame height, and it is about
+> 55% of the frame height tall. The front of the big lantern is completely blank, plain paper, with
+> no writing, so a kanji can be printed on it later. A string of six smaller paper lanterns sags in
+> a gentle curve across the top. The shop's roofline and noren curtain sit soft and out of focus
+> behind. The night sky is deep indigo (#21385B to #142640). Leave the outer 5% on every side as
+> continuous background, because it is trimmed when the card is cut. No text, letters, kanji,
+> numbers or logos anywhere. Keep the same lantern shape, camera and painting style in every scene;
+> only the mood and the small story details change.
+
+| Event | Scene (send after the shared frame) | Save as |
+| --- | --- | --- |
+| Health Inspection | Cool, slightly stern night with a blue-grey haze. A clipboard and a white inspector's cap rest on the ledge below the lantern, and a beam of torchlight sweeps across the noren. The lantern glows a calmer, paler amber. | `art/ev-inspect.webp` |
+| Food Blogger | Lively night. A phone on a little tripod, its screen glowing, points up at the lantern from the lower left. Camera-flash sparkles and soft bokeh dots float in the air. | `art/ev-blogger.webp` |
+| Tuna Auction | Pre-dawn blue turning pink at the bottom edge. A whole frosted tuna lies on a wooden pallet under the lantern beside a paper ticket tag and a chalked slate. Wisps of cold mist rise. | `art/ev-auction.webp` |
+| Rice Shortage | Quiet, sparse night. An empty, tipped-over straw rice sack and a wooden rice scoop lie under the lantern, with a few lonely grains on the ground. The small lantern string has two lanterns unlit. | `art/ev-shortage.webp` |
+| Summer Matsuri | Festive night. Fireworks bloom in the sky behind, the lantern string is extra bright and doubled, and a paper fan and a pinwheel peek in from the bottom corners. Warm, joyful glow. | `art/ev-matsuri.webp` |
+| Celebrity Chef | Glamorous night. Warm spotlight beams cross behind the lantern, and a crisp tall white toque hangs from a hook beside it. Gold sparkles drift in the air, as if someone famous just arrived. | `art/ev-celebrity.webp` |
+| Power Cut | The lantern and the string are dark and unlit, just paper in deep blue shadow. The only light is a single candle in a small holder on the ledge below, casting a warm pool and long shadows. The sky has a few stars. | `art/ev-powercut.webp` |
+
+When the files are in `art/`, the event cards use them as the panel behind the kanji in place of the
+drawn night scene.
+
 ## After slicing
 
 `tools/slice_sheets.py` writes every file above. To switch the game over from the SVG placeholders,
