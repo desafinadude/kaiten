@@ -114,9 +114,24 @@ function chefBack(i){
     row('<span class="minus">−1</span>','Unserved','each order still held','−1 VP'));
 }
 
+// what each event does, as icon rows (icon, text, value)
+function eventFx(id){
+  const im=k=>'<img src="'+A(k)+'" alt="">', W='<img class="wi" src="'+A('ing-W')+'" alt="wasabi">';
+  return ({
+    inspect:[[im('ing-T'),'More than 4 fish: throw out the extra',''],[im('ing-S'),'4 fish or fewer','+1 VP']],
+    blogger:[[im('st-head'),'Every dish served this round','+1 VP']],
+    auction:[[im('st-market'),'Fish Market takes','+1 fish']],
+    shortage:[[im('st-pantry'),'Pantry gives','−1 staple']],
+    matsuri:[[im('ing-W'),'Every chef gains','+1'+W]],
+    celebrity:[['<span class="catdot big c-special"></span>','First chef to serve a Special','+3 VP']],
+    powercut:[[im('st-belt'),'Only 1 chef at the Kaiten Belt; its wasabi stays',''],[im('st-belt'),'The belt does not turn at round end','']],
+  })[id]||[];
+}
 function eventFront(e){
-  return frame('event','<div class="hd"><span class="kind">Event · rounds 2, 4, 6</span><span class="nm">'+esc(e.name)+'</span></div>'+
-    '<div class="kj">'+e.kj+'</div><div class="etext">'+esc(e.text)+'</div><div class="foot">Lasts this round</div>');
+  const lights=Array.from({length:6},(_,k)=>'<span class="lt" style="--k:'+k+'"></span>').join('');
+  return frame('event','<div class="hd"><span class="kind">Event · 出来事</span><span class="nm">'+esc(e.name)+'</span></div>'+
+    '<div class="night"><div class="string">'+lights+'</div><div class="biglan"><span>'+e.kj+'</span></div></div>'+
+    '<div class="fx"><small>This round</small>'+eventFx(e.id).map(([i,t,v])=>'<div class="arow"><span class="ai">'+i+'</span><span class="at">'+t+'</span>'+(v?'<span class="av">'+v+'</span>':'')+'</div>').join('')+'</div>');
 }
 function eventBack(){return frame('back eventback','<div class="disc"><span class="jp">出来事</span><span class="en">EVENT</span></div>');}
 
@@ -260,9 +275,17 @@ img{display:block}
 
 .guest .hd{background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.1)),url(art/tex-noren.webp) 0 0/60mm,var(--indigo)}
 .event .hd{background:linear-gradient(rgba(255,255,255,.1),rgba(0,0,0,.15)),#8f1f17}
-.event .kj{position:absolute;left:50%;top:25.5mm;width:28mm;height:28mm;margin-left:-14mm;border-radius:50%;background:#ff6a3d;color:#fff;font-family:var(--disp);font-size:13mm;display:flex;align-items:center;justify-content:center;box-shadow:0 0 0 1.4mm #fff,0 0 4mm 1mm rgba(255,120,60,.6)}
-.event .etext{position:absolute;left:5mm;right:5mm;top:58mm;font-size:3mm;line-height:1.35;text-align:center;font-weight:500}
-.event .foot{position:absolute;left:0;right:0;bottom:3mm;text-align:center;font-size:2.2mm;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);font-weight:900}
+.event .night{position:absolute;left:-${CARD.bleed}mm;right:-${CARD.bleed}mm;top:17mm;height:41mm;background:radial-gradient(120% 90% at 50% 100%,#3a4d6e,#142640 70%);overflow:hidden}
+.event .string{position:absolute;left:0;right:0;top:3mm;height:8mm}
+.event .string::before{content:"";position:absolute;left:-2mm;right:-2mm;top:0;height:7mm;border-bottom:.35mm solid #0b0f18;border-radius:0 0 50% 50%}
+.event .lt{position:absolute;top:calc(4.6mm + (var(--k) - 2.5) * (var(--k) - 2.5) * -.38mm);left:calc(6mm + var(--k) * 11.6mm);width:3.6mm;height:4.6mm;border-radius:1.8mm/2.3mm;background:radial-gradient(circle at 50% 40%,#ffe2a0,#ff8a3d 70%);box-shadow:0 0 2mm .6mm rgba(255,150,70,.6)}
+.event .biglan{position:absolute;left:50%;top:9mm;width:24mm;height:29mm;margin-left:-12mm;border-radius:12mm/14.5mm;background:radial-gradient(circle at 50% 42%,#ffe2a0,#ff6a3d 55%,#c2342a);box-shadow:0 0 6mm 2mm rgba(255,120,60,.55);display:flex;align-items:center;justify-content:center}
+.event .biglan::before,.event .biglan::after{content:"";position:absolute;left:5mm;right:5mm;height:2.4mm;background:#1b140e;border-radius:.6mm}
+.event .biglan::before{top:-1.2mm}.event .biglan::after{bottom:-1.2mm}
+.event .biglan span{font-family:var(--disp);color:#fff;font-size:8.6mm;line-height:1;writing-mode:vertical-rl;text-shadow:0 .4mm 0 rgba(143,31,23,.6)}
+.event .fx{position:absolute;left:5mm;right:5mm;top:61mm;bottom:4.5mm;border-radius:2.4mm;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 .45mm #8f1f17;padding:1.8mm 2.4mm;display:flex;flex-direction:column;justify-content:center;gap:1mm}
+.event .fx small{text-align:center;font-size:2mm;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#8f1f17}
+.event .fx .arow{font-size:2.7mm}.event .fx .av{font-size:3.2mm;color:#8f1f17}
 
 .back .disc{position:absolute;left:50%;top:50%;width:40mm;height:40mm;margin:-20mm 0 0 -20mm;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1mm;color:#fff}
 .back .jp{font-family:var(--disp);font-size:7mm;line-height:1}.back .en{font-family:var(--disp);font-size:2.8mm;letter-spacing:.4em;margin-right:-.4em;color:#ffd27a}
@@ -368,7 +391,6 @@ img{display:block}
 .roundline>b{font-family:var(--disp);font-weight:400;font-size:4.4mm}
 .lanterns{display:flex;gap:2mm}
 .lanterns{position:relative;padding-top:2.4mm;gap:3mm!important;width:max-content}
-.lanterns::before{content:"";position:absolute;left:-2mm;right:-2mm;top:.6mm;height:.4mm;background:#3a2a1c;border-radius:.2mm}
 .lan{position:relative;width:11mm;height:14mm;border-radius:5.5mm/7mm;background:radial-gradient(circle at 50% 40%,#5a6f94,#2c3d5c 75%);box-shadow:inset 0 0 0 .3mm rgba(255,255,255,.15);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);line-height:1}
 .lan b{font-size:4.6mm;font-weight:400}.lan small{font-family:"Zen Kaku Gothic New";font-size:1.9mm;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
 .lan::before,.lan::after{content:"";position:absolute;left:2.2mm;right:2.2mm;height:1.2mm;background:#1b140e;border-radius:.4mm}
