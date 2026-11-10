@@ -214,6 +214,29 @@ function tokenSheets(){
   return out;
 }
 
+// travel kitchen: the board as 9 cards (fish on the ice, the 7 stations, the round track) for a small table
+function stationCard(L){
+  const c2=L.cap(2), c4=L.cap(4);
+  const cap=c4>20?'<b>∞</b><small>chefs</small>':'<b>'+c2+'</b><small>'+(c2===1?'chef':'chefs')+'</small>';
+  return frame('stn','<div class="hd"><span class="kind">Station · '+L.kj+'</span>'+nmHTML(L.name)+'</div>'+
+    '<div class="vp capb">'+cap+'</div>'+
+    '<div class="stxt">'+esc(L.text)+'</div><img class="sart" src="'+A('st-'+L.id)+'" alt="">'+
+    (c4!==c2&&c4<20?'<div class="snote">'+c4+' chefs with 4 players</div>':''));
+}
+function iceCard(){
+  return frame('stn icec','<div class="hd"><span class="kind">Supply · 氷</span>'+nmHTML('Fish on the ice')+'</div>'+
+    '<div class="stxt">Lay 5 fish beside this card. Refill to 5 from the bag after each visit to the Fish Market.</div>'+
+    '<div class="fishrow">'+['T','S','U','E','T'].map(k=>'<img src="'+A('ing-'+k)+'" alt="">').join('')+'</div>');
+}
+function roundsCard(){
+  const lan=i=>'<span class="lan'+(EVENT_ROUNDS.includes(i)?' ev':'')+'"><b>'+i+'</b>'+(EVENT_ROUNDS.includes(i)?'<small>event</small>':'')+'</span>';
+  return frame('stn roundc','<div class="hd"><span class="kind">Track · 回</span>'+nmHTML('Rounds')+'</div>'+
+    '<div class="lrow">'+[1,2,3,4].map(lan).join('')+'</div><div class="lrow">'+[5,6,7].map(lan).join('')+'</div>'+
+    '<div class="beltnote"><b>The belt</b>Deal 5 dishes in a row beside this card, newest on the left. Put the last-lap token on the right-hand dish.</div>');
+}
+function stationBack(){return frame('back stnback','<div class="disc"><span class="jp">厨房</span><span class="en">KITCHEN</span></div>');}
+const travelFronts=()=>[iceCard(),...LOCS.map(stationCard),roundsCard()];
+
 // both boards on one A3 sheet, with a cut line between them
 const boardSheet=()=>{const b=board(); return '<div class="boardpage"><div class="bwrap belt">'+b.belt+'</div><div class="bwrap kitchen">'+b.kitchen+'</div></div>';};
 `;
@@ -406,6 +429,27 @@ img{display:block}
 .foot .rules{flex:1;display:flex;flex-direction:column;gap:1mm;align-items:flex-end;text-align:right}
 .board>.foot{display:flex;align-items:center;gap:8mm;font-size:3mm;color:var(--ink);background:rgba(252,247,236,.75);border-radius:2mm;padding:2mm 4mm}
 
+/* ---------- travel kitchen cards ---------- */
+.stn{background:linear-gradient(rgba(255,246,224,.45),rgba(255,246,224,.3)),url(art/tex-table.webp) 0 0/90mm,#f0dbb0}
+.stn .hd{--cat:var(--wood-dk)}
+.stn .capb{background:#fcf7ec;color:var(--wood-dk);box-shadow:inset 0 0 0 .7mm var(--wood-dk),0 .6mm 0 rgba(60,35,10,.35);transform:none}
+.stn .capb b{font-size:6.6mm}
+.stxt{position:absolute;left:4mm;right:4mm;top:22mm;font-size:3.4mm;line-height:1.3;font-weight:500;color:var(--ink-2);text-align:center}
+.sart{position:absolute;left:50%;bottom:9mm;width:44mm;height:44mm;margin-left:-22mm;object-fit:contain;filter:drop-shadow(0 1mm 1mm rgba(60,35,10,.3))}
+.snote{position:absolute;left:4mm;right:4mm;bottom:3.5mm;text-align:center;font-size:2.4mm;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--wood-dk)}
+.icec{background:linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),url(art/tex-ice-cover.webp) center/cover}
+.icec .hd{--cat:#4f6f7a}.icec .stxt{color:#2c3c42}
+.fishrow{position:absolute;left:3mm;right:3mm;bottom:12mm;display:flex;flex-wrap:wrap;justify-content:center;gap:1mm}
+.fishrow img{width:17mm;height:17mm;object-fit:contain;filter:drop-shadow(0 .6mm .6mm rgba(0,0,0,.25))}
+.roundc .hd{--cat:var(--lac-2)}
+.lrow{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:1.6mm}
+.lrow:nth-of-type(2){top:23mm}.lrow:nth-of-type(3){top:41mm}
+.roundc .lan{width:12.5mm;height:16.5mm}
+.beltnote{position:absolute;left:4mm;right:4mm;bottom:4mm;border-radius:2.4mm;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 .45mm var(--wood-dk);padding:2mm 2.6mm;font-size:2.8mm;line-height:1.3;color:var(--ink-2);font-weight:500}
+.beltnote b{display:block;font-size:2.2mm;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--wood-dk);margin-bottom:.6mm}
+.stnback{background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.15)),url(art/tex-table.webp) 0 0/90mm,#7a532b}
+.stnback .disc{box-shadow:inset 0 0 0 .8mm #ffd27a;background:rgba(43,31,20,.55)}
+
 /* ---------- contact sheets (overview images) ---------- */
 .contact{display:flex;flex-wrap:wrap;gap:4mm;padding:6mm;background:#2a221b;width:max-content}
 .contact.wide{max-width:${8 * (CARD.w + 2 * CARD.bleed + 4) + 12}mm}
@@ -455,6 +499,7 @@ async function ready(page) {
       ['regulars', 'Regular cards', 'REGULARS.map(guestFront)', 'REGULARS.map(()=>guestBack())'],
       ['events', 'Event cards', 'EVENTS.map(eventFront)', 'EVENTS.map(()=>eventBack())'],
       ['chefs', 'Chef cards', 'CHARS.map(chefFront)', 'CHARS.map((c,i)=>chefBack(i))'],
+      ['kitchen', 'Travel kitchen', 'travelFronts()', 'travelFronts().map(()=>stationBack())'],
     ];
     const pdf = async (builder, file) => {
       const page = await open(builder, { width: 794, height: 1123 });
@@ -490,6 +535,7 @@ async function ready(page) {
       'contact-dishes': `()=>'<div class="contact wide">'+DISHES.map(dishFront).join('')+'</div>'`,
       'contact-chefs-guests-events': `()=>'<div class="contact wide">'+CHARS.map(chefFront).join('')+REGULARS.map(guestFront).join('')+EVENTS.map(eventFront).join('')+'</div>'`,
       'contact-backs': `()=>'<div class="contact">'+dishBack()+guestBack()+eventBack()+CHARS.map((c,i)=>chefBack(i)).join('')+'</div>'`,
+      'contact-travel': `()=>'<div class="contact wide" style="max-width:${5 * (CARD.w + 2 * CARD.bleed + 4) + 12}mm">'+travelFronts().join('')+stationBack()+'</div>'`,
       'contact-tokens': `()=>'<div class="contact" style="max-width:220mm;gap:3mm">'+FISH.concat(['R','N','W']).map(ingTok).join('')+[1,3,5,10].map(vpTok).join('')+CHARS.map(chefTok).join('')+['W','F','R','N'].map(plusTok).join('')+lastTok()+'<div class="tok firstt"><b>先</b><small>FIRST</small></div><div class="tok roundt"><b>回</b><small>ROUND</small></div></div>'`,
     };
     for (const [name, b] of Object.entries(sheets)) {
