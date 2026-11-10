@@ -48,12 +48,14 @@ function bonusOf(d){
   }
 }
 
+// card titles: long names step down a size so two lines sit comfortably in the header
+const nmHTML=t=>'<span class="nm'+(t.length>13?' long':'')+'">'+esc(t)+'</span>';
 function frame(cls,inner,extra){return '<div class="card '+cls+'"'+(extra||'')+'><div class="trim">'+inner+'</div></div>';}
 
 function dishFront(d){
   const b=bonusOf(d);
   return frame('dish c-'+d.cat,
-    '<div class="hd"><span class="kind">'+CAT_NAME[d.cat]+'</span><span class="nm">'+esc(d.name)+'</span></div>'+
+    '<div class="hd"><span class="kind">'+CAT_NAME[d.cat]+'</span>'+nmHTML(d.name)+'</div>'+
     '<div class="vp"><b>'+d.vp+'</b><small>VP</small></div>'+
     '<div class="plate"><img src="'+dishArtOf(d.id)+'" alt=""></div>'+
     '<div class="cost">'+[...d.cost].map(k=>ing(k)).join('')+'</div>'+
@@ -73,7 +75,7 @@ function reqHTML(q){
 }
 function guestFront(r){
   return frame('guest',
-    '<div class="hd"><span class="kind">Regular · 常連</span><span class="nm">'+esc(r.name)+'</span></div>'+
+    '<div class="hd"><span class="kind">Regular · 常連</span>'+nmHTML(r.name)+'</div>'+
     '<div class="vp"><b>'+r.vp+'</b><small>VP</small></div>'+
     '<div class="portrait"><img src="'+A('reg-'+r.id)+'" alt=""></div>'+
     '<div class="wants"><small>Wants on your counter</small><div class="wlist'+(r.req.cat&&Object.keys(r.req.cat).length>2?' many':'')+'">'+reqHTML(r.req)+'</div></div>');
@@ -81,7 +83,7 @@ function guestFront(r){
 function guestBack(){return frame('back guestback','<div class="disc"><span class="jp">常連</span><span class="en">REGULAR</span></div>');}
 
 function chefFront(c,i){
-  return frame('chef','<div class="hd" style="background:'+PCOL[i]+'"><span class="kind">Chef · '+['Blue','Red','Yellow','Teal'][i]+'</span><span class="nm">'+esc(c.name)+'</span></div>'+
+  return frame('chef','<div class="hd" style="background:'+PCOL[i]+'"><span class="kind">Chef · '+['Blue','Red','Yellow','Teal'][i]+'</span>'+nmHTML(c.name)+'</div>'+
     '<div class="portrait" style="--pc:'+PCOL[i]+'"><img src="'+A('chef-'+c.art)+'" alt=""></div>'+
     '<div class="title">'+esc(c.title)+'</div>'+chefAbility(c),' style="--pc:'+PCOL[i]+'"');
 }
@@ -129,7 +131,7 @@ function eventFx(id){
 }
 function eventFront(e){
   const lights=Array.from({length:6},(_,k)=>'<span class="lt" style="--k:'+k+'"></span>').join('');
-  return frame('event','<div class="hd"><span class="kind">Event · 出来事</span><span class="nm">'+esc(e.name)+'</span></div>'+
+  return frame('event','<div class="hd"><span class="kind">Event · 出来事</span>'+nmHTML(e.name)+'</div>'+
     '<div class="night"><div class="string">'+lights+'</div><div class="biglan"><span>'+e.kj+'</span></div></div>'+
     '<div class="fx"><small>This round</small>'+eventFx(e.id).map(([i,t,v])=>'<div class="arow"><span class="ai">'+i+'</span><span class="at">'+t+'</span>'+(v?'<span class="av">'+v+'</span>':'')+'</div>').join('')+'</div>');
 }
@@ -224,9 +226,10 @@ img{display:block}
 /* ---------- card: designed with bleed; .trim marks the cut line ---------- */
 .card{position:relative;width:${CARD.w + 2 * CARD.bleed}mm;height:${CARD.h + 2 * CARD.bleed}mm;overflow:hidden;background:url(art/tex-paper.webp) 0 0/90mm,var(--paper)}
 .trim{position:absolute;left:${CARD.bleed}mm;top:${CARD.bleed}mm;width:${CARD.w}mm;height:${CARD.h}mm}
-.hd{position:absolute;left:-${CARD.bleed}mm;right:-${CARD.bleed}mm;top:-${CARD.bleed}mm;height:${20 + CARD.bleed}mm;padding:${CARD.bleed + 1.6}mm ${CARD.bleed + 16}mm 1.6mm ${CARD.bleed + 4}mm;justify-content:center;background:linear-gradient(rgba(255,255,255,.12),rgba(0,0,0,.12)),var(--cat,var(--indigo));color:#fff;display:flex;flex-direction:column;gap:.6mm}
+.hd{position:absolute;left:-${CARD.bleed}mm;right:-${CARD.bleed}mm;top:-${CARD.bleed}mm;height:${20 + CARD.bleed}mm;padding:${CARD.bleed + 1.4}mm ${CARD.bleed + 17.5}mm 1.4mm ${CARD.bleed + 4}mm;justify-content:center;gap:.5mm!important;background:linear-gradient(rgba(255,255,255,.12),rgba(0,0,0,.12)),var(--cat,var(--indigo));color:#fff;display:flex;flex-direction:column;gap:.6mm}
 .hd .kind{font-size:2.3mm;font-weight:900;letter-spacing:.14em;text-transform:uppercase;opacity:.9}
-.hd .nm{font-family:var(--disp);font-size:4.6mm;line-height:1.18}
+.hd .nm{font-family:var(--disp);font-size:4.6mm;line-height:1.12}
+.hd .nm.long{font-size:3.9mm;line-height:1.05}
 .vp{position:absolute;right:2.5mm;top:3mm;width:14mm;height:14mm;border-radius:50%;background:var(--lac);color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(-8deg);box-shadow:inset 0 0 0 .7mm rgba(255,255,255,.4),0 .6mm 0 var(--lac-2);font-family:var(--disp);line-height:1}
 .vp b{font-size:6mm;font-weight:400}.vp small{font-size:1.9mm;letter-spacing:.1em}
 .ing{width:7.5mm;height:7.5mm;border-radius:50%;background:#fffdf8;box-shadow:0 0 0 .35mm var(--paper-2),0 .4mm .8mm rgba(0,0,0,.15);display:inline-flex;align-items:center;justify-content:center;flex:none}
