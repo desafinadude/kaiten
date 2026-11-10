@@ -124,10 +124,54 @@ function board(){
   const belt='<div class="beltboard"><div class="dir">The belt turns this way at the end of each round →</div><div class="slots">'+[0,1,2,3,4].map(slot).join('')+'</div></div>';
   const kitchen='<div class="board"><div class="mid"><div class="stations"><div class="station ice"><div class="sh"><b>Fish on the ice</b><span class="skj">氷</span></div><p>Lay 5 fish here. Refill to 5 from the fish bag after each visit.</p></div>'+
     LOCS.map(st).join('')+'</div></div>'+
-    '<div class="foot"><div class="brand"><span class="jp">回転寿司</span><span class="en">KAITEN</span></div>'+rounds+'<div class="rules"><span><b>Closing:</b> plates · 4 VP per Nigiri + Maki + Sashimi set · regulars · closing bonuses · 1 VP per 3 leftover ingredients · −1 VP per unserved order</span>'+
-    '<span><b>Catch-up:</b> 6+ VP behind → +1 wasabi · 15+ → +2</span></div></div></div>';
+    '<div class="foot"><div class="brand"><span class="jp">回転寿司</span><span class="en">KAITEN</span></div>'+rounds+'</div></div>';
   return {belt,kitchen};
 }
+// duplex card sheets: 3x3 on A4, trim edges butted with no gaps, bleed kept on every outer edge,
+// crop marks outside the bleed; backs mirrored so they line up when flipped on the long edge
+function dupSheets(fronts,backs,label){
+  const L=(210-3*CARD.w)/2, T=(297-3*CARD.h)/2, B=CARD.bleed;
+  const marks=()=>{let c=''; for(let i=0;i<=3;i++){const x=L+i*CARD.w, y=T+i*CARD.h;
+    c+='<div class="cut" style="left:'+x+'mm;top:0;width:.2mm;height:'+(T-B-1)+'mm"></div><div class="cut" style="left:'+x+'mm;bottom:0;width:.2mm;height:'+(T-B-1)+'mm"></div>'+
+      '<div class="cut" style="top:'+y+'mm;left:0;height:.2mm;width:'+(L-B-1)+'mm"></div><div class="cut" style="top:'+y+'mm;right:0;height:.2mm;width:'+(L-B-1)+'mm"></div>';}
+    return c;};
+  const sheet=(cells,lab)=>{
+    let h='';
+    cells.forEach((html,k)=>{ if(!html) return;
+      const r=Math.floor(k/3), c=k%3;
+      const lo=c===0||!cells[k-1], ro=c===2||!cells[k+1], to=r===0||!cells[k-3], bo=r===2||!cells[k+3];
+      const x=L+c*CARD.w-(lo?B:0), y=T+r*CARD.h-(to?B:0), w=CARD.w+(lo?B:0)+(ro?B:0), hh=CARD.h+(to?B:0)+(bo?B:0);
+      h+='<div class="pcell" style="left:'+x+'mm;top:'+y+'mm;width:'+w+'mm;height:'+hh+'mm"><div style="position:absolute;left:'+(lo?0:-B)+'mm;top:'+(to?0:-B)+'mm">'+html+'</div></div>';});
+    return '<div class="sheet">'+h+marks()+'<div class="label">'+lab+'</div></div>';};
+  let out=''; const n=Math.ceil(fronts.length/9);
+  for(let p=0;p<fronts.length;p+=9){
+    const fr=Array.from({length:9},(_,k)=>fronts[p+k]||null), bk=Array.from({length:9},(_,k)=>backs[p+k]||null);
+    const mb=Array.from({length:9},(_,k)=>bk[Math.floor(k/3)*3+(2-k%3)]);
+    const s=p/9+1;
+    out+=sheet(fr,'Kaiten · '+label+' · sheet '+s+' of '+n+' · FRONT')+sheet(mb,'Kaiten · '+label+' · sheet '+s+' of '+n+' · BACK · print double-sided, flip on the long edge');
+  }
+  return out;
+}
+
+// token sheets: every token the game needs on a fixed grid, each with a bleed halo and a cut guide;
+// the back of each sheet is the same tokens mirrored, so double-sided printing gives two-faced tokens
+function tokenSheets(){
+  const list=[], add=(n,f)=>{for(let i=0;i<n;i++) list.push(f());};
+  FISH.forEach(k=>add(12,()=>ingTok(k))); add(30,()=>ingTok('R')); add(20,()=>ingTok('N')); add(35,()=>ingTok('W'));
+  [[1,30],[3,20],[5,15],[10,10]].forEach(([v,n])=>add(n,()=>vpTok(v)));
+  CHARS.forEach((c,i)=>add(4,()=>chefTok(c,i)));
+  list.push(tok('firstt','<b>先</b><small>FIRST</small>','--ring:#ffd27a'), tok('roundt','<b>回</b><small>ROUND</small>','--ring:#8f1f17'));
+  const P=TOKEN+4, cols=7, rows=10, per=cols*rows, L=(210-cols*P)/2, T=(297-rows*P)/2;
+  const slot=(t,r,c)=>'<div class="tslot" style="left:'+(L+c*P)+'mm;top:'+(T+r*P)+'mm">'+t+'</div>';
+  let out=''; const n=Math.ceil(list.length/per);
+  for(let p=0;p<n;p++){
+    const pg=list.slice(p*per,(p+1)*per);
+    out+='<div class="sheet">'+pg.map((t,k)=>slot(t,Math.floor(k/cols),k%cols)).join('')+'<div class="label">Kaiten · tokens · sheet '+(p+1)+' of '+n+' · FRONT · cut on the dashed circles</div></div>'+
+      '<div class="sheet">'+pg.map((t,k)=>slot(t,Math.floor(k/cols),cols-1-k%cols)).join('')+'<div class="label">Kaiten · tokens · sheet '+(p+1)+' of '+n+' · BACK · print double-sided, flip on the long edge</div></div>';
+  }
+  return out;
+}
+
 // both boards on one A3 sheet, with a cut line between them
 const boardSheet=()=>{const b=board(); return '<div class="boardpage"><div class="bwrap belt">'+b.belt+'</div><div class="bwrap kitchen">'+b.kitchen+'</div></div>';};
 `;
@@ -213,6 +257,14 @@ img{display:block}
 .cell{position:relative;width:${CARD.w}mm;height:${CARD.h}mm;overflow:hidden}
 .cell>.card{position:absolute;left:-${CARD.bleed}mm;top:-${CARD.bleed}mm}
 .cut{position:absolute;background:#999}
+.pcell{position:absolute;overflow:hidden}
+.tslot{position:absolute;width:${TOKEN + 4}mm;height:${TOKEN + 4}mm;display:flex;align-items:center;justify-content:center}
+.tslot .tok{outline:.2mm dashed rgba(255,255,255,.85);outline-offset:-.1mm}
+.tslot .vpt{box-shadow:inset 0 0 0 1.1mm var(--ring),inset 0 0 0 1.7mm rgba(255,255,255,.45),0 0 0 1.6mm var(--ring)}
+.tslot .ingt{box-shadow:inset 0 0 0 1.1mm var(--ring),0 0 0 1.6mm var(--ring)}
+.tslot .cheft{box-shadow:inset 0 0 0 1.4mm var(--ring),0 0 0 1.6mm var(--ring)}
+.tslot .roundt{box-shadow:inset 0 0 0 1.1mm #8f1f17,0 0 0 1.6mm #8f1f17}
+.tslot .firstt{width:${TOKEN}mm;height:${TOKEN}mm;box-shadow:inset 0 0 0 1.2mm #ffd27a,0 0 0 1.6mm #ffd27a}.tslot .firstt b{font-size:7.5mm}.tslot .firstt small{font-size:2mm}
 .label{position:absolute;left:10mm;bottom:5mm;font-size:2.6mm;color:#888}
 
 /* ---------- tokens ---------- */
@@ -323,41 +375,26 @@ async function ready(page) {
     EVENTS.forEach(e=>{f.push(eventFront(e));b.push(eventBack());});
     return {f,b};})()`;
 
-  /* 1. print-and-play cards: A4, 3x3, fronts then mirrored backs for long-edge duplex */
+  /* 1. print-and-play cards: one duplex PDF per deck (and all decks together), 3x3 on A4 with bleed */
   {
-    const page = await open(`()=>{const {f,b}=${deck}; let out='';
-      const cuts=()=>{let c=''; const L=(210-3*CARD.w)/2, T=(297-3*CARD.h)/2;
-        for(let i=0;i<=3;i++){const x=L+i*CARD.w, y=T+i*CARD.h;
-          c+='<div class="cut" style="left:'+x+'mm;top:0;width:.2mm;height:'+(T-1)+'mm"></div><div class="cut" style="left:'+x+'mm;bottom:0;width:.2mm;height:'+(T-1)+'mm"></div>';
-          c+='<div class="cut" style="top:'+y+'mm;left:0;height:.2mm;width:'+(L-1)+'mm"></div><div class="cut" style="top:'+y+'mm;right:0;height:.2mm;width:'+(L-1)+'mm"></div>';}
-        return c;};
-      for(let p=0;p<f.length;p+=9){
-        const fr=f.slice(p,p+9), bk=b.slice(p,p+9);
-        out+='<div class="sheet"><div class="grid">'+fr.map(c=>'<div class="cell">'+c+'</div>').join('')+'</div>'+cuts()+'<div class="label">Kaiten · cards '+(p+1)+'–'+(p+fr.length)+' · fronts</div></div>';
-        // backs: mirror each row so they line up when printed double-sided (flip on long edge)
-        const rows=[]; for(let r=0;r<3;r++){const row=[0,1,2].map(cix=>bk[r*3+cix]); rows.push(row.reverse());}
-        out+='<div class="sheet"><div class="grid">'+rows.flat().map(c=>'<div class="cell">'+(c||'')+'</div>').join('')+'</div>'+cuts()+'<div class="label">Kaiten · cards '+(p+1)+'–'+(p+fr.length)+' · backs (print double-sided, flip on long edge)</div></div>';
-      }
-      return out;}`, { width: 794, height: 1123 });
-    await page.pdf({ path: path.join(OUT, 'kaiten-cards-A4.pdf'), width: '210mm', height: '297mm', printBackground: true });
-    await page.close();
+    const decks = [
+      ['dishes', 'Dish cards', 'DISHES.map(dishFront)', 'DISHES.map(()=>dishBack())'],
+      ['regulars', 'Regular cards', 'REGULARS.map(guestFront)', 'REGULARS.map(()=>guestBack())'],
+      ['events', 'Event cards', 'EVENTS.map(eventFront)', 'EVENTS.map(()=>eventBack())'],
+      ['chefs', 'Chef cards', 'CHARS.map(chefFront)', 'CHARS.map((c,i)=>chefBack(i))'],
+    ];
+    const pdf = async (builder, file) => {
+      const page = await open(builder, { width: 794, height: 1123 });
+      await page.pdf({ path: path.join(OUT, file), width: '210mm', height: '297mm', printBackground: true });
+      await page.close();
+    };
+    for (const [id, label, f, b] of decks) await pdf(`()=>dupSheets(${f},${b},'${label}')`, `kaiten-cards-${id}-A4.pdf`);
+    await pdf(`()=>${decks.map(([, label, f, b]) => `dupSheets(${f},${b},'${label}')`).join('+')}`, 'kaiten-cards-A4.pdf');
   }
 
-  /* 2. tokens: A4 sheets */
+  /* 2. tokens: duplex A4 sheets */
   {
-    const page = await open(`()=>{
-      const rep=(n,f)=>Array.from({length:n},f).join('');
-      const groups=[
-        ['Tuna ×12',rep(12,()=>ingTok('T'))],['Salmon ×12',rep(12,()=>ingTok('S'))],['Eel ×12',rep(12,()=>ingTok('U'))],['Shrimp ×12',rep(12,()=>ingTok('E'))],
-        ['Rice ×30',rep(30,()=>ingTok('R'))],['Nori ×20',rep(20,()=>ingTok('N'))],['Wasabi ×35',rep(35,()=>ingTok('W'))],
-        ['VP 1 ×30',rep(30,()=>vpTok(1))],['VP 3 ×20',rep(20,()=>vpTok(3))],['VP 5 ×15',rep(15,()=>vpTok(5))],['VP 10 ×10',rep(10,()=>vpTok(10))],
-        ['Chefs ×4 each',CHARS.map((c,i)=>rep(4,()=>chefTok(c,i))).join('')],
-        ['Markers','<div class="tok firstt"><b>先</b><small>FIRST</small></div><div class="tok roundt"><b>回</b><small>ROUND</small></div>']];
-      // pack whole groups onto A4 pages by height: a heading, then rows of 7 tokens
-      const perRow=Math.floor((210-22+3)/(TOKEN+3)), avail=297-24-10; let pages=[[]], h=0;
-      groups.forEach(([t,body])=>{const n=(body.match(/class="tok/g)||[]).length, gh=8+Math.ceil(n/perRow)*(TOKEN+3);
-        if(h+gh>avail&&h){pages.push([]); h=0;} pages[pages.length-1].push('<h3>'+t+'</h3>'+body); h+=gh;});
-      return pages.map((g,i)=>'<div class="sheet"><div class="toksheet">'+g.join('')+'</div><div class="label">Kaiten · tokens sheet '+(i+1)+' · cut on the grey circles; glue to 2 mm card for chunky tokens</div></div>').join('');}`, { width: 794, height: 1123 });
+    const page = await open(`()=>tokenSheets()`, { width: 794, height: 1123 });
     await page.pdf({ path: path.join(OUT, 'kaiten-tokens-A4.pdf'), width: '210mm', height: '297mm', printBackground: true });
     await page.close();
   }
