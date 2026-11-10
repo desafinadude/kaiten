@@ -130,9 +130,8 @@ function eventFx(id){
   })[id]||[];
 }
 function eventFront(e){
-  const lights=Array.from({length:6},(_,k)=>'<span class="lt" style="--k:'+k+'"></span>').join('');
   return frame('event','<div class="hd"><span class="kind">Event · 出来事</span>'+nmHTML(e.name)+'</div>'+
-    '<div class="night"><div class="string">'+lights+'</div><div class="biglan"><span>'+e.kj+'</span></div></div>'+
+    '<div class="night"><div class="biglan"><span>'+e.kj+'</span></div></div>'+
     '<div class="fx"><small>This round</small>'+eventFx(e.id).map(([i,t,v])=>'<div class="arow"><span class="ai">'+i+'</span><span class="at">'+t+'</span>'+(v?'<span class="av">'+v+'</span>':'')+'</div>').join('')+'</div>');
 }
 function eventBack(){return frame('back eventback','<div class="disc"><span class="jp">出来事</span><span class="en">EVENT</span></div>');}
@@ -284,14 +283,9 @@ img{display:block}
 
 .guest .hd{background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.1)),url(art/tex-noren.webp) 0 0/60mm,var(--indigo)}
 .event .hd{background:linear-gradient(rgba(255,255,255,.1),rgba(0,0,0,.15)),#8f1f17}
-.event .night{position:absolute;left:-${CARD.bleed}mm;right:-${CARD.bleed}mm;top:17mm;height:41mm;background:radial-gradient(120% 90% at 50% 100%,#3a4d6e,#142640 70%);overflow:hidden}
-.event .string{position:absolute;left:0;right:0;top:3mm;height:8mm}
-.event .string::before{content:"";position:absolute;left:-2mm;right:-2mm;top:0;height:7mm;border-bottom:.35mm solid #0b0f18;border-radius:0 0 50% 50%}
-.event .lt{position:absolute;top:calc(4.6mm + (var(--k) - 2.5) * (var(--k) - 2.5) * -.38mm);left:calc(6mm + var(--k) * 11.6mm);width:3.6mm;height:4.6mm;border-radius:1.8mm/2.3mm;background:radial-gradient(circle at 50% 40%,#ffe2a0,#ff8a3d 70%);box-shadow:0 0 2mm .6mm rgba(255,150,70,.6)}
-.event .biglan{position:absolute;left:50%;top:9mm;width:24mm;height:29mm;margin-left:-12mm;border-radius:12mm/14.5mm;background:radial-gradient(circle at 50% 42%,#ffe2a0,#ff6a3d 55%,#c2342a);box-shadow:0 0 6mm 2mm rgba(255,120,60,.55);display:flex;align-items:center;justify-content:center}
-.event .biglan::before,.event .biglan::after{content:"";position:absolute;left:5mm;right:5mm;height:2.4mm;background:#1b140e;border-radius:.6mm}
-.event .biglan::before{top:-1.2mm}.event .biglan::after{bottom:-1.2mm}
-.event .biglan span{font-family:var(--disp);color:#fff;font-size:8.6mm;line-height:1;writing-mode:vertical-rl;text-shadow:0 .4mm 0 rgba(143,31,23,.6)}
+.event .night{position:absolute;left:-${CARD.bleed}mm;right:-${CARD.bleed}mm;top:17mm;height:41mm;background:url(art/ev-lantern.webp) 50% 50%/cover,#142640;overflow:hidden}
+.event .biglan{position:absolute;left:50%;top:10mm;width:20mm;height:25.5mm;margin-left:-10mm;display:flex;align-items:center;justify-content:center}
+.event .biglan span{font-family:var(--disp);color:#2a120c;font-size:8.2mm;line-height:1.05;writing-mode:vertical-rl;opacity:.88;mix-blend-mode:multiply;text-shadow:0 0 .6mm rgba(255,210,150,.35)}
 .event .fx{position:absolute;left:5mm;right:5mm;top:61mm;bottom:4.5mm;border-radius:2.4mm;background:rgba(255,255,255,.65);box-shadow:inset 0 0 0 .45mm #8f1f17;padding:1.8mm 2.4mm;display:flex;flex-direction:column;justify-content:center;gap:1mm}
 .event .fx small{text-align:center;font-size:2mm;font-weight:900;letter-spacing:.16em;text-transform:uppercase;color:#8f1f17}
 .event .fx .arow{font-size:2.7mm}.event .fx .av{font-size:3.2mm;color:#8f1f17}
