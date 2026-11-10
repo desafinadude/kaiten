@@ -112,18 +112,21 @@ const chefTok=(c,i)=>tok('cheft','<img src="'+A('chef-'+c.art)+'" alt="">','--ri
 function board(){
   const slot=(i)=>'<div class="bslot'+(i===4?' last':'')+'"><span class="slab">'+(i===0?'New':i===4?'Last lap':'')+'</span>'+
     (i===4?'<span class="bargain"><b>−1</b> ingredient<br>for whoever takes it</span>':'')+'<span class="wnote">wasabi here</span></div>';
+  // how many chefs a station holds: one big number in the corner (with the 4-player count if it differs)
   const spots=(L)=>{const c2=L.cap(2), c4=L.cap(4);
-    if(c4>20) return '<div class="open">Open to all · any number of chefs</div>';
-    return '<div class="spots">'+Array.from({length:c4},(_,k)=>'<span class="spot'+(k>=c2?' p4':'')+'">'+(k>=c2?'4P':'')+'</span>').join('')+'</div>';};
-  const st=L=>'<div class="station"><div class="sh"><img src="'+A('st-'+L.id)+'" alt=""><b>'+L.name+'</b><span class="skj">'+L.kj+'</span></div><p>'+esc(L.text)+'</p>'+spots(L)+'</div>';
-  const rounds='<div class="station rounds"><div class="sh"><b>Rounds</b><span class="skj">回</span></div><div class="lanterns">'+
+    if(c4>20) return '<div class="cap"><b>∞</b><small>chefs</small></div>';
+    return '<div class="cap"><b>'+c2+'</b><small>'+(c2===1?'chef':'chefs')+(c4!==c2?' · '+c4+' with 4 players':'')+'</small></div>';};
+  const st=L=>'<div class="station"><div class="sh"><b>'+L.name+'</b><span class="skj">'+L.kj+'</span></div><p>'+esc(L.text)+'</p>'+
+    '<div class="sfoot"><img class="sbig" src="'+A('st-'+L.id)+'" alt="">'+spots(L)+'</div></div>';
+  // the round track is a single line under the stations
+  const rounds='<div class="roundline"><b>Rounds</b><div class="lanterns">'+
     Array.from({length:ROUNDS},(_,i)=>'<span class="lan'+(EVENT_ROUNDS.includes(i+1)?' ev':'')+'"><b>'+(i+1)+'</b>'+(EVENT_ROUNDS.includes(i+1)?'<small>event</small>':'')+'</span>').join('')+'</div></div>';
   return '<div class="board"><div class="brand"><span class="jp">回転寿司</span><span class="en">KAITEN</span></div>'+
     '<div class="beltband"><div class="dir">The belt turns this way at the end of each round →</div><div class="slots">'+[0,1,2,3,4].map(slot).join('')+'</div></div>'+
-    '<div class="mid"><div class="ice"><div class="sh"><b>Fish on the ice</b></div><div class="fishspots">'+[0,1,2,3,4].map(()=>'<span class="fspot"></span>').join('')+'</div><p>Refill to 5 from the fish bag after each visit.</p></div>'+
-    '<div class="stations">'+LOCS.map(st).join('')+rounds+'</div></div>'+
-    '<div class="foot"><span><b>Closing:</b> plates · 4 VP per Nigiri + Maki + Sashimi set · regulars · closing bonuses · 1 VP per 3 leftover ingredients · −1 VP per unserved order</span>'+
-    '<span><b>Catch-up:</b> 6+ VP behind → +1 wasabi · 15+ → +2</span></div></div>';
+    '<div class="mid"><div class="stations"><div class="station ice"><div class="sh"><b>Fish on the ice</b><span class="skj">氷</span></div><p>Lay 5 fish here. Refill to 5 from the fish bag after each visit.</p></div>'+
+    LOCS.map(st).join('')+'</div></div>'+
+    '<div class="foot">'+rounds+'<div class="rules"><span><b>Closing:</b> plates · 4 VP per Nigiri + Maki + Sashimi set · regulars · closing bonuses · 1 VP per 3 leftover ingredients · −1 VP per unserved order</span>'+
+    '<span><b>Catch-up:</b> 6+ VP behind → +1 wasabi · 15+ → +2</span></div></div></div>';
 }
 `;
 
@@ -241,26 +244,33 @@ img{display:block}
 .bargain b{display:inline-block;background:#2f7d4a;border-radius:3mm;padding:.2mm 2mm;font-family:var(--disp);font-weight:400;font-size:4mm;box-shadow:0 0 0 .5mm #fff}
 .wnote{position:absolute;left:0;right:0;bottom:2.5mm;text-align:center;font-size:2.3mm;color:rgba(255,255,255,.8);font-weight:700}
 .mid{flex:1;display:flex;gap:5mm;min-height:0}
-.ice{width:80mm;border-radius:4mm;border:1mm solid #9cb7c1;background:linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),url(art/tex-ice-cover.webp) center/cover;padding:3mm;display:flex;flex-direction:column;gap:2mm}
-.ice p{margin:auto 0 0;font-size:2.7mm;color:#2c3c42;font-weight:700}
-.fishspots{display:flex;flex-wrap:wrap;gap:3mm;justify-content:center;margin-top:3mm}
-.fspot{width:${TOKEN + 1}mm;height:${TOKEN + 1}mm;border-radius:50%;border:.6mm dashed #5f7f8a;background:rgba(255,255,255,.4)}
+.station.ice{border-color:#7f9aa4;box-shadow:0 1.2mm 0 #7f9aa4;background:linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),url(art/tex-ice-cover.webp) center/cover}
+.station.ice p{color:#2c3c42}
+.station.ice .skj{color:#21385b}
 .sh{display:flex;align-items:center;gap:2mm}
 .sh img{width:9mm;height:9mm;object-fit:contain}
-.sh b{font-family:var(--disp);font-weight:400;font-size:4.6mm}
+.sh b{font-family:var(--disp);font-weight:400;font-size:6.4mm;line-height:1.05}
+.station .skj{font-size:5mm}
+.sfoot{margin-top:auto;display:flex;align-items:flex-end;justify-content:space-between;gap:2mm}
+.sbig{width:40mm;height:40mm;object-fit:contain;filter:drop-shadow(0 1mm 1mm rgba(60,35,10,.3))}
 .skj{margin-left:auto;font-family:var(--disp);color:var(--lac);font-size:4mm}
-.stations{flex:1;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:1fr 1fr;gap:4mm}
-.station{border:.6mm solid var(--wood-dk);border-radius:3mm;padding:2.6mm 3mm;background:linear-gradient(rgba(255,246,224,.45),rgba(255,246,224,.3)),url(art/tex-table.webp) 0 0/90mm,#f0dbb0;box-shadow:0 1.2mm 0 var(--wood-dk);display:flex;flex-direction:column;gap:1.4mm}
-.station p{margin:0;font-size:3mm;line-height:1.3;color:var(--ink-2);font-weight:500}
-.spots{margin-top:auto;display:flex;gap:2.5mm}
-.spot{width:${TOKEN + 1}mm;height:${TOKEN + 1}mm;border-radius:50%;background:#caa66c;box-shadow:inset 0 1mm 1.6mm rgba(60,35,10,.45);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:3.4mm;color:rgba(60,35,10,.55)}
+.stations{flex:1;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-template-rows:1fr 1fr;gap:4mm}
+.station{border:.6mm solid var(--wood-dk);border-radius:3mm;padding:2.4mm 2.4mm;min-width:0;background:linear-gradient(rgba(255,246,224,.45),rgba(255,246,224,.3)),url(art/tex-table.webp) 0 0/90mm,#f0dbb0;box-shadow:0 1.2mm 0 var(--wood-dk);display:flex;flex-direction:column;gap:1.4mm}
+.station p{margin:0;font-size:3.2mm;line-height:1.3;color:var(--ink-2);font-weight:500}
+.cap{display:flex;flex-direction:column;align-items:flex-end;line-height:1;color:var(--wood-dk)}
+.cap b{font-family:var(--disp);font-weight:400;font-size:16mm}
+.cap small{font-size:2.6mm;font-weight:900;letter-spacing:.06em;text-transform:uppercase;margin-top:1mm}
+.spot{width:${TOKEN}mm;height:${TOKEN}mm;border-radius:50%;background:#caa66c;box-shadow:inset 0 1mm 1.6mm rgba(60,35,10,.45);display:flex;align-items:center;justify-content:center;font-family:var(--disp);font-size:3.4mm;color:rgba(60,35,10,.55)}
 .spot.p4{background:transparent;border:.6mm dashed #a27e47;box-shadow:none}
 .open{margin-top:auto;border:.6mm dashed #a27e47;border-radius:3mm;padding:3mm;text-align:center;font-size:2.8mm;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#7a532b}
-.rounds .lanterns{margin-top:auto;display:grid;grid-template-columns:repeat(4,1fr);gap:2mm}
-.lan{height:13mm;border-radius:6.5mm/7mm;background:#3a4d6e;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);line-height:1}
+.roundline{display:flex;align-items:center;gap:3mm}
+.roundline>b{font-family:var(--disp);font-weight:400;font-size:4.4mm}
+.lanterns{display:flex;gap:2mm}
+.lan{width:13mm;height:11mm;border-radius:6.5mm/5.5mm;background:#3a4d6e;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--disp);line-height:1}
 .lan b{font-size:4.6mm;font-weight:400}.lan small{font-family:"Zen Kaku Gothic New";font-size:1.9mm;font-weight:900;letter-spacing:.1em;text-transform:uppercase}
 .lan.ev{background:#ff6a3d}
-.board>.foot{display:flex;justify-content:space-between;gap:6mm;font-size:3mm;color:var(--ink);background:rgba(252,247,236,.75);border-radius:2mm;padding:2mm 4mm}
+.foot .rules{flex:1;display:flex;flex-direction:column;gap:1mm;align-items:flex-end;text-align:right}
+.board>.foot{display:flex;align-items:center;gap:8mm;font-size:3mm;color:var(--ink);background:rgba(252,247,236,.75);border-radius:2mm;padding:2mm 4mm}
 
 /* ---------- contact sheets (overview images) ---------- */
 .contact{display:flex;flex-wrap:wrap;gap:4mm;padding:6mm;background:#2a221b;width:max-content}
