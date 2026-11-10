@@ -143,6 +143,11 @@ const tok=(cls,inner,style)=>'<div class="tok '+cls+'"'+(style?' style="'+style+
 const ingTok=k=>tok('ingt','<img src="'+A('ing-'+k)+'" alt="">','--bg:'+TINT[k][0]+';--ring:'+TINT[k][1]);
 const VPC={1:['#fcf7ec','#c2342a','#c2342a'],3:['#e7bb4f','#8a6516','#2b1f14'],5:['#c2342a','#8f1f17','#fff'],10:['#21385b','#142640','#fff']};
 const vpTok=n=>tok('vpt','<b>'+n+'</b><small>VP</small>','--bg:'+VPC[n][0]+';--ring:'+VPC[n][1]+';--fg:'+VPC[n][2]);
+// +1 tokens: a bonus from a card or a chef's ability, ready to collect (fish means draw one from the bag)
+const PLUS={W:['wasabi','ing-W',TINT.W],F:['fish','st-market',['#dce8f2','#2f6690']],R:['rice','ing-R',TINT.R],N:['nori','ing-N',TINT.N]};
+const plusTok=k=>tok('plust','<span class="pn">+1</span><img src="'+A(PLUS[k][1])+'" alt=""><small>'+PLUS[k][0]+'</small>','--bg:'+PLUS[k][2][0]+';--ring:'+PLUS[k][2][1]+(k==='R'?';--fg:#7d6539':''));
+// last-lap token: sits on the last belt spot when you play without the belt board, and goes with the dish that is taken from there
+const lastTok=()=>tok('lastt','<small>LAST LAP</small><b>−1</b><small>ingredient</small>','--ring:#c2342a');
 const chefTok=(c,i)=>tok('cheft','<img src="'+A('chef-'+c.art)+'" alt="">','--ring:'+PCOL[i]);
 
 /* ---------- board ---------- */
@@ -197,6 +202,7 @@ function tokenSheets(){
   FISH.forEach(k=>add(12,()=>ingTok(k))); add(30,()=>ingTok('R')); add(20,()=>ingTok('N')); add(35,()=>ingTok('W'));
   [[1,30],[3,20],[5,15],[10,10]].forEach(([v,n])=>add(n,()=>vpTok(v)));
   CHARS.forEach((c,i)=>add(4,()=>chefTok(c,i)));
+  [['W',8],['F',8],['R',6],['N',6]].forEach(([k,n])=>add(n,()=>plusTok(k))); add(3,lastTok);
   list.push(tok('firstt','<b>先</b><small>FIRST</small>','--ring:#ffd27a'), tok('roundt','<b>回</b><small>ROUND</small>','--ring:#8f1f17'));
   const P=TOKEN+4, cols=7, rows=10, per=cols*rows, L=(210-cols*P)/2, T=(297-rows*P)/2;
   const slot=(t,r,c)=>'<div class="tslot" style="left:'+(L+c*P)+'mm;top:'+(T+r*P)+'mm">'+t+'</div>';
@@ -329,6 +335,7 @@ img{display:block}
 .tslot .vpt{box-shadow:inset 0 0 0 1.1mm var(--ring),inset 0 0 0 1.7mm rgba(255,255,255,.45),0 0 0 1.6mm var(--ring)}
 .tslot .ingt{box-shadow:inset 0 0 0 1.1mm var(--ring),0 0 0 1.6mm var(--ring)}
 .tslot .cheft{box-shadow:inset 0 0 0 1.4mm var(--ring),0 0 0 1.6mm var(--ring)}
+.tslot .plust,.tslot .lastt{box-shadow:inset 0 0 0 1.1mm var(--ring),0 0 0 1.6mm var(--ring)}
 .tslot .roundt{box-shadow:inset 0 0 0 1.1mm #8f1f17,0 0 0 1.6mm #8f1f17}
 .tslot .firstt{width:${TOKEN}mm;height:${TOKEN}mm;box-shadow:inset 0 0 0 1.2mm #ffd27a,0 0 0 1.6mm #ffd27a}.tslot .firstt b{font-size:7.5mm}.tslot .firstt small{font-size:2mm}
 .label{position:absolute;left:10mm;bottom:5mm;font-size:2.6mm;color:#888}
@@ -345,6 +352,10 @@ img{display:block}
 .firstt b{font-family:var(--disp);font-size:10mm;font-weight:400;line-height:1}.firstt small{font-size:2.4mm;letter-spacing:.2em;font-weight:900}
 .roundt{background:radial-gradient(circle,#ffb35c,#ff6a3d 70%);color:#fff;box-shadow:inset 0 0 0 1.1mm #8f1f17}
 .roundt b{font-family:var(--disp);font-size:7mm;font-weight:400;line-height:1}.roundt small{font-size:2mm;letter-spacing:.14em;font-weight:900}
+.plust{background:radial-gradient(circle,#fff 0 30%,var(--bg) 70%);box-shadow:inset 0 0 0 1.1mm var(--ring);color:var(--fg,var(--ring));line-height:1;gap:.2mm}
+.plust .pn{font-family:var(--disp);font-size:6mm}.plust img{width:8.5mm;height:8.5mm;object-fit:contain}.plust small{font-size:2mm;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
+.lastt{background:linear-gradient(rgba(255,255,255,.08),rgba(0,0,0,.1)),url(art/tex-belt.webp) 0 0/20mm 100%,#8d989b;color:#fff;box-shadow:inset 0 0 0 1.1mm var(--ring);line-height:1;text-shadow:0 .3mm .8mm rgba(0,0,0,.5)}
+.lastt b{font-family:var(--disp);font-size:8mm;font-weight:400;color:#ffd27a}.lastt small{font-size:1.9mm;font-weight:900;letter-spacing:.12em;text-transform:uppercase}
 .toksheet{display:flex;flex-wrap:wrap;align-content:flex-start;gap:3mm;padding:12mm 11mm}
 .toksheet .tok{outline:.2mm solid #bbb;outline-offset:.4mm}
 .toksheet h3{width:100%;margin:2mm 0 0;font-size:3mm;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#888}
@@ -486,7 +497,7 @@ async function ready(page) {
       'contact-dishes': `()=>'<div class="contact wide">'+DISHES.map(dishFront).join('')+'</div>'`,
       'contact-chefs-guests-events': `()=>'<div class="contact wide">'+CHARS.map(chefFront).join('')+REGULARS.map(guestFront).join('')+EVENTS.map(eventFront).join('')+'</div>'`,
       'contact-backs': `()=>'<div class="contact">'+dishBack()+guestBack()+eventBack()+CHARS.map((c,i)=>chefBack(i)).join('')+'</div>'`,
-      'contact-tokens': `()=>'<div class="contact" style="max-width:220mm;gap:3mm">'+FISH.concat(['R','N','W']).map(ingTok).join('')+[1,3,5,10].map(vpTok).join('')+CHARS.map(chefTok).join('')+'<div class="tok firstt"><b>先</b><small>FIRST</small></div><div class="tok roundt"><b>回</b><small>ROUND</small></div></div>'`,
+      'contact-tokens': `()=>'<div class="contact" style="max-width:220mm;gap:3mm">'+FISH.concat(['R','N','W']).map(ingTok).join('')+[1,3,5,10].map(vpTok).join('')+CHARS.map(chefTok).join('')+['W','F','R','N'].map(plusTok).join('')+lastTok()+'<div class="tok firstt"><b>先</b><small>FIRST</small></div><div class="tok roundt"><b>回</b><small>ROUND</small></div></div>'`,
     };
     for (const [name, b] of Object.entries(sheets)) {
       const page = await open(b, { width: 1400, height: 900 }, 1.25);
@@ -508,7 +519,7 @@ async function ready(page) {
     await page.close();
     // one of each token too
     const wrap = (name, inner) => `'<div data-name="${name}" style="display:inline-block;padding:2px">'+${inner}+'</div>'`;
-    const tp = await open(`()=>FISH.concat(['R','N','W']).map(k=>${wrap("token-'+k+'", 'ingTok(k)')}).join('')+[1,3,5,10].map(n=>${wrap("token-vp'+n+'", 'vpTok(n)')}).join('')+CHARS.map((c,i)=>${wrap("token-chef-'+c.id+'", 'chefTok(c,i)')}).join('')+${wrap('token-first', `'<div class="tok firstt"><b>先</b><small>FIRST</small></div>'`)}+${wrap('token-round', `'<div class="tok roundt"><b>回</b><small>ROUND</small></div>'`)}`, { width: 900, height: 900 });
+    const tp = await open(`()=>FISH.concat(['R','N','W']).map(k=>${wrap("token-'+k+'", 'ingTok(k)')}).join('')+[1,3,5,10].map(n=>${wrap("token-vp'+n+'", 'vpTok(n)')}).join('')+CHARS.map((c,i)=>${wrap("token-chef-'+c.id+'", 'chefTok(c,i)')}).join('')+['W','F','R','N'].map(k=>${wrap("token-plus'+k+'", 'plusTok(k)')}).join('')+${wrap('token-lastlap', 'lastTok()')}+${wrap('token-first', `'<div class="tok firstt"><b>先</b><small>FIRST</small></div>'`)}+${wrap('token-round', `'<div class="tok roundt"><b>回</b><small>ROUND</small></div>'`)}`, { width: 900, height: 900 });
     for (const el of await tp.$$('[data-name]')) await (await el.$('.tok')).screenshot({ path: path.join(dir, (await el.getAttribute('data-name')) + '.png'), omitBackground: true });
     await tp.close();
   }
