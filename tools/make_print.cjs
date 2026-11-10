@@ -380,6 +380,11 @@ async function ready(page) {
       await (await el.$('.card')).screenshot({ path: path.join(dir, name + '.png') });
     }
     await page.close();
+    // one of each token too
+    const wrap = (name, inner) => `'<div data-name="${name}" style="display:inline-block;padding:2px">'+${inner}+'</div>'`;
+    const tp = await open(`()=>FISH.concat(['R','N','W']).map(k=>${wrap("token-'+k+'", 'ingTok(k)')}).join('')+[1,3,5,10].map(n=>${wrap("token-vp'+n+'", 'vpTok(n)')}).join('')+CHARS.map((c,i)=>${wrap("token-chef-'+c.id+'", 'chefTok(c,i)')}).join('')+${wrap('token-first', `'<div class="tok firstt"><b>先</b><small>FIRST</small></div>'`)}+${wrap('token-round', `'<div class="tok roundt"><b>回</b><small>ROUND</small></div>'`)}`, { width: 900, height: 900 });
+    for (const el of await tp.$$('[data-name]')) await (await el.$('.tok')).screenshot({ path: path.join(dir, (await el.getAttribute('data-name')) + '.png'), omitBackground: true });
+    await tp.close();
   }
 
   await browser.close();
