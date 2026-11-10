@@ -86,12 +86,23 @@ function chefFront(c,i){
     '<div class="title">'+esc(c.title)+'</div><div class="ability"><small>Ability</small>'+esc(c.text)+'</div>',' style="--pc:'+PCOL[i]+'"');
 }
 function chefBack(i){
-  return frame('back aid','<div class="aidh" style="background:'+PCOL[i]+'">A round</div><ol>'+
-    '<li><b>Morning.</b> Collect your <i>Each round</i> bonuses.</li>'+
-    '<li><b>Place chefs</b> one at a time, clockwise, doing each station at once.</li>'+
-    '<li><b>The belt turns.</b> Last-lap dish leaves, the rest slide right and gain 1 wasabi, refill from the left.</li>'+
-    '<li><b>Catch-up.</b> 6+ VP behind the leader: +1 wasabi; 15+: +2.</li></ol>'+
-    '<div class="aidh small" style="background:'+PCOL[i]+'">Closing</div><p>Plates · 4 VP per Nigiri + Maki + Sashimi set · regulars · closing bonuses · 1 VP per 3 leftover ingredients · −1 VP per unserved order.</p>');
+  // the player aid: one short line per step, each with an icon
+  const row=(icon,lead,text,val)=>'<div class="arow"><span class="ai">'+icon+'</span><span class="at"><b>'+lead+'</b> '+text+'</span>'+(val?'<span class="av">'+val+'</span>':'')+'</div>';
+  const img=k=>'<img src="'+A(k)+'" alt="">';
+  const W='<img class="wi" src="'+A('ing-W')+'" alt="wasabi">';
+  const sets='<span class="tri"><span class="catdot c-nigiri"></span><span class="catdot c-maki"></span><span class="catdot c-sashimi"></span></span>';
+  return frame('back aid','<div class="aidh" style="background:'+PCOL[i]+'">A round</div>'+
+    row(img('ing-R'),'Morning','collect your Each round bonuses')+
+    row(img('chef-'+CHARS[i].art),'Place chefs','one at a time, clockwise')+
+    row(img('st-belt'),'Belt turns','last lap leaves, the rest slide right','+1'+W)+
+    row(img('ing-W'),'Catch-up','6+ behind: +1'+W+' · 15+: +2'+W)+
+    '<div class="aidh" style="background:'+PCOL[i]+'">Closing</div>'+
+    row(img('st-head'),'Plates','VP printed on each dish')+
+    row(sets,'Sets','each Nigiri + Maki + Sashimi','4 VP')+
+    row('<span class="regdot"></span>','Regulars','VP on each one won')+
+    row('<span class="bchip">×1</span>','Bonuses','closing effects on your dishes')+
+    row(img('ing-R'),'Leftovers','every 3 ingredients','1 VP')+
+    row('<span class="minus">−1</span>','Unserved','each order still held','−1 VP'));
 }
 
 function eventFront(e){
@@ -249,7 +260,19 @@ img{display:block}
 .aid .trim{padding:5mm 5mm 4mm;display:flex;flex-direction:column;gap:1.6mm;font-size:2.65mm;line-height:1.3}
 .aidh{color:#fff;font-family:var(--disp);font-size:3.6mm;padding:1mm 2.5mm;border-radius:1.2mm}
 .aidh.small{font-size:3mm}
-.aid ol{margin:0;padding-left:4mm;display:flex;flex-direction:column;gap:1mm}.aid p{margin:0}
+.aid .trim{gap:.9mm;padding-top:4mm}
+.aid .aidh{font-size:3.2mm;padding:.7mm 2.4mm}
+.wi{width:3mm;height:3mm;object-fit:contain;vertical-align:-.7mm;display:inline}
+.arow{display:flex;align-items:center;gap:1.6mm;font-size:2.45mm;line-height:1.15;min-height:5.2mm}
+.ai{flex:none;width:5.2mm;height:5.2mm;border-radius:50%;background:#fff;box-shadow:0 0 0 .3mm var(--paper-2);display:flex;align-items:center;justify-content:center;overflow:hidden}
+.ai img{width:4.6mm;height:4.6mm;object-fit:contain}
+.ai img[src*="chef-"]{width:100%;height:100%;object-fit:cover}
+.at{flex:1;min-width:0}.at b{font-weight:900}
+.av{flex:none;font-family:var(--disp);font-size:2.7mm;color:var(--ink);display:flex;align-items:center;gap:.4mm}
+.tri{display:flex;gap:.3mm}.tri .catdot{width:1.6mm;height:1.6mm;box-shadow:none}
+.ai .regdot{width:3mm;height:3mm;border-width:.6mm}
+.bchip{font-family:var(--disp);font-size:2.2mm;color:#fff;background:var(--indigo);border-radius:2mm;padding:.2mm .8mm}
+.minus{font-family:var(--disp);font-size:2.6mm;color:var(--lac)}
 
 /* ---------- print sheets ---------- */
 .sheet{position:relative;width:210mm;height:297mm;overflow:hidden;page-break-after:always;break-after:page}
