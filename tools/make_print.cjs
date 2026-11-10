@@ -230,8 +230,7 @@ function iceCard(){
 function roundsCard(){
   const lan=i=>'<span class="lan'+(EVENT_ROUNDS.includes(i)?' ev':'')+'"><b>'+i+'</b>'+(EVENT_ROUNDS.includes(i)?'<small>event</small>':'')+'</span>';
   return frame('stn roundc','<div class="hd"><span class="kind">Track · 回</span>'+nmHTML('Rounds')+'</div>'+
-    '<div class="lrow">'+[1,2,3,4].map(lan).join('')+'</div><div class="lrow">'+[5,6,7].map(lan).join('')+'</div>'+
-    '<div class="beltnote"><b>The belt</b>Deal 5 dishes in a row beside this card, newest on the left. Put the last-lap token on the right-hand dish.</div>');
+    '<div class="lgrid">'+[[1,2,3],[4,5],[6,7]].map(r=>'<div class="lrow">'+r.map(lan).join('')+'</div>').join('')+'</div>');
 }
 function stationBack(){return frame('back stnback','<div class="disc"><span class="jp">厨房</span><span class="en">KITCHEN</span></div>');}
 const travelFronts=()=>[iceCard(),...LOCS.map(stationCard),roundsCard()];
@@ -439,11 +438,9 @@ img{display:block}
 .icec{background:linear-gradient(rgba(255,255,255,.3),rgba(255,255,255,.3)),url(art/tex-ice-cover.webp) center/cover}
 .icec .hd{--cat:#4f6f7a}.icec .stxt{color:#2c3c42}
 .roundc .hd{--cat:var(--lac-2)}
-.lrow{position:absolute;left:0;right:0;display:flex;justify-content:center;gap:1.6mm}
-.lrow:nth-of-type(2){top:23mm}.lrow:nth-of-type(3){top:41mm}
-.roundc .lan{width:12.5mm;height:16.5mm}
-.beltnote{position:absolute;left:4mm;right:4mm;bottom:4mm;border-radius:2.4mm;background:rgba(255,255,255,.6);box-shadow:inset 0 0 0 .45mm var(--wood-dk);padding:2mm 2.6mm;font-size:2.8mm;line-height:1.3;color:var(--ink-2);font-weight:500}
-.beltnote b{display:block;font-size:2.2mm;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--wood-dk);margin-bottom:.6mm}
+.lgrid{position:absolute;left:0;right:0;top:21mm;bottom:3mm;display:flex;flex-direction:column;justify-content:space-evenly}
+.lrow{display:flex;justify-content:center;gap:4mm}
+.roundc .lan{width:15mm;height:19.5mm;padding-top:2mm}.roundc .lan b{font-size:6mm}.roundc .lan small{font-size:1.9mm}
 .stnback{background:linear-gradient(rgba(0,0,0,.1),rgba(0,0,0,.15)),url(art/tex-table.webp) 0 0/90mm,#7a532b}
 .stnback .disc{box-shadow:inset 0 0 0 .8mm #ffd27a;background:rgba(43,31,20,.55)}
 
